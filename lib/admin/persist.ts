@@ -57,14 +57,38 @@ export async function commitFile(opts: {
   return res.data.commit.sha || "";
 }
 
-/** Dispara el webhook de Coolify para redeploy (configurado por env). */
-export async function triggerRedeploy(): Promise<{ ok: boolean; status?: number }> {
-  const url = process.env.COOLIFY_DEPLOY_WEBHOOK;
-  if (!url) return { ok: false };
+/**
+ * Dispara redeploy en Coolify v3 vía API REST (login programático + deploy).
+ * Requiere COOLIFY_URL, COOLIFY_APP_ID, COOLIFY_EMAIL, COOLIFY_PASSWORD.
+ */
+export async function triggerRedeploy(): Promise<{ ok: boolean; buildId?: string; error?: string }> {
+  const url = process.env.COOLIFY_URL;
+  const appId = process.env.COOLIFY_APP_ID;
+  const email = process.env.COOLIFY_EMAIL;
+  const password = process.env.COOLIFY_PASSWORD;
+  if (!url || !appId || !email || !password) return { ok: false, error: "Coolify env vars no configuradas" };
+
   try {
-    const res = await fetch(url, { method: "GET", cache: "no-store" });
-    return { ok: res.ok, status: res.status };
-  } catch {
-    return { ok: false };
+    const loginRes = await fetch(`${url}/api/v1/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password, isLogin: true }),
+      cache: "no-store",
+    });
+    if (!loginRes.ok) return { ok: false, error: `login ${loginRes.status}` };
+    const { token } = (await loginRes.json()) as { token?: string };
+    if (!token) return { ok: false, error: "login sin token" };
+
+    const deployRes = await fetch(`${url}/api/v1/applications/${appId}/deploy`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+      body: "{}",
+      cache: "no-store",
+    });
+    if (!deployRes.ok) return { ok: false, error: `deploy ${deployRes.status}` };
+    const data = (await deployRes.json()) as { buildId?: string };
+    return { ok: true, buildId: data.buildId };
+  } catch (e: unknown) {
+    return { ok: false, error: String((e as Error)?.message || e).slice(0, 200) };
   }
 }
