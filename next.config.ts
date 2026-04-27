@@ -9,6 +9,9 @@ const config: NextConfig = {
   // Evita que Next infiera el workspace root mirando al lockfile del HOME.
   outputFileTracingRoot: path.join(__dirname),
   images: {
+    // Sin sharp en el runtime alpine. Las imágenes ya están a tamaño
+    // razonable (~1600px) — sirvelas tal cual sin optimización en runtime.
+    unoptimized: true,
     remotePatterns: [
       { protocol: "https", hostname: "hubstartidea.es" },
       { protocol: "https", hostname: "startidea.es" },
