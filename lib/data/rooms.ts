@@ -24,6 +24,8 @@ export type Room = {
   highlight?: string;
   /** Identificador en el plano (Aula 1..6, Biblioteca, etc.) */
   planLabel: string;
+  /** Imagen representativa de la sala (relativa a /public). */
+  image: string;
 };
 
 export const rooms: Room[] = [
@@ -47,6 +49,7 @@ export const rooms: Room[] = [
     ],
     highlight: "Más solicitada",
     planLabel: "Aula 6",
+    image: "/images/rooms/cc33.jpg",
   },
   {
     slug: "serendipia",
@@ -66,6 +69,7 @@ export const rooms: Room[] = [
       "Wifi de fibra",
     ],
     planLabel: "Biblioteca / Sala alumnos",
+    image: "/images/rooms/serendipia.jpg",
   },
   {
     slug: "socrates",
@@ -85,6 +89,7 @@ export const rooms: Room[] = [
       "Wifi de fibra",
     ],
     planLabel: "Aula 2",
+    image: "/images/rooms/socrates.jpg",
   },
   {
     slug: "aula-3",
@@ -99,6 +104,7 @@ export const rooms: Room[] = [
     uses: ["Cursos", "Talleres", "Sesiones colaborativas"],
     equipment: ["Proyector", "Pizarra", "Wifi de fibra", "Climatización"],
     planLabel: "Aula 3",
+    image: "/images/rooms/aula-3.jpg",
   },
   {
     slug: "aula-1",
@@ -113,6 +119,7 @@ export const rooms: Room[] = [
     uses: ["Eventos", "Encuentros", "Networking", "Asambleas"],
     equipment: ["Proyector", "Pantalla", "Wifi de fibra", "Mobiliario móvil"],
     planLabel: "Aula 1",
+    image: "/images/rooms/aula-1.jpg",
   },
   {
     slug: "estudio-podcast",
@@ -133,6 +140,7 @@ export const rooms: Room[] = [
     ],
     highlight: "Granada Social",
     planLabel: "Aula 5",
+    image: "/images/rooms/estudio-podcast.jpg",
   },
   {
     slug: "coworking-open",
@@ -153,6 +161,7 @@ export const rooms: Room[] = [
       "Zona de descanso",
     ],
     planLabel: "Pasillo 2 / Zona común",
+    image: "/images/rooms/coworking-open.jpg",
   },
   {
     slug: "office-privado",
@@ -167,6 +176,7 @@ export const rooms: Room[] = [
     uses: ["Equipo pequeño", "Consultas", "Trabajo confidencial"],
     equipment: ["Mesa de trabajo", "Wifi de fibra", "Acceso 24/7 (a convenir)"],
     planLabel: "Sala Profesores / Administración",
+    image: "/images/rooms/office-privado.jpg",
   },
 ];
 

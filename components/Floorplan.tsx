@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { motion } from "framer-motion";
 import { Users, Maximize2, ArrowRight } from "lucide-react";
 import Link from "next/link";
@@ -214,8 +215,23 @@ export function Floorplan() {
                 key={active.slug}
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="rounded-3xl border border-[var(--color-line)] bg-[var(--color-paper)] p-8 shadow-[var(--shadow-soft)]"
+                className="overflow-hidden rounded-3xl border border-[var(--color-line)] bg-[var(--color-paper)] shadow-[var(--shadow-soft)]"
               >
+                <div className="relative aspect-[16/10] w-full overflow-hidden bg-[var(--color-paper-2)]">
+                  <Image
+                    src={active.image}
+                    alt={`${active.name} — ${active.subtitle}`}
+                    fill
+                    sizes="(min-width: 1024px) 40vw, 100vw"
+                    className="object-cover"
+                  />
+                  {active.highlight && (
+                    <span className="absolute left-5 top-5 rounded-full bg-[var(--color-coral-500)] px-3 py-1 text-xs font-medium text-white shadow-sm">
+                      {active.highlight}
+                    </span>
+                  )}
+                </div>
+                <div className="p-8">
                 <div className="flex items-start justify-between gap-4">
                   <div>
                     <div className="text-xs uppercase tracking-[0.18em] text-[var(--color-coral-600)]">
@@ -225,11 +241,6 @@ export function Floorplan() {
                       {active.name}
                     </h3>
                   </div>
-                  {active.highlight && (
-                    <span className="rounded-full bg-[var(--color-coral-500)] px-3 py-1 text-xs font-medium text-white">
-                      {active.highlight}
-                    </span>
-                  )}
                 </div>
 
                 <div className="mt-6 grid grid-cols-2 gap-4">
@@ -258,6 +269,7 @@ export function Floorplan() {
                   Ver detalle de {active.name}
                   <ArrowRight size={14} />
                 </Link>
+                </div>
               </motion.div>
             ) : (
               <div className="rounded-3xl border border-dashed border-[var(--color-line)] bg-transparent p-8">

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, Maximize2, Users, MapPin } from "lucide-react";
@@ -53,6 +54,17 @@ export default async function SalaPage({ params }: Props) {
           </div>
         </header>
 
+        <div className="mt-12 relative aspect-[21/9] overflow-hidden rounded-3xl bg-[var(--color-paper-2)]">
+          <Image
+            src={room.image}
+            alt={`${room.name} — ${room.subtitle}`}
+            fill
+            sizes="(min-width: 1280px) 1280px, 100vw"
+            priority
+            className="object-cover"
+          />
+        </div>
+
         <div className="mt-16 grid gap-px overflow-hidden rounded-3xl border border-[var(--color-line)] bg-[var(--color-line)] sm:grid-cols-2 lg:grid-cols-4">
           <Spec icon={<Maximize2 size={16} />} label="Superficie" value={`${room.area} m²`} />
           <Spec
@@ -105,13 +117,24 @@ export default async function SalaPage({ params }: Props) {
               <Link
                 key={r.slug}
                 href={`/salas/${r.slug}`}
-                className="rounded-2xl border border-[var(--color-line)] bg-[var(--color-paper)] p-6 transition hover:border-[var(--color-ink)]"
+                className="group overflow-hidden rounded-2xl border border-[var(--color-line)] bg-[var(--color-paper)] transition hover:border-[var(--color-ink)]"
               >
-                <div className="text-xs uppercase tracking-[0.18em] text-[var(--color-coral-600)]">
-                  {r.subtitle}
+                <div className="relative aspect-[16/10] overflow-hidden bg-[var(--color-paper-2)]">
+                  <Image
+                    src={r.image}
+                    alt={`${r.name} — ${r.subtitle}`}
+                    fill
+                    sizes="(min-width: 768px) 33vw, 100vw"
+                    className="object-cover transition duration-500 group-hover:scale-[1.03]"
+                  />
                 </div>
-                <div className="mt-2 font-display text-xl tracking-tight">{r.name}</div>
-                <div className="mt-3 text-sm text-[var(--color-mute)]">{r.short}</div>
+                <div className="p-6">
+                  <div className="text-xs uppercase tracking-[0.18em] text-[var(--color-coral-600)]">
+                    {r.subtitle}
+                  </div>
+                  <div className="mt-2 font-display text-xl tracking-tight">{r.name}</div>
+                  <div className="mt-3 text-sm text-[var(--color-mute)]">{r.short}</div>
+                </div>
               </Link>
             ))}
           </div>

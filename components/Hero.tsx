@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowRight, MapPin } from "lucide-react";
@@ -10,8 +11,16 @@ const words = ["Coworking", "formación", "podcast", "comunidad"];
 export function Hero() {
   return (
     <section className="relative isolate overflow-hidden pt-32 pb-24 md:pt-40 md:pb-32">
-      {/* Mesh gradient background */}
+      {/* Foto de Granada de fondo + mesh gradient encima */}
       <div aria-hidden className="absolute inset-0 -z-10">
+        <Image
+          src="/images/hero-granada.jpg"
+          alt=""
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover opacity-25"
+        />
         <div className="mesh-blob absolute -left-40 top-20 h-[520px] w-[520px] rounded-full bg-[var(--color-coral-300)]/40 blur-[120px]" />
         <div
           className="mesh-blob absolute right-[-160px] top-40 h-[480px] w-[480px] rounded-full bg-[var(--color-moss-500)]/30 blur-[120px]"
@@ -21,7 +30,7 @@ export function Hero() {
           className="mesh-blob absolute bottom-[-120px] left-1/3 h-[420px] w-[420px] rounded-full bg-[var(--color-coral-500)]/25 blur-[120px]"
           style={{ animationDelay: "-12s" }}
         />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,transparent_0%,var(--color-paper)_70%)]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[var(--color-paper)]/30 via-[var(--color-paper)]/60 to-[var(--color-paper)]" />
       </div>
 
       <div className="container-page">

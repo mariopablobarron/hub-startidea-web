@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, Maximize2, Users } from "lucide-react";
 import { rooms } from "@/lib/data/rooms";
@@ -29,8 +30,24 @@ export default function SalasPage() {
           <Link
             key={room.slug}
             href={`/salas/${room.slug}`}
-            className="group flex flex-col gap-6 rounded-3xl border border-[var(--color-line)] bg-[var(--color-paper)] p-8 transition hover:border-[var(--color-ink)]"
+            className="group flex flex-col overflow-hidden rounded-3xl border border-[var(--color-line)] bg-[var(--color-paper)] transition hover:border-[var(--color-ink)]"
           >
+            <div className="relative aspect-[16/10] w-full overflow-hidden bg-[var(--color-paper-2)]">
+              <Image
+                src={room.image}
+                alt={`${room.name} — ${room.subtitle}`}
+                fill
+                sizes="(min-width: 768px) 50vw, 100vw"
+                className="object-cover transition duration-500 group-hover:scale-[1.03]"
+              />
+              {room.highlight && (
+                <span className="absolute left-5 top-5 rounded-full bg-[var(--color-coral-500)] px-3 py-1 text-xs font-medium text-white shadow-sm">
+                  {room.highlight}
+                </span>
+              )}
+            </div>
+
+            <div className="flex flex-col gap-6 p-8">
             <div className="flex items-start justify-between gap-4">
               <div>
                 <div className="text-xs uppercase tracking-[0.18em] text-[var(--color-coral-600)]">
@@ -40,11 +57,6 @@ export default function SalasPage() {
                   {room.name}
                 </h2>
               </div>
-              {room.highlight && (
-                <span className="rounded-full bg-[var(--color-coral-50)] px-3 py-1 text-xs font-medium text-[var(--color-coral-700)]">
-                  {room.highlight}
-                </span>
-              )}
             </div>
 
             <p className="text-[var(--color-mute)]">{room.short}</p>
@@ -67,6 +79,7 @@ export default function SalasPage() {
               <span className="grid h-9 w-9 place-items-center rounded-full border border-[var(--color-line)] transition group-hover:border-[var(--color-ink)] group-hover:bg-[var(--color-ink)] group-hover:text-[var(--color-paper)]">
                 <ArrowRight size={14} />
               </span>
+            </div>
             </div>
           </Link>
         ))}

@@ -32,8 +32,19 @@ export const metadata: Metadata = {
     siteName: site.name,
     title: `${site.name} — Coworking en el centro de Granada`,
     description: site.description,
+    images: [
+      {
+        url: "/images/og/og-default.jpg",
+        width: 1200,
+        height: 630,
+        alt: site.name,
+      },
+    ],
   },
-  twitter: { card: "summary_large_image" },
+  twitter: {
+    card: "summary_large_image",
+    images: ["/images/og/og-default.jpg"],
+  },
   alternates: { canonical: site.url },
 };
 
