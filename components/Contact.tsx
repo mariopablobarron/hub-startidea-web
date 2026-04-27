@@ -1,6 +1,9 @@
 import Link from "next/link";
 import { Phone, Mail, MapPin, ArrowRight, Clock } from "lucide-react";
-import { site } from "@/lib/site";
+import { content } from "@/lib/content";
+
+const site = content.site;
+const contact = content.contact;
 
 export function Contact() {
   return (
@@ -10,15 +13,13 @@ export function Contact() {
           <div className="grid gap-12 p-10 md:grid-cols-[1.4fr_1fr] md:p-16">
             <div>
               <span className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.18em] text-white/80">
-                <span className="h-px w-8 bg-white" /> Reserva tu visita
+                <span className="h-px w-8 bg-white" /> {contact.eyebrow}
               </span>
               <h2 className="mt-4 max-w-xl font-display text-4xl tracking-tight md:text-5xl">
-                Pásate por el HUB. Te invitamos al café.
+                {contact.title}
               </h2>
               <p className="mt-6 max-w-lg text-white/85">
-                La mejor manera de saber si encajas es venir un rato. Te
-                enseñamos las salas, te presentamos a quien esté esa mañana y
-                contestamos cualquier pregunta sobre tarifas y disponibilidad.
+                {contact.description}
               </p>
               <div className="mt-10 flex flex-wrap gap-3">
                 <a
@@ -45,12 +46,12 @@ export function Contact() {
                 {site.address.postal} {site.address.city}
               </InfoCard>
               <InfoCard icon={<Clock size={16} />} label="Horario">
-                Lunes a viernes, 9:00–20:00
-                <br />
-                Eventos: bajo reserva
+                {contact.schedule.split("\n").map((line, i, arr) => (
+                  <span key={i}>{line}{i < arr.length - 1 && <br />}</span>
+                ))}
               </InfoCard>
               <InfoCard icon={<MapPin size={16} />} label="Cómo llegar">
-                Centro de Granada · 5 min andando del Realejo · paradas LAC, parking Puerta Real.
+                {contact.directions}
               </InfoCard>
             </div>
           </div>

@@ -2,7 +2,11 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Mic, Radio, Video, ArrowRight } from "lucide-react";
+import { Mic, ArrowRight } from "lucide-react";
+import { content } from "@/lib/content";
+import { getIcon } from "@/lib/icons";
+
+const podcast = content.podcast;
 
 export function Podcast() {
   return (
@@ -25,25 +29,25 @@ export function Podcast() {
 
           {/* Texto */}
           <div>
-            <span className="eyebrow">Estudio podcast</span>
+            <span className="eyebrow">{podcast.eyebrow}</span>
             <h2 className="mt-4 text-4xl tracking-tight md:text-5xl">
-              Da voz a tu proyecto. <em className="font-display italic text-[var(--color-coral-600)]">Literalmente.</em>
+              {podcast.titleStart}<em className="font-display italic text-[var(--color-coral-600)]">{podcast.titleEm}</em>
             </h2>
             <p className="mt-6 max-w-xl text-lg text-[var(--color-mute)]">
-              Estudio profesional con tratamiento acústico, mesa de mezclas y
-              cuatro micros listos para grabar tu podcast, programa de radio o
-              entrevista en vídeo. Te ayudamos también con la edición y la
-              distribución si lo necesitas.
+              {podcast.description}
             </p>
 
             <ul className="mt-10 space-y-4">
-              <Feature icon={<Radio size={16} />} title="Grabación de podcast" desc="Episodios listos para publicar en Spotify, iVoox, Apple Podcasts." />
-              <Feature icon={<Video size={16} />} title="Vídeo entrevista" desc="Doble cámara, iluminación de estudio y captura sincronizada." />
-              <Feature icon={<Mic size={16} />} title="Voiceover" desc="Cabina insonorizada para locuciones publicitarias y narrativas." />
+              {podcast.features.map((f) => {
+                const Icon = getIcon(f.icon);
+                return (
+                  <Feature key={f.title} icon={<Icon size={16} />} title={f.title} desc={f.desc} />
+                );
+              })}
             </ul>
 
             <Link href="#contacto" className="mt-10 inline-flex items-center gap-2 text-sm font-medium text-[var(--color-coral-600)] hover:text-[var(--color-coral-700)]">
-              Reserva una sesión
+              {podcast.cta}
               <ArrowRight size={14} />
             </Link>
           </div>

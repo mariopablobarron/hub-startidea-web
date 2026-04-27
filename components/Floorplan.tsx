@@ -5,8 +5,10 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import { Users, Maximize2, ArrowRight } from "lucide-react";
 import Link from "next/link";
-import { rooms, type Room } from "@/lib/data/rooms";
+import { rooms, type Room, content } from "@/lib/content";
 import { cn } from "@/lib/cn";
+
+const tour = content.tour;
 
 /**
  * Plano esquemático del HUB. Las coordenadas son simbólicas (no a escala
@@ -66,15 +68,13 @@ export function Floorplan() {
       <div className="container-page">
         <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div>
-            <span className="eyebrow">Tour del local</span>
+            <span className="eyebrow">{tour.eyebrow}</span>
             <h2 className="mt-4 max-w-2xl text-4xl tracking-tight md:text-5xl">
-              Pasa por cada sala sin moverte de la silla.
+              {tour.title}
             </h2>
           </div>
           <p className="max-w-md text-[var(--color-mute)]">
-            Toca cualquier zona del plano para ver su tamaño, capacidad y
-            equipamiento. ¿Prefieres venir? Acércate a saludar y te lo
-            enseñamos en directo.
+            {tour.description}
           </p>
         </div>
 

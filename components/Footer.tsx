@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { Instagram, Facebook, Phone, Mail, MapPin } from "lucide-react";
-import { site } from "@/lib/site";
+import { content } from "@/lib/content";
+
+const site = content.site;
 
 export function Footer() {
   return (

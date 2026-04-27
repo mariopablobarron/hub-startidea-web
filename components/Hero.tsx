@@ -4,9 +4,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowRight, MapPin } from "lucide-react";
-import { site } from "@/lib/site";
+import { content } from "@/lib/content";
 
-const words = ["Coworking", "formación", "podcast", "comunidad"];
+const hero = content.hero;
+const words = hero.rotatingWords;
 
 export function Hero() {
   return (
@@ -40,14 +41,14 @@ export function Hero() {
           transition={{ duration: 0.6 }}
           className="flex items-center gap-3"
         >
-          <span className="eyebrow">HUB Startidea · Granada</span>
+          <span className="eyebrow">{hero.eyebrow}</span>
         </motion.div>
 
         <h1 className="mt-6 max-w-5xl text-5xl leading-[0.95] tracking-tight md:text-7xl lg:text-[88px]">
           <RevealLines>
-            <>El espacio donde se cocina la </>
-            <em className="font-display italic text-[var(--color-coral-600)]">innovación social</em>
-            <> en el centro de Granada.</>
+            <>{hero.titleStart}</>
+            <em className="font-display italic text-[var(--color-coral-600)]">{hero.titleEm}</em>
+            <>{hero.titleEnd}</>
           </RevealLines>
         </h1>
 
@@ -57,8 +58,7 @@ export function Hero() {
           transition={{ duration: 0.6, delay: 0.4 }}
           className="mt-8 max-w-2xl text-lg text-[var(--color-mute)] md:text-xl"
         >
-          Coworking, salas de formación, estudio de podcast y una comunidad de
-          proyectos que cambian las cosas. 330 m² en C/ Conde Cifuentes, 33.
+          {hero.subtitle}
         </motion.p>
 
         <motion.div
@@ -68,31 +68,32 @@ export function Hero() {
           className="mt-10 flex flex-wrap items-center gap-3"
         >
           <Link href="#contacto" className="btn-primary">
-            Reserva tu visita
+            {hero.ctaPrimary}
             <ArrowRight size={16} />
           </Link>
           <Link href="#tour" className="btn-ghost">
-            Ver el local
+            {hero.ctaSecondary}
             <MapPin size={16} />
           </Link>
         </motion.div>
 
         {/* Tags rotativos */}
         <div className="mt-16 flex items-center gap-2 text-sm text-[var(--color-mute)]">
-          <span className="font-medium uppercase tracking-wider text-[var(--color-ink)]/60">Aquí pasa de todo:</span>
+          <span className="font-medium uppercase tracking-wider text-[var(--color-ink)]/60">{hero.rotatingTagline}</span>
           <RotatingWords items={words} />
         </div>
 
         {/* Stats */}
         <div className="mt-16 grid grid-cols-2 gap-y-8 border-t border-[var(--color-line)] pt-10 md:grid-cols-4">
-          <Stat value="330" suffix="m²" label="Espacio útil" />
-          <Stat value="6" label="Aulas multifunción" />
-          <Stat value="1" label="Estudio de podcast" />
-          <Stat
-            value={site.address.city}
-            label="Centro · accesible"
-            isText
-          />
+          {hero.stats.map((s, i) => (
+            <Stat
+              key={i}
+              value={s.value}
+              suffix={"suffix" in s ? (s as { suffix?: string }).suffix : undefined}
+              label={s.label}
+              isText={"isText" in s ? (s as { isText?: boolean }).isText : undefined}
+            />
+          ))}
         </div>
       </div>
     </section>

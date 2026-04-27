@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, Maximize2, Users, MapPin } from "lucide-react";
-import { rooms, getRoom } from "@/lib/data/rooms";
+import { rooms, getRoom } from "@/lib/content";
 
 type Props = { params: Promise<{ slug: string }> };
 

@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowUpRight, Maximize2, Users } from "lucide-react";
-import { rooms } from "@/lib/data/rooms";
+import { rooms } from "@/lib/content";
 
 export function RoomsGrid() {
   const featured = rooms.filter((r) => r.category !== "comun").slice(0, 6);
