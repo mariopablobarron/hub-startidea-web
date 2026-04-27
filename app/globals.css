@@ -1,0 +1,108 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-display: "Fraunces", ui-serif, Georgia, serif;
+
+  --color-ink: #0a0a0b;
+  --color-ink-2: #1a1a1d;
+  --color-ink-3: #2a2a2e;
+  --color-paper: #faf8f4;
+  --color-paper-2: #f1ede5;
+  --color-mute: #6b6b6b;
+  --color-line: #e6e1d6;
+  --color-line-dark: #2a2a2e;
+
+  /* Coral cálido — Granada, sol, energía emprendedora */
+  --color-coral-50: #fff3ed;
+  --color-coral-100: #ffe0d0;
+  --color-coral-300: #ffae84;
+  --color-coral-500: #ff6b35;
+  --color-coral-600: #ed4f15;
+  --color-coral-700: #c43c0d;
+
+  /* Verde innovación social */
+  --color-moss-500: #4a9d7f;
+  --color-moss-600: #38826a;
+
+  --shadow-soft: 0 1px 2px rgb(10 10 11 / 0.04), 0 4px 16px rgb(10 10 11 / 0.06);
+  --shadow-glow: 0 0 0 1px rgb(255 107 53 / 0.2), 0 8px 32px rgb(255 107 53 / 0.16);
+}
+
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-feature-settings: "ss01", "cv11";
+  }
+
+  ::selection {
+    background: var(--color-coral-500);
+    color: white;
+  }
+
+  h1, h2, h3 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+}
+
+@layer components {
+  .container-page {
+    @apply mx-auto w-full max-w-7xl px-6 md:px-10;
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-full bg-[var(--color-ink)] px-6 py-3 text-sm font-medium text-[var(--color-paper)] transition hover:bg-[var(--color-coral-600)];
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 rounded-full border border-[var(--color-line)] bg-transparent px-6 py-3 text-sm font-medium text-[var(--color-ink)] transition hover:border-[var(--color-ink)];
+  }
+
+  .eyebrow {
+    @apply inline-flex items-center gap-2 text-xs font-medium uppercase tracking-[0.18em] text-[var(--color-mute)];
+  }
+
+  .eyebrow::before {
+    content: "";
+    @apply h-px w-8 bg-[var(--color-coral-500)];
+  }
+}
+
+/* mesh gradient animado del hero */
+@keyframes mesh-drift {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  33% { transform: translate3d(4%, -2%, 0) scale(1.04); }
+  66% { transform: translate3d(-3%, 3%, 0) scale(0.98); }
+}
+
+.mesh-blob {
+  animation: mesh-drift 18s ease-in-out infinite;
+  will-change: transform;
+}
+
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.marquee-track {
+  animation: marquee 40s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mesh-blob, .marquee-track { animation: none; }
+}
