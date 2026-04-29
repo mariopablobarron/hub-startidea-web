@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { auth, signOut } from "@/auth";
-import { LogOut, Home, MessageSquareQuote, Sparkles, Phone, LayoutGrid, Settings } from "lucide-react";
+import { LogOut, Home, MessageSquareQuote, Sparkles, Phone, LayoutGrid, Settings, BookOpen, MessageSquare } from "lucide-react";
 
 export const metadata = { title: "Admin · HUB Startidea", robots: "noindex" };
 
@@ -20,6 +20,8 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     { href: "/admin/comunidad", label: "Comunidad", icon: Sparkles },
     { href: "/admin/contacto", label: "Contacto", icon: Phone },
     { href: "/admin/sitio", label: "Datos del sitio", icon: Settings },
+    { href: "/admin/faq", label: "FAQ chatbot", icon: BookOpen },
+    { href: "/admin/conversaciones", label: "Conversaciones", icon: MessageSquare },
   ];
 
   return (

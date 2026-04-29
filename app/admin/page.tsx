@@ -9,6 +9,8 @@ export default function AdminDashboard() {
     { href: "/admin/comunidad", title: "Comunidad", desc: "Texto y los 3 pilares de la sección Comunidad." },
     { href: "/admin/contacto", title: "Contacto", desc: "Texto del CTA final, horario y direcciones." },
     { href: "/admin/sitio", title: "Datos del sitio", desc: "Email, teléfono, dirección, redes sociales." },
+    { href: "/admin/faq", title: "FAQ chatbot", desc: "Tarifas, horarios y respuestas que el bot público usa para responder." },
+    { href: "/admin/conversaciones", title: "Conversaciones", desc: "Histórico de chats. Aprende qué te preguntan los visitantes." },
   ];
 
   return (

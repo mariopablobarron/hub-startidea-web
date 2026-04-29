@@ -1,0 +1,111 @@
+{
+  "_meta": {
+    "description": "Datos que el chatbot público usa para responder. Editable desde /admin/faq. Cada cambio aquí se commitea a GitHub y dispara un redeploy.",
+    "lastUpdated": "2026-04-29",
+    "version": 1
+  },
+  "tariffs": {
+    "_note": "PENDIENTE: rellenar con tarifas reales. Mientras estén vacíos, el bot derivará al humano.",
+    "coworkingOpen": {
+      "perDay": null,
+      "perWeek": null,
+      "perMonth": null,
+      "packs": [],
+      "notes": ""
+    },
+    "officePrivate": {
+      "perMonth": null,
+      "minStay": "",
+      "notes": ""
+    },
+    "rooms": {
+      "cc33": {
+        "perHour": null,
+        "halfDay": null,
+        "fullDay": null,
+        "event": null,
+        "minBooking": "",
+        "notes": ""
+      },
+      "serendipia": {
+        "perHour": null,
+        "halfDay": null,
+        "fullDay": null,
+        "minBooking": "",
+        "notes": ""
+      },
+      "socrates": {
+        "perHour": null,
+        "halfDay": null,
+        "fullDay": null,
+        "notes": ""
+      },
+      "aula-1": {
+        "perHour": null,
+        "halfDay": null,
+        "fullDay": null,
+        "event": null,
+        "notes": ""
+      },
+      "aula-3": {
+        "perHour": null,
+        "halfDay": null,
+        "fullDay": null,
+        "notes": ""
+      },
+      "estudio-podcast": {
+        "perHour": null,
+        "session2h": null,
+        "editedEpisode": null,
+        "notes": ""
+      }
+    },
+    "discounts": [],
+    "trial": ""
+  },
+  "schedule": {
+    "openHours": "Lunes a viernes, 9:00 a 20:00",
+    "weekend": "Eventos bajo reserva",
+    "access24h": "",
+    "holidays": ""
+  },
+  "location": {
+    "address": "C/ Conde Cifuentes 33, 18005 Granada",
+    "neighborhood": "Centro · Realejo",
+    "publicTransport": "Paradas LAC en Puerta Real (5 min andando) y Acera del Darro",
+    "parking": "Parking subterráneo Puerta Real (~150 m), parking Caleta",
+    "accessibility": "Edificio accesible: sin barreras en planta principal y baño adaptado"
+  },
+  "policies": {
+    "pets": "",
+    "smoking": "Edificio sin humo",
+    "kitchen": "Zona de café e infusiones gratis · microondas y nevera de uso común",
+    "wifi": "Fibra simétrica 600 Mbps"
+  },
+  "extras": [],
+  "frequentQuestions": [
+    {
+      "q": "¿Puedo probar un día antes de contratar?",
+      "a": "PENDIENTE — confirmar política de trial."
+    },
+    {
+      "q": "¿Hay algún descuento para cooperativas o ONG?",
+      "a": "PENDIENTE — confirmar."
+    },
+    {
+      "q": "¿Puedo grabar un podcast por horas o solo por sesiones largas?",
+      "a": "PENDIENTE — confirmar."
+    }
+  ],
+  "handoff": {
+    "whatsappNumber": "+34958045789",
+    "whatsappMessage": "Hola, vengo desde la web del HUB Startidea. Me gustaría hablar contigo sobre…",
+    "email": "hola@hubstartidea.es",
+    "triggers": [
+      "Quiero reservar / contratar",
+      "Necesito una cifra exacta de presupuesto",
+      "Tengo un caso fuera de lo habitual",
+      "Quiero hablar con una persona"
+    ]
+  }
+}
