@@ -1,9 +1,12 @@
 import { content } from "@/lib/content";
 import { updateHero } from "@/lib/admin/actions";
-import { Field, Input, Textarea, SaveBar, PageHeader } from "../_components/Field";
+import { Field, Input, Textarea, SaveBar, PageHeader, FlashBanner } from "../_components/Field";
 
-export default function HeroAdmin() {
+type Props = { searchParams: Promise<{ saved?: string; error?: string }> };
+
+export default async function HeroAdmin({ searchParams }: Props) {
   const h = content.hero;
+  const sp = await searchParams;
 
   return (
     <form action={updateHero} className="space-y-6">
@@ -12,6 +15,7 @@ export default function HeroAdmin() {
         back={{ href: "/admin", label: "Dashboard" }}
         description="Lo primero que ve un visitante. El bloque grande del título y el subtítulo."
       />
+      <FlashBanner saved={sp.saved === "1"} error={sp.error} />
 
       <section className="space-y-4 rounded-2xl border border-[var(--color-line)] bg-[var(--color-paper)] p-6">
         <Field label="Eyebrow" hint="Texto pequeño en mayúsculas sobre el título.">

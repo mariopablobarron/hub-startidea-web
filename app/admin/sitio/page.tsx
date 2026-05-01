@@ -1,9 +1,12 @@
 import { content } from "@/lib/content";
 import { updateSite } from "@/lib/admin/actions";
-import { Field, Input, SaveBar, PageHeader } from "../_components/Field";
+import { Field, Input, SaveBar, PageHeader, FlashBanner } from "../_components/Field";
 
-export default function SiteAdmin() {
+type Props = { searchParams: Promise<{ saved?: string; error?: string }> };
+
+export default async function SiteAdmin({ searchParams }: Props) {
   const s = content.site;
+  const sp = await searchParams;
   return (
     <form action={updateSite} className="space-y-6">
       <PageHeader
@@ -11,6 +14,7 @@ export default function SiteAdmin() {
         back={{ href: "/admin", label: "Dashboard" }}
         description="Email, teléfono, dirección, redes y referencia a la agencia matriz."
       />
+      <FlashBanner saved={sp.saved === "1"} error={sp.error} />
       <section className="space-y-4 rounded-2xl border border-[var(--color-line)] bg-[var(--color-paper)] p-6">
         <div className="grid gap-3 md:grid-cols-2">
           <Field label="Nombre"><Input name="name" defaultValue={s.name} required /></Field>

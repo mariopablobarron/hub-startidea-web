@@ -2,12 +2,16 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 import { content } from "@/lib/content";
 import { updateRoom, uploadRoomImage } from "@/lib/admin/actions";
-import { Field, Input, Textarea, SaveBar, PageHeader } from "../../_components/Field";
+import { Field, Input, Textarea, SaveBar, PageHeader, FlashBanner } from "../../_components/Field";
 
-type Props = { params: Promise<{ slug: string }> };
+type Props = {
+  params: Promise<{ slug: string }>;
+  searchParams: Promise<{ saved?: string; error?: string }>;
+};
 
-export default async function RoomEditPage({ params }: Props) {
+export default async function RoomEditPage({ params, searchParams }: Props) {
   const { slug } = await params;
+  const sp = await searchParams;
   const room = content.rooms.find((r) => r.slug === slug);
   if (!room) notFound();
 
@@ -27,6 +31,7 @@ export default async function RoomEditPage({ params }: Props) {
         title={`Editar sala — ${room.name}`}
         back={{ href: "/admin/salas", label: "Salas" }}
       />
+      <FlashBanner saved={sp.saved === "1"} error={sp.error} />
 
       {/* Subir imagen — formulario aparte */}
       <form action={upload} encType="multipart/form-data" className="space-y-4 rounded-2xl border border-[var(--color-line)] bg-[var(--color-paper)] p-6">

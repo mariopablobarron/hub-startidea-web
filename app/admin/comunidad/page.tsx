@@ -1,11 +1,14 @@
 import { content } from "@/lib/content";
 import { updateCommunity } from "@/lib/admin/actions";
-import { Field, Input, Textarea, SaveBar, PageHeader } from "../_components/Field";
+import { Field, Input, Textarea, SaveBar, PageHeader, FlashBanner } from "../_components/Field";
 
 const ICONS = ["Sparkles", "Heart", "Network", "Users", "Mic", "Radio", "Video", "GraduationCap", "Calendar"];
 
-export default function CommunityAdmin() {
+type Props = { searchParams: Promise<{ saved?: string; error?: string }> };
+
+export default async function CommunityAdmin({ searchParams }: Props) {
   const c = content.community;
+  const sp = await searchParams;
   return (
     <form action={updateCommunity} className="space-y-6">
       <PageHeader
@@ -13,6 +16,7 @@ export default function CommunityAdmin() {
         back={{ href: "/admin", label: "Dashboard" }}
         description="Sección 'No alquilamos metros cuadrados, conectamos personas'."
       />
+      <FlashBanner saved={sp.saved === "1"} error={sp.error} />
 
       <section className="space-y-4 rounded-2xl border border-[var(--color-line)] bg-[var(--color-paper)] p-6">
         <Field label="Eyebrow"><Input name="eyebrow" defaultValue={c.eyebrow} required /></Field>

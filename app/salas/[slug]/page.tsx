@@ -3,9 +3,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, Maximize2, Users, MapPin } from "lucide-react";
-import { rooms, getRoom } from "@/lib/content";
+import { rooms, getRoom, content } from "@/lib/content";
+import { JsonLd } from "@/components/JsonLd";
+import { roomServiceSchema, breadcrumbSchema } from "@/lib/seo/structuredData";
 
 type Props = { params: Promise<{ slug: string }> };
+
+const site = content.site;
 
 export async function generateStaticParams() {
   return rooms.map((r) => ({ slug: r.slug }));
@@ -15,9 +19,33 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const room = getRoom(slug);
   if (!room) return {};
+  const url = `${site.url}/salas/${room.slug}`;
+  const cap = Math.max(room.capacity.school, room.capacity.theater, room.capacity.coctel ?? 0, room.capacity.boardroom ?? 0);
+  const description = `${room.short} ${room.area} m², capacidad hasta ${cap} personas. ${site.name}, C/ Conde Cifuentes 33, Granada.`;
   return {
     title: `${room.name} — ${room.subtitle}`,
-    description: room.short,
+    description,
+    alternates: { canonical: url },
+    openGraph: {
+      title: `${room.name} · ${site.name}`,
+      description,
+      url,
+      type: "website",
+      images: [
+        {
+          url: `${site.url}${room.image}`,
+          width: 1600,
+          height: 900,
+          alt: `${room.name} — ${room.subtitle}`,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${room.name} · ${site.name}`,
+      description,
+      images: [`${site.url}${room.image}`],
+    },
   };
 }
 
@@ -30,6 +58,16 @@ export default async function SalaPage({ params }: Props) {
 
   return (
     <>
+      <JsonLd
+        data={[
+          roomServiceSchema(room),
+          breadcrumbSchema([
+            { name: "Inicio", url: site.url },
+            { name: "Salas", url: `${site.url}/salas` },
+            { name: room.name, url: `${site.url}/salas/${room.slug}` },
+          ]),
+        ]}
+      />
       <article className="container-page pt-32 pb-20 md:pt-40">
         <Link href="/salas" className="inline-flex items-center gap-2 text-sm text-[var(--color-mute)] hover:text-[var(--color-ink)]">
           <ArrowLeft size={14} /> Todas las salas

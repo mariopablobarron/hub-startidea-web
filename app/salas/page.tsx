@@ -2,17 +2,37 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, Maximize2, Users } from "lucide-react";
-import { rooms } from "@/lib/content";
+import { rooms, content } from "@/lib/content";
+import { JsonLd } from "@/components/JsonLd";
+import { roomsItemListSchema, breadcrumbSchema } from "@/lib/seo/structuredData";
+
+const site = content.site;
 
 export const metadata: Metadata = {
   title: "Salas y espacios",
   description:
     "Descubre las salas del HUB Startidea: aulas multifunción, sala de reuniones Serendipia, estudio de podcast, coworking abierto y office privado.",
+  alternates: { canonical: `${site.url}/salas` },
+  openGraph: {
+    title: `Salas y espacios · ${site.name}`,
+    description: "Aulas multifunción, sala de reuniones, estudio de podcast, coworking y office privado.",
+    url: `${site.url}/salas`,
+    images: [{ url: `${site.url}/images/og/og-default.jpg`, width: 1200, height: 630 }],
+  },
 };
 
 export default function SalasPage() {
   return (
     <>
+      <JsonLd
+        data={[
+          roomsItemListSchema(),
+          breadcrumbSchema([
+            { name: "Inicio", url: site.url },
+            { name: "Salas", url: `${site.url}/salas` },
+          ]),
+        ]}
+      />
       <header className="container-page pt-32 md:pt-40">
         <span className="eyebrow">Catálogo de espacios</span>
         <h1 className="mt-4 max-w-4xl text-5xl tracking-tight md:text-6xl">

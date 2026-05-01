@@ -1,5 +1,6 @@
 "use server";
 
+import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { faq, type Faq } from "@/lib/chat/faqShape";
 import { commitFile, triggerRedeploy } from "./persist";
@@ -10,6 +11,17 @@ async function requireAdmin() {
 }
 
 type FaqJson = Faq;
+
+async function withFeedback(redirectPath: string, fn: () => Promise<void>): Promise<never> {
+  try {
+    await fn();
+  } catch (e: unknown) {
+    if ((e as { digest?: string })?.digest?.startsWith("NEXT_REDIRECT")) throw e;
+    const msg = e instanceof Error ? e.message : String(e);
+    redirect(`${redirectPath}?error=${encodeURIComponent(msg.slice(0, 200))}`);
+  }
+  redirect(`${redirectPath}?saved=1`);
+}
 
 async function saveFaq(next: FaqJson, message: string) {
   const json = JSON.stringify(next, null, 2) + "\n";
@@ -27,7 +39,8 @@ function str(v: FormDataEntryValue | null): string {
 }
 
 export async function updateFaq(formData: FormData) {
-  await requireAdmin();
+  return withFeedback("/admin/faq", async () => {
+    await requireAdmin();
 
   const next: FaqJson = {
     ...faq,
@@ -111,5 +124,6 @@ export async function updateFaq(formData: FormData) {
     },
   };
 
-  await saveFaq(next, "feat(admin): actualizar FAQ del chatbot");
+    await saveFaq(next, "feat(admin): actualizar FAQ del chatbot");
+  });
 }

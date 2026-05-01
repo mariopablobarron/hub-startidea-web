@@ -1,10 +1,13 @@
 import { faq } from "@/lib/chat/faqShape";
 import { content } from "@/lib/content";
 import { updateFaq } from "@/lib/admin/faqActions";
-import { Field, Input, Textarea, SaveBar, PageHeader } from "../_components/Field";
+import { Field, Input, Textarea, SaveBar, PageHeader, FlashBanner } from "../_components/Field";
 
-export default function FaqAdmin() {
+type Props = { searchParams: Promise<{ saved?: string; error?: string }> };
+
+export default async function FaqAdmin({ searchParams }: Props) {
   const t = faq.tariffs;
+  const sp = await searchParams;
   return (
     <form action={updateFaq} className="space-y-6">
       <PageHeader
@@ -12,6 +15,7 @@ export default function FaqAdmin() {
         back={{ href: "/admin", label: "Dashboard" }}
         description="Tarifas, horarios y respuestas que el bot público usa para responder. Si dejas un precio vacío, el bot derivará al humano cuando alguien pregunte por esa sala."
       />
+      <FlashBanner saved={sp.saved === "1"} error={sp.error} />
 
       {/* COWORKING */}
       <section className="space-y-4 rounded-2xl border border-[var(--color-line)] bg-[var(--color-paper)] p-6">

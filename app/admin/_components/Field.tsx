@@ -1,3 +1,7 @@
+"use client";
+
+import { useFormStatus } from "react-dom";
+import { CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
 import { cn } from "@/lib/cn";
 
 export function Field({
@@ -52,9 +56,52 @@ export function SaveBar({ children }: { children?: React.ReactNode }) {
       </div>
       <div className="flex gap-2">
         {children}
-        <button type="submit" className="btn-primary">
-          Guardar cambios
-        </button>
+        <SubmitButton />
+      </div>
+    </div>
+  );
+}
+
+function SubmitButton() {
+  const { pending } = useFormStatus();
+  return (
+    <button
+      type="submit"
+      disabled={pending}
+      className="btn-primary disabled:opacity-60"
+      aria-busy={pending}
+    >
+      {pending ? (
+        <>
+          <Loader2 size={14} className="animate-spin" />
+          Guardando…
+        </>
+      ) : (
+        "Guardar cambios"
+      )}
+    </button>
+  );
+}
+
+/** Banner que aparece tras un Save con éxito (se lee de ?saved=1). */
+export function FlashBanner({ saved, error }: { saved?: boolean; error?: string }) {
+  if (!saved && !error) return null;
+  if (saved) {
+    return (
+      <div className="flex items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
+        <CheckCircle2 size={16} />
+        <div>
+          <strong>Cambios guardados.</strong> El nuevo build estará en producción en 1-2 minutos.
+        </div>
+      </div>
+    );
+  }
+  return (
+    <div className="flex items-start gap-2 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
+      <AlertCircle size={16} className="mt-0.5 shrink-0" />
+      <div>
+        <strong>Error al guardar.</strong>
+        <p className="mt-1 text-xs opacity-80">{error}</p>
       </div>
     </div>
   );

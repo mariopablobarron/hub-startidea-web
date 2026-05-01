@@ -1,9 +1,12 @@
 import { content } from "@/lib/content";
 import { updateContact } from "@/lib/admin/actions";
-import { Field, Input, Textarea, SaveBar, PageHeader } from "../_components/Field";
+import { Field, Input, Textarea, SaveBar, PageHeader, FlashBanner } from "../_components/Field";
 
-export default function ContactAdmin() {
+type Props = { searchParams: Promise<{ saved?: string; error?: string }> };
+
+export default async function ContactAdmin({ searchParams }: Props) {
   const c = content.contact;
+  const sp = await searchParams;
   return (
     <form action={updateContact} className="space-y-6">
       <PageHeader
@@ -11,6 +14,7 @@ export default function ContactAdmin() {
         back={{ href: "/admin", label: "Dashboard" }}
         description="CTA naranja al final de la home + datos visuales (horario, cómo llegar)."
       />
+      <FlashBanner saved={sp.saved === "1"} error={sp.error} />
       <section className="space-y-4 rounded-2xl border border-[var(--color-line)] bg-[var(--color-paper)] p-6">
         <Field label="Eyebrow"><Input name="eyebrow" defaultValue={c.eyebrow} required /></Field>
         <Field label="Título"><Input name="title" defaultValue={c.title} required /></Field>
