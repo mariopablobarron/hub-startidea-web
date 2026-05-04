@@ -33,7 +33,26 @@
   html {
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
-    scroll-behavior: smooth;
+  }
+
+  /* Smooth scroll solo si el usuario lo permite. */
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
+
+  /* Anchors no quedan ocultos bajo el header sticky (h-16 = 4rem). */
+  :target,
+  [id] {
+    scroll-margin-top: 5rem;
+  }
+
+  /* Focus visible accesible — el outline por defecto es feo y a veces invisible. */
+  :focus-visible {
+    outline: 2px solid var(--color-coral-500);
+    outline-offset: 2px;
+    border-radius: 4px;
   }
 
   body {
@@ -104,5 +123,18 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .mesh-blob, .marquee-track { animation: none; }
+  .mesh-blob,
+  .marquee-track {
+    animation: none !important;
+  }
+
+  /* Refuerza override por si algún componente fuerza transición. */
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
