@@ -1,0 +1,30 @@
+app/layout.tsx
+  f12e84bac900e417 3
+app/globals.css
+  f12e84bac900e417 36-55,126-139
+app/not-found.tsx
+  f12e84bac900e417 2-4,7-9,11-12,14,16,18-58
+components/Header.tsx
+  f12e84bac900e417 30-44
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.4",
+  "base_commit_sha": "d5565807ac439710e9a060b0a4911656ef0b114a",
+  "prompts": {
+    "f12e84bac900e417": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ba62ea7a-a471-4585-b822-8ababb0c1519",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron",
+      "messages": [],
+      "total_additions": 101,
+      "total_deletions": 8,
+      "accepted_lines": 101,
+      "overriden_lines": 0,
+      "messages_url": "https://usegitai.com/cas/b34defa7a14acaccaa480847717464d396e01db63394670450ec56f750e688d8"
+    }
+  }
+}
