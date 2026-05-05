@@ -1,0 +1,42 @@
+components/Services.tsx
+  f12e84bac900e417 13
+components/Footer.tsx
+  f12e84bac900e417 71
+data/content.json
+  f12e84bac900e417 334,382
+app/salas/[slug]/opengraph-image.tsx
+  f12e84bac900e417 2,119
+app/salas/[slug]/page.tsx
+  f12e84bac900e417 6,24,107
+components/Header.tsx
+  f12e84bac900e417 14
+app/salas/page.tsx
+  f12e84bac900e417 5,87
+components/Floorplan.tsx
+  f12e84bac900e417 8,196,248
+components/RoomsGrid.tsx
+  f12e84bac900e417 7,72
+lib/content.ts
+  f12e84bac900e417 37-45
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.4",
+  "base_commit_sha": "553531cd0f92a555b4a2568916ef47e0af96d5e6",
+  "prompts": {
+    "f12e84bac900e417": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ba62ea7a-a471-4585-b822-8ababb0c1519",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron",
+      "messages": [],
+      "total_additions": 26,
+      "total_deletions": 17,
+      "accepted_lines": 26,
+      "overriden_lines": 0,
+      "messages_url": "https://usegitai.com/cas/d0a8b73b6aef3772d44bfa29da88b5eb399df7c250f238c6bfc2a722e89daeb0"
+    }
+  }
+}
