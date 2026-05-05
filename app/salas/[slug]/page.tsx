@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, Maximize2, Users, MapPin } from "lucide-react";
-import { rooms, getRoom, content } from "@/lib/content";
+import { rooms, getRoom, content, formatArea } from "@/lib/content";
 import { JsonLd } from "@/components/JsonLd";
 import { roomServiceSchema, breadcrumbSchema } from "@/lib/seo/structuredData";
 
@@ -21,7 +21,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!room) return {};
   const url = `${site.url}/salas/${room.slug}`;
   const cap = Math.max(room.capacity.school, room.capacity.theater, room.capacity.coctel ?? 0, room.capacity.boardroom ?? 0);
-  const description = `${room.short} ${room.area} m², capacidad hasta ${cap} personas. ${site.name}, C/ Conde Cifuentes 33, Granada.`;
+  const description = `${room.short} ${formatArea(room.area)} m², capacidad hasta ${cap} personas. ${site.name}, C/ Conde Cifuentes 33, Granada.`;
   return {
     title: `${room.name} — ${room.subtitle}`,
     description,
@@ -104,7 +104,7 @@ export default async function SalaPage({ params }: Props) {
         </div>
 
         <div className="mt-16 grid gap-px overflow-hidden rounded-3xl border border-[var(--color-line)] bg-[var(--color-line)] sm:grid-cols-2 lg:grid-cols-4">
-          <Spec icon={<Maximize2 size={16} />} label="Superficie" value={`${room.area} m²`} />
+          <Spec icon={<Maximize2 size={16} />} label="Superficie" value={`${formatArea(room.area)} m²`} />
           <Spec
             icon={<Users size={16} />}
             label="Aforo escolar"

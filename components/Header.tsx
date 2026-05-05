@@ -11,8 +11,8 @@ const site = content.site;
 const nav = [
   { href: "/#salas", label: "Salas" },
   { href: "/#tour", label: "Tour" },
+  { href: "/#ecosistema", label: "Ecosistema" },
   { href: "/#podcast", label: "Podcast" },
-  { href: "/#formacion", label: "Formación" },
   { href: "/#comunidad", label: "Comunidad" },
 ];
 

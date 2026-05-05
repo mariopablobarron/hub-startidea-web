@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowUpRight, Maximize2, Users } from "lucide-react";
-import { rooms } from "@/lib/content";
+import { rooms, formatArea } from "@/lib/content";
 
 export function RoomsGrid() {
   const featured = rooms.filter((r) => r.category !== "comun").slice(0, 6);
@@ -69,7 +69,7 @@ export function RoomsGrid() {
                   <div className="mt-6 flex items-center gap-5 text-sm text-[var(--color-ink)]/80">
                     <span className="inline-flex items-center gap-1.5">
                       <Maximize2 size={14} className="text-[var(--color-coral-500)]" />
-                      {room.area} m²
+                      {formatArea(room.area)} m²
                     </span>
                     <span className="inline-flex items-center gap-1.5">
                       <Users size={14} className="text-[var(--color-coral-500)]" />

@@ -68,7 +68,7 @@ export function Footer() {
             <li><Link href="/#salas" className="hover:text-[var(--color-coral-500)]">Salas</Link></li>
             <li><Link href="/#tour" className="hover:text-[var(--color-coral-500)]">Tour del local</Link></li>
             <li><Link href="/#podcast" className="hover:text-[var(--color-coral-500)]">Estudio podcast</Link></li>
-            <li><Link href="/#formacion" className="hover:text-[var(--color-coral-500)]">Formación</Link></li>
+            <li><Link href="/#ecosistema" className="hover:text-[var(--color-coral-500)]">Ecosistema</Link></li>
             <li>
               <a href={site.parent.url} target="_blank" rel="noreferrer noopener" className="hover:text-[var(--color-coral-500)]">
                 {site.parent.name} ↗

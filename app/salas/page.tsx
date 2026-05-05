@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, Maximize2, Users } from "lucide-react";
-import { rooms, content } from "@/lib/content";
+import { rooms, content, formatArea } from "@/lib/content";
 import { JsonLd } from "@/components/JsonLd";
 import { roomsItemListSchema, breadcrumbSchema } from "@/lib/seo/structuredData";
 
@@ -84,7 +84,7 @@ export default function SalasPage() {
             <div className="flex items-center gap-6 text-sm">
               <span className="inline-flex items-center gap-1.5">
                 <Maximize2 size={14} className="text-[var(--color-coral-500)]" />
-                {room.area} m²
+                {formatArea(room.area)} m²
               </span>
               <span className="inline-flex items-center gap-1.5">
                 <Users size={14} className="text-[var(--color-coral-500)]" />

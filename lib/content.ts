@@ -34,3 +34,12 @@ export function getRoom(slug: string): Room | undefined {
 }
 
 export const totalArea = Math.round(rooms.reduce((s, r) => s + r.area, 0));
+
+/**
+ * Formatea metros cuadrados sin decimales para la UI pública.
+ * Los datos en content.json mantienen la precisión real (ej. 47.3),
+ * pero al renderizarlos al usuario se muestra siempre redondeado.
+ */
+export function formatArea(area: number): string {
+  return String(Math.round(area));
+}

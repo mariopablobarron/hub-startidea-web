@@ -1,5 +1,5 @@
 import { ImageResponse } from "next/og";
-import { rooms, getRoom, content } from "@/lib/content";
+import { rooms, getRoom, content, formatArea } from "@/lib/content";
 
 // Sin runtime: edge — Next.js 15 no permite combinar edge + generateStaticParams.
 // Node runtime es perfectamente válido para OG; las imágenes se cachean en CDN.
@@ -116,7 +116,7 @@ export default async function OG({ params }: Props) {
               <div style={{ fontSize: 14, opacity: 0.55, textTransform: "uppercase", letterSpacing: "0.12em" }}>
                 Superficie
               </div>
-              <div style={{ fontWeight: 600 }}>{room.area} m²</div>
+              <div style={{ fontWeight: 600 }}>{formatArea(room.area)} m²</div>
             </div>
             <div style={{ display: "flex", flexDirection: "column" }}>
               <div style={{ fontSize: 14, opacity: 0.55, textTransform: "uppercase", letterSpacing: "0.12em" }}>

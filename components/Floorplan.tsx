@@ -5,7 +5,7 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import { Users, Maximize2, ArrowRight } from "lucide-react";
 import Link from "next/link";
-import { rooms, type Room, content } from "@/lib/content";
+import { rooms, type Room, content, formatArea } from "@/lib/content";
 import { cn } from "@/lib/cn";
 
 const tour = content.tour;
@@ -193,7 +193,7 @@ export function Floorplan() {
                         fontSize="11"
                         fill={isActive ? "white" : "var(--color-mute)"}
                       >
-                        {room.area} m²
+                        {formatArea(room.area)} m²
                       </text>
                     )}
                   </g>
@@ -245,7 +245,7 @@ export function Floorplan() {
 
                 <div className="mt-6 grid grid-cols-2 gap-4">
                   <Spec icon={<Maximize2 size={14} />} label="Superficie">
-                    {active.area} m²
+                    {formatArea(active.area)} m²
                   </Spec>
                   <Spec icon={<Users size={14} />} label="Capacidad">
                     hasta {Math.max(active.capacity.school, active.capacity.theater, active.capacity.coctel ?? 0, active.capacity.boardroom ?? 0)} pers.
