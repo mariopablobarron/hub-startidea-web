@@ -41,17 +41,17 @@ export default async function RoomEditPage({ params, searchParams }: Props) {
             <Image src={room.image} alt={room.name} fill sizes="256px" className="object-cover" />
           </div>
           <div className="flex-1 space-y-3">
-            <Field label="Subir nueva foto" hint="JPG, PNG o WebP, máximo 5 MB.">
+            <Field label="Subir nueva foto" hint="JPG, PNG, WebP o HEIC (móvil). Máximo 15 MB; se optimiza al subir.">
               <input
                 type="file"
                 name="file"
-                accept="image/jpeg,image/png,image/webp"
+                accept="image/jpeg,image/png,image/webp,image/heic,image/heif"
                 required
                 className="block w-full text-sm file:mr-3 file:rounded-lg file:border file:border-[var(--color-line)] file:bg-[var(--color-paper-2)] file:px-3 file:py-2 file:text-sm hover:file:bg-[var(--color-paper)]"
               />
             </Field>
             <div className="text-xs text-[var(--color-mute)]">
-              La foto se subirá a <code className="rounded bg-[var(--color-paper-2)] px-1">public/images/rooms/{slug}.jpg</code> y reemplazará la actual.
+              La foto se redimensiona a 1600 px y se guarda como <code className="rounded bg-[var(--color-paper-2)] px-1">public/images/rooms/{slug}.jpg</code>, reemplazando la actual.
             </div>
             <button type="submit" className="btn-primary">Subir y aplicar</button>
           </div>

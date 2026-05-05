@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import sharp from "sharp";
 import { auth } from "@/auth";
 import { commitFile, triggerRedeploy } from "./persist";
 import contentJson from "@/data/content.json";
@@ -176,22 +177,44 @@ export async function uploadRoomImage(slug: string, formData: FormData): Promise
     await requireAdmin();
     const file = formData.get("file") as File | null;
     if (!file) throw new Error("No se ha enviado archivo");
-    if (file.size > 5 * 1024 * 1024) throw new Error("Imagen demasiado grande (máx 5 MB)");
-    const ext = (file.type.split("/")[1] || "jpg").replace("jpeg", "jpg");
-    const allowed = ["jpg", "png", "webp"];
-    if (!allowed.includes(ext)) throw new Error(`Formato no permitido (${ext}). Usa jpg, png o webp.`);
-    const path = `public/images/rooms/${slug}.${ext}`;
-    const publicPath = `/images/rooms/${slug}.${ext}`;
+    // Aceptamos hasta 15 MB en entrada (móviles modernos sacan fotos de 8-12 MB);
+    // sharp reduce el peso final >90% antes del commit.
+    if (file.size > 15 * 1024 * 1024) throw new Error("Imagen demasiado grande (máx 15 MB)");
+    const inputExt = (file.type.split("/")[1] || "").replace("jpeg", "jpg");
+    const allowedInput = ["jpg", "png", "webp", "heic", "heif"];
+    if (!allowedInput.includes(inputExt)) {
+      throw new Error(`Formato no permitido (${inputExt}). Usa jpg, png, webp o heic.`);
+    }
 
-    const buf = Buffer.from(await file.arrayBuffer());
-    await commitFile({ path, content: buf, message: `feat(admin): subir foto de ${slug}` });
+    // Optimización: redimensionar a max 1600px de ancho y comprimir a JPG quality 82.
+    // Mantener .jpg como extensión final asegura consistencia con el resto del sitio
+    // (OG images, Image src, etc.) y next/image servirá WebP/AVIF al navegador.
+    const inputBuf = Buffer.from(await file.arrayBuffer());
+    const optimized = await sharp(inputBuf)
+      .rotate() // respeta EXIF orientation (móviles giran las fotos al colgarlas)
+      .resize({ width: 1600, withoutEnlargement: true, fit: "inside" })
+      .jpeg({ quality: 82, mozjpeg: true })
+      .toBuffer();
 
-    const next: ContentJson = {
-      ...contentJson,
-      rooms: contentJson.rooms.map((r) =>
-        r.slug === slug ? { ...r, image: publicPath } : r,
-      ),
-    } as ContentJson;
-    await saveContent(next, `feat(admin): apuntar imagen de ${slug} a ${publicPath}`);
+    const path = `public/images/rooms/${slug}.jpg`;
+    const publicPath = `/images/rooms/${slug}.jpg`;
+
+    await commitFile({ path, content: optimized, message: `feat(admin): subir foto de ${slug}` });
+
+    // Si el path no cambia (siempre .jpg) no hace falta tocar content.json salvo
+    // que la sala apuntara antes a otra extensión. Lo dejamos coherente por si acaso.
+    if (contentJson.rooms.find((r) => r.slug === slug)?.image !== publicPath) {
+      const next: ContentJson = {
+        ...contentJson,
+        rooms: contentJson.rooms.map((r) =>
+          r.slug === slug ? { ...r, image: publicPath } : r,
+        ),
+      } as ContentJson;
+      await saveContent(next, `feat(admin): apuntar imagen de ${slug} a ${publicPath}`);
+    } else {
+      // Solo necesitamos invalidar la cache y forzar redeploy para servir la nueva imagen.
+      revalidatePath("/", "layout");
+      await triggerRedeploy();
+    }
   });
 }
