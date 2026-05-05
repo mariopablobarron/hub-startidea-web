@@ -1,0 +1,26 @@
+app/admin/salas/[slug]/page.tsx
+  f12e84bac900e417 44,48,54
+lib/admin/actions.ts
+  f12e84bac900e417 5,180-187,189-197,199-218
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.4",
+  "base_commit_sha": "46271d523641817fb6a8436e1960ed9bb863ec82",
+  "prompts": {
+    "f12e84bac900e417": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ba62ea7a-a471-4585-b822-8ababb0c1519",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron",
+      "messages": [],
+      "total_additions": 43,
+      "total_deletions": 20,
+      "accepted_lines": 43,
+      "overriden_lines": 0,
+      "messages_url": "https://usegitai.com/cas/ad8cee878bfabe869496c37b92e62eed061d138e988cf38f6089c49ec684cd47"
+    }
+  }
+}
