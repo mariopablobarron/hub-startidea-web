@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 import { content } from "@/lib/content";
 
-export const runtime = "edge";
+// Node runtime (no edge): consistente con [slug]/opengraph-image.tsx.
 export const alt = content.site.name;
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
@@ -47,8 +47,21 @@ export default async function OG() {
           <div style={{ fontSize: 20, letterSpacing: "0.18em", textTransform: "uppercase", opacity: 0.72 }}>
             Coworking · Formación · Podcast
           </div>
-          <div style={{ fontSize: 88, lineHeight: 1.02, fontWeight: 500, letterSpacing: "-0.02em", maxWidth: 950 }}>
-            El espacio donde se cocina la <i style={{ color: "#ed4f15" }}>innovación social</i> en Granada.
+          <div
+            style={{
+              fontSize: 88,
+              lineHeight: 1.02,
+              fontWeight: 500,
+              letterSpacing: "-0.02em",
+              maxWidth: 950,
+              display: "flex",
+              flexWrap: "wrap",
+              gap: "0 0.25em",
+            }}
+          >
+            <span>El espacio donde se cocina la</span>
+            <span style={{ color: "#ed4f15", fontStyle: "italic" }}>innovación social</span>
+            <span>en Granada.</span>
           </div>
         </div>
 

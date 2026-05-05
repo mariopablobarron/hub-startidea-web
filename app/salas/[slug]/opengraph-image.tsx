@@ -1,6 +1,8 @@
 import { ImageResponse } from "next/og";
 import { rooms, getRoom, content } from "@/lib/content";
 
+// Sin runtime: edge — Next.js 15 no permite combinar edge + generateStaticParams.
+// Node runtime es perfectamente válido para OG; las imágenes se cachean en CDN.
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
