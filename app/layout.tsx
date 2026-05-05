@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import Script from "next/script";
 import { Inter, Fraunces } from "next/font/google";
 import "./globals.css";
 import { PublicShell } from "@/components/PublicShell";
@@ -58,6 +59,15 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="es" className={`${inter.variable} ${fraunces.variable}`}>
+      <head>
+        {/* Umami analytics (privacy-first, sin cookies) */}
+        <Script
+          defer
+          src="https://analytics.hubstartidea.es/script.js"
+          data-website-id="2c83c9c1-7b4d-4206-8f7e-551874203ef6"
+          strategy="afterInteractive"
+        />
+      </head>
       <body>
         <a
           href="#main"
