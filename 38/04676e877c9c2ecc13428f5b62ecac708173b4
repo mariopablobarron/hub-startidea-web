@@ -1,0 +1,36 @@
+lib/contact/actions.ts
+  s_f12e84bac900e4::t_49f4e9ac016b93 1-106
+tests/e2e/public.spec.ts
+  s_f12e84bac900e4::t_35e8aec44c87c6 60-82
+components/ContactForm.tsx
+  s_f12e84bac900e4::t_b6523d11553fe0 1-205
+lib/contact/schema.ts
+  s_f12e84bac900e4::t_a67b2c2d4e5a03 1-67
+components/Contact.tsx
+  s_f12e84bac900e4::t_2ec512a92de614 59-61
+  s_f12e84bac900e4::t_4f1a13d7d7076c 4
+lib/mail/resend.ts
+  s_f12e84bac900e4::t_1a3d68dbf59122 1-54
+app/globals.css
+  s_f12e84bac900e4::t_3f5630e350962a 103-111
+lib/contact/rate-limit.ts
+  s_f12e84bac900e4::t_ab53d2817dd74d 1-37
+lib/contact/emails.ts
+  s_f12e84bac900e4::t_43cf950fe3924f 1-111
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.4",
+  "base_commit_sha": "3804676e877c9c2ecc13428f5b62ecac708173b4",
+  "prompts": {},
+  "sessions": {
+    "s_f12e84bac900e4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ba62ea7a-a471-4585-b822-8ababb0c1519",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}
