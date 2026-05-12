@@ -2,6 +2,7 @@
   "name": "hub-startidea-web",
   "version": "0.1.0",
   "private": true,
+  "packageManager": "pnpm@10.33.2",
   "description": "Web pública del coworking HUB Startidea — Granada",
   "scripts": {
     "dev": "next dev --turbopack",
