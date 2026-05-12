@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Phone, Mail, MapPin, ArrowRight, Clock } from "lucide-react";
 import { content } from "@/lib/content";
+import { ContactForm } from "./ContactForm";
 
 const site = content.site;
 const contact = content.contact;
@@ -54,6 +55,9 @@ export function Contact() {
                 {contact.directions}
               </InfoCard>
             </div>
+          </div>
+          <div className="border-t border-white/20 p-10 md:p-16">
+            <ContactForm />
           </div>
           <Link
             href={`https://maps.google.com/?q=${encodeURIComponent(`${site.address.street}, ${site.address.city}`)}`}

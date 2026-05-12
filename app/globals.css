@@ -100,6 +100,15 @@
     content: "";
     @apply h-px w-8 bg-[var(--color-coral-500)];
   }
+
+  /* Inputs del formulario de contacto — viven sobre fondo coral, por eso
+     el contraste va al revés (texto blanco, bordes con alpha). */
+  .form-input {
+    @apply block w-full rounded-xl border border-white/30 bg-white/15 px-3.5 py-2.5 text-sm text-white placeholder:text-white/55 outline-none transition focus:border-white/60 focus:bg-white/20;
+  }
+  .form-input[aria-invalid="true"] {
+    @apply border-red-300 bg-red-500/15;
+  }
 }
 
 /* mesh gradient animado del hero */

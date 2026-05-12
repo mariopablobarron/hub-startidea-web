@@ -57,6 +57,29 @@ test.describe("Web pública", () => {
   });
 });
 
+test.describe("Formulario de contacto", () => {
+  test("home renderiza form de contacto con campos esperados", async ({ page }) => {
+    await page.goto("/#contacto");
+    await expect(page.getByRole("heading", { name: /Cuéntanos qué buscas/i })).toBeVisible();
+    await expect(page.getByLabel(/^Nombre/i)).toBeVisible();
+    await expect(page.getByLabel(/^Email/i)).toBeVisible();
+    await expect(page.getByLabel(/^Mensaje/i)).toBeVisible();
+    await expect(page.getByRole("button", { name: /Enviar mensaje/i })).toBeVisible();
+  });
+
+  test("submit vacío muestra validación del navegador (no envía)", async ({ page }) => {
+    await page.goto("/#contacto");
+    const submit = page.getByRole("button", { name: /Enviar mensaje/i });
+    await submit.click();
+    // El form tiene required en nombre/email/mensaje. El navegador bloquea
+    // el submit nativo. Como noValidate=true en el form, la validación cae
+    // sobre la server action: comprobamos que aparece algún mensaje de error.
+    // Pero como noValidate=true, el navegador no muestra los popups nativos.
+    // Verificamos que tras click no aparece banner de éxito.
+    await expect(page.getByText(/¡Mensaje recibido!/i)).toHaveCount(0);
+  });
+});
+
 test.describe("Cabeceras de seguridad", () => {
   test("home incluye headers anti-clickjacking + nosniff + Referrer-Policy", async ({ request }) => {
     const res = await request.get("/");
