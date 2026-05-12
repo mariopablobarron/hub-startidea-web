@@ -1,0 +1,21 @@
+app/api/health/route.ts
+  s_f12e84bac900e4::t_1c10ecec2a5919 1-35
+tests/e2e/public.spec.ts
+  s_f12e84bac900e4::t_efa45444e2c9a2 49-57
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.4",
+  "base_commit_sha": "c364894fa252abbf81397a87b387170e29c05aa8",
+  "prompts": {},
+  "sessions": {
+    "s_f12e84bac900e4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ba62ea7a-a471-4585-b822-8ababb0c1519",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}
