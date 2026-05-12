@@ -1,0 +1,29 @@
+components/Services.tsx
+  s_f12e84bac900e4::t_61a9bb915db765 13
+components/Footer.tsx
+  s_f12e84bac900e4::t_75076a7c746151 2,6
+  s_f12e84bac900e4::t_2233c68d6e243b 11-35
+components/EcosystemStartidea.tsx
+  s_f12e84bac900e4::t_b14a90fa0216ba 1-100
+app/page.tsx
+  s_f12e84bac900e4::t_c5f8329f5f5040 4
+  s_f12e84bac900e4::t_d607c8c0cf001a 25
+data/content.json
+  s_f12e84bac900e4::t_8abe6e77214a6f 325-357
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.4",
+  "base_commit_sha": "56bd850a2b89e28801dc5fdb4ed06cce42e4e8cb",
+  "prompts": {},
+  "sessions": {
+    "s_f12e84bac900e4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ba62ea7a-a471-4585-b822-8ababb0c1519",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}
