@@ -322,6 +322,39 @@
       "label": "Accesible"
     }
   ],
+  "ecosystem": {
+    "eyebrow": "Forma parte de Startidea",
+    "title": "Un espacio físico dentro de una agencia de innovación social.",
+    "description": "El HUB es la sede de Startidea, pero Startidea es mucho más que un coworking: es la productora detrás de proyectos con propósito que conviven aquí.",
+    "ctaLabel": "Conoce Startidea",
+    "ctaUrl": "https://startidea.es",
+    "projects": [
+      {
+        "name": "Startidea",
+        "tagline": "Agencia de innovación social. Diseñamos, lanzamos y acompañamos proyectos con propósito.",
+        "url": "https://startidea.es",
+        "accent": "coral"
+      },
+      {
+        "name": "Tres mil millones de latidos",
+        "tagline": "Proyecto que ayuda a vivir con propósito. Coach reflexivo, círculos íntimos y rutinas guiadas.",
+        "url": "https://tresmilmillonesdelatidos.es",
+        "accent": "warm"
+      },
+      {
+        "name": "Raíz y Acción",
+        "tagline": "Método Startidea: el marco que usamos para llevar ideas de raíz a acción tangible.",
+        "url": "https://raizyaccion.hubstartidea.es",
+        "accent": "earth"
+      },
+      {
+        "name": "TodoMerchandising",
+        "tagline": "Merchandising con impacto social. Camisetas, totebags y materiales para causas y marcas con propósito.",
+        "url": "https://merchandising.hubstartidea.es",
+        "accent": "ink"
+      }
+    ]
+  },
   "servicesIntro": {
     "eyebrow": "Lo que ofrecemos",
     "title": "Cuatro maneras de usar el HUB.",

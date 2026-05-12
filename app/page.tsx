@@ -1,6 +1,7 @@
 import { Hero } from "@/components/Hero";
 import { RoomsGrid } from "@/components/RoomsGrid";
 import { Floorplan } from "@/components/Floorplan";
+import { EcosystemStartidea } from "@/components/EcosystemStartidea";
 import { Services } from "@/components/Services";
 import { Podcast } from "@/components/Podcast";
 import { Community } from "@/components/Community";
@@ -21,6 +22,7 @@ export default function HomePage() {
       <Hero />
       <RoomsGrid />
       <Floorplan />
+      <EcosystemStartidea />
       <Services />
       <Podcast />
       <Community />

@@ -1,12 +1,38 @@
 import Link from "next/link";
-import { Instagram, Facebook, Phone, Mail, MapPin } from "lucide-react";
+import { Instagram, Facebook, Phone, Mail, MapPin, ArrowUpRight } from "lucide-react";
 import { content } from "@/lib/content";
 
 const site = content.site;
+const ecosystemProjects = content.ecosystem.projects;
 
 export function Footer() {
   return (
     <footer className="mt-32 bg-[var(--color-ink)] text-[var(--color-paper)]">
+      {/* Cinta superior con proyectos del ecosistema Startidea */}
+      <div className="border-b border-white/10">
+        <div className="container-page py-10">
+          <div className="grid gap-6 md:grid-cols-[auto_1fr] md:items-center">
+            <div className="text-xs uppercase tracking-[0.18em] text-[var(--color-paper)]/55">
+              El HUB forma parte de
+            </div>
+            <ul className="flex flex-wrap gap-x-6 gap-y-2 text-sm">
+              {ecosystemProjects.map((p) => (
+                <li key={p.url}>
+                  <a
+                    href={p.url}
+                    target="_blank"
+                    rel="noreferrer noopener"
+                    className="inline-flex items-center gap-1 text-[var(--color-paper)]/85 transition hover:text-[var(--color-coral-500)]"
+                  >
+                    {p.name}
+                    <ArrowUpRight size={12} />
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </div>
       <div className="container-page grid gap-12 py-20 md:grid-cols-[1.4fr_1fr_1fr]">
         <div>
           <div className="font-display text-3xl tracking-tight">{site.name}</div>

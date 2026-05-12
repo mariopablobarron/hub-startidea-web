@@ -10,7 +10,7 @@ const amenities = content.amenities;
 
 export function Services() {
   return (
-    <section id="ecosistema" className="bg-[var(--color-ink)] py-24 text-[var(--color-paper)] md:py-32">
+<section id="servicios" className="bg-[var(--color-ink)] py-24 text-[var(--color-paper)] md:py-32">
       <div className="container-page">
         <div className="grid gap-10 md:grid-cols-[1fr_2fr]">
           <div>
