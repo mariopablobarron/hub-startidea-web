@@ -46,6 +46,15 @@ test.describe("Web pública", () => {
     const body = await res.text();
     expect(body).toContain("Disallow: /admin");
   });
+
+  test("/api/health responde 200 con JSON status=ok", async ({ request }) => {
+    const res = await request.get("/api/health");
+    expect(res.status()).toBe(200);
+    const body = await res.json();
+    expect(body.status).toBe("ok");
+    expect(body.service).toBe("hub-startidea-web");
+    expect(body.ts).toBeTruthy();
+  });
 });
 
 test.describe("Cabeceras de seguridad", () => {
