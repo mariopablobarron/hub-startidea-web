@@ -65,6 +65,60 @@ export const contactSchema = z.object({
   directions: z.string().min(1),
 });
 
+export const manifestoSchema = z.object({
+  eyebrow: z.string().min(1),
+  title: z.string().min(1),
+  intro: z.string().min(1),
+  pillars: z
+    .array(
+      z.object({
+        label: z.string().min(1),
+        title: z.string().min(1),
+        description: z.string().min(1),
+        ctaLabel: z.string().min(1),
+        ctaHref: z.string().min(1),
+        items: z.array(z.string().min(1)).min(1),
+      }),
+    )
+    .length(2, "Manifiesto debe tener exactamente 2 pilares"),
+});
+
+export const methodRaizAccionSchema = z.object({
+  eyebrow: z.string().min(1),
+  label: z.string().min(1),
+  title: z.string().min(1),
+  description: z.string().min(1),
+  url: z.string().url(),
+  ctaLabel: z.string().min(1),
+  steps: z
+    .array(
+      z.object({
+        step: z.string().min(1),
+        title: z.string().min(1),
+        description: z.string().min(1),
+      }),
+    )
+    .min(1),
+});
+
+export const ecosystemSchema = z.object({
+  eyebrow: z.string().min(1),
+  title: z.string().min(1),
+  description: z.string().min(1),
+  ctaLabel: z.string().min(1),
+  ctaUrl: z.string().url(),
+  projects: z
+    .array(
+      z.object({
+        name: z.string().min(1),
+        tagline: z.string().min(1),
+        url: z.string().url(),
+        accent: z.enum(["coral", "warm", "earth", "ink"]),
+      }),
+    )
+    .min(1),
+});
+
 export const siteSchema = z.object({
   name: z.string().min(1),
   tagline: z.string(),

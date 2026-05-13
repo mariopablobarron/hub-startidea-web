@@ -6,7 +6,16 @@ import sharp from "sharp";
 import { auth } from "@/auth";
 import { commitFile, triggerRedeploy } from "./persist";
 import contentJson from "@/data/content.json";
-import { heroSchema, roomSchema, communitySchema, contactSchema, siteSchema } from "./schema";
+import {
+  heroSchema,
+  roomSchema,
+  communitySchema,
+  contactSchema,
+  siteSchema,
+  manifestoSchema,
+  methodRaizAccionSchema,
+  ecosystemSchema,
+} from "./schema";
 
 async function requireAdmin() {
   const session = await auth();
@@ -216,5 +225,103 @@ export async function uploadRoomImage(slug: string, formData: FormData): Promise
       revalidatePath("/", "layout");
       await triggerRedeploy();
     }
+  });
+}
+
+// ============================================================
+// Manifesto / Método Raíz y Acción / Ecosistema — copy editable
+// ============================================================
+
+export async function updateManifesto(formData: FormData) {
+  return withFeedback("/admin/manifiesto", async () => {
+    await requireAdmin();
+    const data = manifestoSchema.parse({
+      eyebrow: formData.get("eyebrow"),
+      title: formData.get("title"),
+      intro: formData.get("intro"),
+      pillars: [0, 1].map((i) => ({
+        label: formData.get(`pillar-${i}-label`),
+        title: formData.get(`pillar-${i}-title`),
+        description: formData.get(`pillar-${i}-description`),
+        ctaLabel: formData.get(`pillar-${i}-ctaLabel`),
+        ctaHref: formData.get(`pillar-${i}-ctaHref`),
+        items: String(formData.get(`pillar-${i}-items`) || "")
+          .split("\n")
+          .map((s) => s.trim())
+          .filter(Boolean),
+      })),
+    });
+    const next = { ...contentJson, manifesto: data } as ContentJson;
+    await saveContent(next, "feat(admin): actualizar Manifiesto");
+  });
+}
+
+export async function updateMethodRaizAccion(formData: FormData) {
+  return withFeedback("/admin/metodo", async () => {
+    await requireAdmin();
+    // Los steps los parseamos del formato "step|title|description" línea-a-línea
+    const stepsRaw = String(formData.get("steps") || "");
+    const steps = stepsRaw
+      .split("\n")
+      .map((line) => line.trim())
+      .filter(Boolean)
+      .map((line) => {
+        const parts = line.split("|").map((p) => p.trim());
+        if (parts.length !== 3) {
+          throw new Error(
+            `Paso mal formado: "${line}" — debe ser "número|título|descripción"`,
+          );
+        }
+        return { step: parts[0], title: parts[1], description: parts[2] };
+      });
+
+    const data = methodRaizAccionSchema.parse({
+      eyebrow: formData.get("eyebrow"),
+      label: formData.get("label"),
+      title: formData.get("title"),
+      description: formData.get("description"),
+      url: formData.get("url"),
+      ctaLabel: formData.get("ctaLabel"),
+      steps,
+    });
+    const next = { ...contentJson, methodRaizAccion: data } as ContentJson;
+    await saveContent(next, "feat(admin): actualizar Método Raíz y Acción");
+  });
+}
+
+export async function updateEcosystem(formData: FormData) {
+  return withFeedback("/admin/ecosistema", async () => {
+    await requireAdmin();
+    // Cada proyecto en una línea: "name|tagline|url|accent"
+    const projectsRaw = String(formData.get("projects") || "");
+    const projects = projectsRaw
+      .split("\n")
+      .map((line) => line.trim())
+      .filter(Boolean)
+      .map((line) => {
+        const parts = line.split("|").map((p) => p.trim());
+        if (parts.length !== 4) {
+          throw new Error(
+            `Proyecto mal formado: "${line}" — debe ser "nombre|tagline|url|accent". Accents válidos: coral, warm, earth, ink`,
+          );
+        }
+        return {
+          name: parts[0],
+          tagline: parts[1],
+          url: parts[2],
+          accent: parts[3] as "coral" | "warm" | "earth" | "ink",
+        };
+      });
+
+    const data = ecosystemSchema.parse({
+      eyebrow: formData.get("eyebrow"),
+      title: formData.get("title"),
+      description: formData.get("description"),
+      ctaLabel: formData.get("ctaLabel"),
+      ctaUrl: formData.get("ctaUrl"),
+      projects,
+    });
+    const next = { ...contentJson, ecosystem: data } as ContentJson;
+    await saveContent(next, "feat(admin): actualizar Ecosistema Startidea");
   });
 }

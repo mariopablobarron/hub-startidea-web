@@ -13,13 +13,19 @@ import {
   BookOpen,
   MessageSquare,
   Search,
+  Megaphone,
+  Network,
+  GitBranch,
 } from "lucide-react";
 import { cn } from "@/lib/cn";
 
 const NAV = [
   { href: "/admin", label: "Dashboard", icon: Home, exact: true },
   { href: "/admin/hero", label: "Hero", icon: MessageSquareQuote },
+  { href: "/admin/manifiesto", label: "Manifiesto", icon: Megaphone },
+  { href: "/admin/ecosistema", label: "Ecosistema", icon: Network },
   { href: "/admin/salas", label: "Salas", icon: LayoutGrid },
+  { href: "/admin/metodo", label: "Método Raíz y Acción", icon: GitBranch },
   { href: "/admin/comunidad", label: "Comunidad", icon: Sparkles },
   { href: "/admin/contacto", label: "Contacto", icon: Phone },
   { href: "/admin/sitio", label: "Datos del sitio", icon: Settings },
