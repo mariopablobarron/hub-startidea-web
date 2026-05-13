@@ -1,0 +1,31 @@
+lib/admin/schema.ts
+  s_f12e84bac900e4::t_ae3c6dc3337e35 68-121
+lib/admin/actions.ts
+  s_f12e84bac900e4::t_10d4a3fbc57d5d 9-18
+  s_f12e84bac900e4::t_186d6de7653ba1 230-327
+app/admin/manifiesto/page.tsx
+  s_f12e84bac900e4::t_053efdabee579a 1-70
+app/admin/metodo/page.tsx
+  s_f12e84bac900e4::t_d23e8054e8bca3 1-53
+app/admin/ecosistema/page.tsx
+  s_f12e84bac900e4::t_fc31569548c093 1-60
+app/admin/_components/AdminSidebar.tsx
+  s_f12e84bac900e4::t_1c74ed7f3cb081 16-18
+  s_f12e84bac900e4::t_7596611c41281e 25-26,28
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "246fc680399ee5e83bfb885157623ddd8be7608c",
+  "prompts": {},
+  "sessions": {
+    "s_f12e84bac900e4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ba62ea7a-a471-4585-b822-8ababb0c1519",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}
