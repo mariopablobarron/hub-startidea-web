@@ -1,0 +1,20 @@
+tests/e2e/public.spec.ts
+  s_f12e84bac900e4::t_73afeddb9bb064 83-85,88,90-96,99-103,105-110,113,115,117-120,124,126-159
+  s_f12e84bac900e4::t_3ca5c340a394f8 86-87,89,97-98,104,111-112,114,116,121-123,125
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.4",
+  "base_commit_sha": "573a8f577d3f72fa2f2202a5b1212b2ef38df2ca",
+  "prompts": {},
+  "sessions": {
+    "s_f12e84bac900e4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ba62ea7a-a471-4585-b822-8ababb0c1519",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}
