@@ -80,6 +80,83 @@ test.describe("Formulario de contacto", () => {
   });
 });
 
+test.describe("Narrativa de matriz (HUB casa madre de Startidea)", () => {
+  test("hero menciona Startidea y CTA secundario apunta a #ecosistema", async ({ page }) => {
+    await page.goto("/");
+    // El eyebrow del hero contiene "Casa madre de Startidea"
+    await expect(page.locator("text=Casa madre de Startidea").first()).toBeVisible();
+    // CTA secundario debe enlazar a #ecosistema (NO a #tour como antes)
+    const cta = page.getByRole("link", { name: /Conoce el ecosistema/i }).first();
+    await expect(cta).toBeVisible();
+    await expect(cta).toHaveAttribute("href", "#ecosistema");
+  });
+
+  test("sección #manifiesto presenta los dos pilares", async ({ page }) => {
+    await page.goto("/#manifiesto");
+    await expect(page.getByText(/Como espacio físico/i)).toBeVisible();
+    await expect(page.getByText("Como ecosistema", { exact: true })).toBeVisible();
+    // Cada pilar debe tener CTA con su texto característico
+    await expect(page.getByRole("link", { name: /Ver salas y reservar/i })).toBeVisible();
+  });
+
+  test("sección #ecosistema lista 4 proyectos con enlaces externos", async ({ page }) => {
+    await page.goto("/#ecosistema");
+    // Los 4 proyectos por nombre (h3 dentro de las cards)
+    for (const name of [
+      "Startidea",
+      "Tres mil millones de latidos",
+      "Raíz y Acción",
+      "TodoMerchandising",
+    ]) {
+      // Usamos getByText para evitar fragilidad con role/level que depende del DOM real
+      await expect(page.locator("section#ecosistema").getByText(name, { exact: true }).first()).toBeVisible();
+    }
+    // Cada card abre en nueva pestaña — al menos 4 enlaces externos en la sección
+    const links = page.locator("section#ecosistema a[target='_blank']");
+    expect(await links.count()).toBeGreaterThanOrEqual(4);
+  });
+
+  test("sección #metodo (Raíz y Acción) con 4 pasos y CTA externo", async ({ page }) => {
+    await page.goto("/#metodo");
+    await expect(page.getByText(/Llevamos las ideas/i)).toBeVisible();
+    // 4 pasos: Raíz, Tronco, Ramas, Acción — buscamos por texto dentro de la sección
+    const seccion = page.locator("section#metodo");
+    for (const step of ["Raíz", "Tronco", "Ramas", "Acción"]) {
+      await expect(seccion.getByText(step, { exact: true }).first()).toBeVisible();
+    }
+    const cta = page.getByRole("link", { name: /Descubre el método/i });
+    await expect(cta).toBeVisible();
+    await expect(cta).toHaveAttribute("href", /raizyaccion/);
+  });
+
+  test("footer tiene cinta superior 'El HUB forma parte de' con 4 proyectos", async ({ page }) => {
+    await page.goto("/");
+    const ribbon = page.getByText(/El HUB forma parte de/i);
+    await expect(ribbon).toBeVisible();
+    // 4 links de proyectos en el footer (cinta + columna enlaces)
+    const footerProjectLinks = page.locator("footer a[target='_blank']");
+    expect(await footerProjectLinks.count()).toBeGreaterThanOrEqual(4);
+  });
+
+  test("nav muestra Ecosistema primero y Método entre Tour y Podcast", async ({ page }) => {
+    await page.goto("/");
+    const navLinks = page.locator("header nav a");
+    const labels = await navLinks.allTextContents();
+    const cleaned = labels.map((s) => s.trim()).filter(Boolean);
+    // Ecosistema antes que Salas
+    const ecoIdx = cleaned.indexOf("Ecosistema");
+    const salasIdx = cleaned.indexOf("Salas");
+    expect(ecoIdx).toBeGreaterThanOrEqual(0);
+    expect(ecoIdx).toBeLessThan(salasIdx);
+    // Método entre Tour y Podcast
+    const tourIdx = cleaned.indexOf("Tour");
+    const metodoIdx = cleaned.indexOf("Método");
+    const podcastIdx = cleaned.indexOf("Podcast");
+    expect(tourIdx).toBeLessThan(metodoIdx);
+    expect(metodoIdx).toBeLessThan(podcastIdx);
+  });
+});
+
 test.describe("Cabeceras de seguridad", () => {
   test("home incluye headers anti-clickjacking + nosniff + Referrer-Policy", async ({ request }) => {
     const res = await request.get("/");
