@@ -12,6 +12,7 @@ import {
   Settings,
   BookOpen,
   MessageSquare,
+  Search,
 } from "lucide-react";
 import { cn } from "@/lib/cn";
 
@@ -24,6 +25,7 @@ const NAV = [
   { href: "/admin/sitio", label: "Datos del sitio", icon: Settings },
   { href: "/admin/faq", label: "FAQ chatbot", icon: BookOpen },
   { href: "/admin/conversaciones", label: "Conversaciones", icon: MessageSquare },
+  { href: "/admin/seo", label: "SEO (Search Console)", icon: Search },
 ];
 
 export function AdminSidebar({
