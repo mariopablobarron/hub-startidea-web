@@ -1,0 +1,26 @@
+lib/seo/gsc.ts
+  s_f12e84bac900e4::t_e0d0d062b40157 1-112
+app/admin/seo/page.tsx
+  s_f12e84bac900e4::t_5b2c4bca2826b0 50
+  s_f12e84bac900e4::t_c6922925ff9eab 227-228
+  s_f12e84bac900e4::t_47c2da392a0070 1-49,51-226,229-287
+app/admin/_components/AdminSidebar.tsx
+  s_f12e84bac900e4::t_fc4a9601b46b35 28
+  s_f12e84bac900e4::t_6821dd5b7b6f92 15
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.4",
+  "base_commit_sha": "64d238a11a56a1a7852b026ec43ec18171a1ff5f",
+  "prompts": {},
+  "sessions": {
+    "s_f12e84bac900e4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ba62ea7a-a471-4585-b822-8ababb0c1519",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}
