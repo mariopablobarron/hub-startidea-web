@@ -23,19 +23,22 @@
     }
   },
   "hero": {
-    "eyebrow": "HUB Startidea · Granada",
+    "eyebrow": "HUB Startidea · Casa madre de Startidea",
     "titleStart": "El espacio donde se cocina la ",
     "titleEm": "innovación social",
     "titleEnd": " en el centro de Granada.",
-    "subtitle": "Coworking, salas de formación, estudio de podcast y comunidad de proyectos con propósito. 330 m² en pleno centro de Granada (C/ Conde Cifuentes 33).",
+    "subtitle": "El HUB es a la vez espacio físico (coworking, salas de formación, estudio de podcast) y la casa madre de los proyectos de Startidea. 330 m² en pleno centro de Granada (C/ Conde Cifuentes 33).",
     "ctaPrimary": "Reserva tu visita",
-    "ctaSecondary": "Ver el local",
+    "ctaSecondary": "Conoce el ecosistema",
+    "ctaSecondaryHref": "#ecosistema",
     "rotatingTagline": "Aquí pasa de todo:",
     "rotatingWords": [
       "Coworking",
       "formación",
       "podcast",
-      "comunidad"
+      "comunidad",
+      "proyectos",
+      "mentoría"
     ],
     "stats": [
       {
@@ -322,6 +325,69 @@
       "label": "Accesible"
     }
   ],
+  "manifesto": {
+    "eyebrow": "Qué es el HUB",
+    "title": "Un espacio físico y un ecosistema vivo bajo el mismo techo.",
+    "intro": "El HUB no es solo un coworking. Es la sede donde Startidea diseña, lanza y acompaña proyectos con propósito. Lo que aquí se cuece sale a la calle como iniciativas, formaciones, podcasts y comunidades.",
+    "pillars": [
+      {
+        "label": "Como espacio físico",
+        "title": "Coworking, salas y estudio en pleno centro",
+        "description": "Alquila salas para tu formación, evento o reunión. Reserva el estudio para grabar tu podcast. O instala tu proyecto en el coworking con todas las facilidades.",
+        "ctaLabel": "Ver salas y reservar",
+        "ctaHref": "#salas",
+        "items": [
+          "8 salas multifunción (47 a 12 m²)",
+          "Estudio de podcast profesional",
+          "Coworking con plazas fijas y flex",
+          "Cocina, fibra, accesible, terraza"
+        ]
+      },
+      {
+        "label": "Como ecosistema",
+        "title": "La matriz donde se cocinan los proyectos de Startidea",
+        "description": "El HUB es la base operativa de Startidea: agencia, productora y método. Cuatro proyectos vivos nacen y se acompañan desde aquí.",
+        "ctaLabel": "Conoce el ecosistema",
+        "ctaHref": "#ecosistema",
+        "items": [
+          "Startidea — Agencia de innovación social",
+          "Tres mil millones de latidos — Proyecto de propósito vital",
+          "Raíz y Acción — Método para llevar ideas a la calle",
+          "TodoMerchandising — Merchandising con impacto"
+        ]
+      }
+    ]
+  },
+  "methodRaizAccion": {
+    "eyebrow": "Método de la casa",
+    "label": "Raíz y Acción",
+    "title": "Llevamos las ideas de la raíz a la acción tangible.",
+    "description": "Raíz y Acción es el método que usamos en Startidea para acompañar proyectos. Empieza en lo profundo (el porqué, las personas, el contexto) y termina en lo concreto (decisiones, prototipos, lanzamiento). Lo usan emprendedoras y emprendedores, fundaciones, empresas con propósito y administraciones públicas.",
+    "url": "https://raizyaccion.hubstartidea.es",
+    "ctaLabel": "Descubre el método",
+    "steps": [
+      {
+        "step": "1",
+        "title": "Raíz",
+        "description": "Entender la idea, las personas, el contexto. Sin atajos."
+      },
+      {
+        "step": "2",
+        "title": "Tronco",
+        "description": "Marco, decisiones clave, lo que queda fuera. Estructura."
+      },
+      {
+        "step": "3",
+        "title": "Ramas",
+        "description": "Prototipos, iteración con realidad, ajuste."
+      },
+      {
+        "step": "4",
+        "title": "Acción",
+        "description": "Lanzamiento al mundo. Aprender en producción."
+      }
+    ]
+  },
   "ecosystem": {
     "eyebrow": "Forma parte de Startidea",
     "title": "Un espacio físico dentro de una agencia de innovación social.",

@@ -1,7 +1,9 @@
 import { Hero } from "@/components/Hero";
+import { Manifesto } from "@/components/Manifesto";
+import { EcosystemStartidea } from "@/components/EcosystemStartidea";
 import { RoomsGrid } from "@/components/RoomsGrid";
 import { Floorplan } from "@/components/Floorplan";
-import { EcosystemStartidea } from "@/components/EcosystemStartidea";
+import { MethodRaizAccion } from "@/components/MethodRaizAccion";
 import { Services } from "@/components/Services";
 import { Podcast } from "@/components/Podcast";
 import { Community } from "@/components/Community";
@@ -20,9 +22,11 @@ export default function HomePage() {
         data={[localBusinessSchema(), coworkingSpaceSchema(), websiteSchema()]}
       />
       <Hero />
+      <Manifesto />
+      <EcosystemStartidea />
       <RoomsGrid />
       <Floorplan />
-      <EcosystemStartidea />
+      <MethodRaizAccion />
       <Services />
       <Podcast />
       <Community />

@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { ArrowRight, MapPin } from "lucide-react";
+import { ArrowRight, Compass } from "lucide-react";
 import { content } from "@/lib/content";
 
 const hero = content.hero;
@@ -71,9 +71,9 @@ export function Hero() {
             {hero.ctaPrimary}
             <ArrowRight size={16} />
           </Link>
-          <Link href="#tour" className="btn-ghost">
+          <Link href={hero.ctaSecondaryHref || "#ecosistema"} className="btn-ghost">
             {hero.ctaSecondary}
-            <MapPin size={16} />
+            <Compass size={16} />
           </Link>
         </motion.div>
 

@@ -9,9 +9,10 @@ import { content } from "@/lib/content";
 const site = content.site;
 
 const nav = [
+  { href: "/#ecosistema", label: "Ecosistema" },
   { href: "/#salas", label: "Salas" },
   { href: "/#tour", label: "Tour" },
-  { href: "/#ecosistema", label: "Ecosistema" },
+  { href: "/#metodo", label: "Método" },
   { href: "/#podcast", label: "Podcast" },
   { href: "/#comunidad", label: "Comunidad" },
 ];
