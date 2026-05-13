@@ -1,36 +1,49 @@
 import { ExternalLink, RefreshCw, AlertCircle } from "lucide-react";
+import { revalidateTag } from "next/cache";
 import { auth } from "@/auth";
-import { fetchSummary, fetchTopRows, listSitemaps, getSiteUrl, type GscRow } from "@/lib/seo/gsc";
+import {
+  fetchSummaryCached,
+  fetchTopRowsCached,
+  listSitemapsCached,
+  getSiteUrl,
+  type GscRow,
+} from "@/lib/seo/gsc";
 import { PageHeader } from "../_components/Field";
 
-// Página server-side. Cada visita dispara fetch a GSC API. Como no hay
-// BD, no cacheamos en servidor — la frecuencia de uso es baja (admin
-// puntual, no producción). Si crece el uso, añadir cache con revalidate.
+// Página server-side con cache 1h (TTL en lib/seo/gsc.ts). La API de GSC
+// se actualiza cada 24-48h según Google, así que cachear 1h no pierde
+// frescura útil y evita rate limits si alguien recarga la página.
+// Para forzar refresh manual, action "refresh-cache" abajo.
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "SEO · Admin · HUB Startidea" };
 
+async function refreshCache() {
+  "use server";
+  revalidateTag("gsc");
+}
+
 type LoadResult =
   | {
       ok: true;
-      summary28: Awaited<ReturnType<typeof fetchSummary>>;
-      summary7: Awaited<ReturnType<typeof fetchSummary>>;
+      summary28: Awaited<ReturnType<typeof fetchSummaryCached>>;
+      summary7: Awaited<ReturnType<typeof fetchSummaryCached>>;
       topQueries: GscRow[];
       topPages: GscRow[];
       topCountries: GscRow[];
-      sitemaps: Awaited<ReturnType<typeof listSitemaps>>;
+      sitemaps: Awaited<ReturnType<typeof listSitemapsCached>>;
     }
   | { ok: false; error: string };
 
 async function load(): Promise<LoadResult> {
   try {
     const [summary28, summary7, topQueries, topPages, topCountries, sitemaps] = await Promise.all([
-      fetchSummary(28),
-      fetchSummary(7),
-      fetchTopRows({ days: 28, dimension: "query", limit: 30 }),
-      fetchTopRows({ days: 28, dimension: "page", limit: 20 }),
-      fetchTopRows({ days: 28, dimension: "country", limit: 10 }),
-      listSitemaps(),
+      fetchSummaryCached(28),
+      fetchSummaryCached(7),
+      fetchTopRowsCached(28, "query", 30),
+      fetchTopRowsCached(28, "page", 20),
+      fetchTopRowsCached(28, "country", 10),
+      listSitemapsCached(),
     ]);
     return { ok: true, summary28, summary7, topQueries, topPages, topCountries, sitemaps };
   } catch (e) {
@@ -119,9 +132,19 @@ export default async function AdminSeoPage() {
             <SitemapsCard sitemaps={data.sitemaps} />
           </section>
 
-          <div className="flex items-center gap-2 text-xs text-[var(--color-mute)]">
-            <RefreshCw size={12} />
-            Datos en vivo. Cada visita a esta página llama a la API de Search Console.
+          <div className="flex items-center justify-between gap-3 rounded-xl border border-[var(--color-line)] bg-[var(--color-paper)] px-4 py-3 text-xs">
+            <div className="flex items-center gap-2 text-[var(--color-mute)]">
+              <RefreshCw size={12} />
+              Datos cacheados 1 hora. GSC actualiza una vez al día, por lo que cachear no pierde frescura útil.
+            </div>
+            <form action={refreshCache}>
+              <button
+                type="submit"
+                className="rounded-full border border-[var(--color-line)] px-3 py-1 text-xs hover:border-[var(--color-ink)] hover:bg-[var(--color-paper-2)]"
+              >
+                Forzar refresh
+              </button>
+            </form>
           </div>
         </>
       )}
@@ -213,7 +236,7 @@ function RowsTable({
   );
 }
 
-function SitemapsCard({ sitemaps }: { sitemaps: Awaited<ReturnType<typeof listSitemaps>> }) {
+function SitemapsCard({ sitemaps }: { sitemaps: Awaited<ReturnType<typeof listSitemapsCached>> }) {
   return (
     <div className="rounded-2xl border border-[var(--color-line)] bg-[var(--color-paper)] p-6">
       <h2 className="font-display text-lg">Sitemaps</h2>

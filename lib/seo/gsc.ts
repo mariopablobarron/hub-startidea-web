@@ -1,3 +1,4 @@
+import { unstable_cache } from "next/cache";
 import { google } from "googleapis";
 
 // Cliente Google Search Console (Webmasters v3).
@@ -110,3 +111,29 @@ export async function listSitemaps() {
   const { data } = await client.sitemaps.list({ siteUrl });
   return data.sitemap || [];
 }
+
+// =============================================================
+// Versiones cacheadas (1 hora) para el panel admin. Evitan llamar
+// a GSC en cada reload — los datos de GSC se actualizan cada 24-48h
+// según Google, así que un TTL agresivo está bien.
+// =============================================================
+const CACHE_TTL = 3600; // 1 hora
+
+export const fetchSummaryCached = unstable_cache(
+  async (days: number) => fetchSummary(days),
+  ["gsc-summary"],
+  { revalidate: CACHE_TTL, tags: ["gsc"] },
+);
+
+export const fetchTopRowsCached = unstable_cache(
+  async (days: number, dimension: "query" | "page" | "country" | "device", limit: number) =>
+    fetchTopRows({ days, dimension, limit }),
+  ["gsc-top-rows"],
+  { revalidate: CACHE_TTL, tags: ["gsc"] },
+);
+
+export const listSitemapsCached = unstable_cache(
+  async () => listSitemaps(),
+  ["gsc-sitemaps"],
+  { revalidate: CACHE_TTL, tags: ["gsc"] },
+);
