@@ -114,6 +114,10 @@ export const ecosystemSchema = z.object({
         tagline: z.string().min(1),
         url: z.string().url(),
         accent: z.enum(["coral", "warm", "earth", "ink"]),
+        // Campos opcionales: si están, la página /ecosistema usa esto en lugar
+        // del tagline. Si no, fallback al tagline corto.
+        longDescription: z.string().optional(),
+        what: z.string().optional(),
       }),
     )
     .min(1),

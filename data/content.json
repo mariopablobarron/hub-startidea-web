@@ -399,25 +399,33 @@
         "name": "Startidea",
         "tagline": "Agencia de innovación social. Diseñamos, lanzamos y acompañamos proyectos con propósito.",
         "url": "https://startidea.es",
-        "accent": "coral"
+        "accent": "coral",
+        "what": "Agencia matriz · 11+ años acompañando ideas",
+        "longDescription": "Startidea es la agencia de innovación social que dirige Mario Pablo Barron desde Granada. Trabaja con fundaciones, empresas con propósito, administraciones públicas y emprendedoras y emprendedores que quieren llevar una idea a la realidad. El HUB es su sede física; lo que aquí se cuece sale a la calle en forma de proyectos."
       },
       {
         "name": "Tres mil millones de latidos",
         "tagline": "Proyecto que ayuda a vivir con propósito. Coach reflexivo, círculos íntimos y rutinas guiadas.",
         "url": "https://tresmilmillonesdelatidos.es",
-        "accent": "warm"
+        "accent": "warm",
+        "what": "Producto digital · acompañamiento personal",
+        "longDescription": "Una vida humana son aproximadamente tres mil millones de latidos. Este proyecto es un coach reflexivo (no un chatbot motivacional) que ayuda a la persona a tomar decisiones difíciles con perspectiva. Incluye conversaciones íntimas, círculos compartidos y rutinas para sostener el cambio. Nació en Startidea como respuesta a la pregunta: ¿cómo escalar la mentoría sin perder profundidad?"
       },
       {
         "name": "Raíz y Acción",
         "tagline": "Método Startidea: el marco que usamos para llevar ideas de raíz a acción tangible.",
         "url": "https://raizyaccion.hubstartidea.es",
-        "accent": "earth"
+        "accent": "earth",
+        "what": "Metodología · open source para acompañar proyectos",
+        "longDescription": "Raíz y Acción es el método que Startidea ha desarrollado a lo largo de más de una década acompañando proyectos. Cuatro fases —Raíz, Tronco, Ramas, Acción— van de lo profundo (porqué, personas, contexto) a lo concreto (prototipos, decisiones, lanzamiento). El método se publica abierto para que cualquiera pueda aplicarlo o adaptarlo."
       },
       {
         "name": "TodoMerchandising",
         "tagline": "Merchandising con impacto social. Camisetas, totebags y materiales para causas y marcas con propósito.",
         "url": "https://merchandising.hubstartidea.es",
-        "accent": "ink"
+        "accent": "ink",
+        "what": "Servicio · producción ética y trazable",
+        "longDescription": "TodoMerchandising es la división de producción de Startidea. Hace camisetas, totebags, lonas, packaging y materiales gráficos para causas sociales, fundaciones, marcas con propósito y campañas. Trabaja con proveedores trazables y prioriza materiales reciclados y producción local cuando es viable."
       }
     ]
   },

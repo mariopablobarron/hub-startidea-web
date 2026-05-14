@@ -80,6 +80,48 @@ test.describe("Formulario de contacto", () => {
   });
 });
 
+test.describe("Páginas dedicadas (SEO)", () => {
+  test("/ecosistema carga con title, intro y 4 proyectos", async ({ page }) => {
+    const res = await page.goto("/ecosistema");
+    expect(res?.status()).toBe(200);
+    await expect(page).toHaveTitle(/Ecosistema Startidea/i);
+    await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+    // 4 cards de proyectos
+    for (const name of [
+      "Startidea",
+      "Tres mil millones de latidos",
+      "Raíz y Acción",
+      "TodoMerchandising",
+    ]) {
+      await expect(page.getByRole("heading", { name, level: 2 })).toBeVisible();
+    }
+    // CTA hacia /metodo en el cierre
+    await expect(page.getByRole("link", { name: /Conoce el método Raíz y Acción/i })).toBeVisible();
+  });
+
+  test("/metodo carga con title, fases y CTA externo", async ({ page }) => {
+    const res = await page.goto("/metodo");
+    expect(res?.status()).toBe(200);
+    await expect(page).toHaveTitle(/Raíz y Acción/i);
+    await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+    // 4 fases con sus nombres
+    for (const step of ["Raíz", "Tronco", "Ramas", "Acción"]) {
+      await expect(page.locator("ol").getByText(step, { exact: true }).first()).toBeVisible();
+    }
+    // CTA hacia raizyaccion.hubstartidea.es
+    const externalCta = page.locator("a[href*='raizyaccion']").first();
+    await expect(externalCta).toBeVisible();
+  });
+
+  test("sitemap incluye /ecosistema y /metodo", async ({ request }) => {
+    const res = await request.get("/sitemap.xml");
+    expect(res.status()).toBe(200);
+    const body = await res.text();
+    expect(body).toContain("/ecosistema");
+    expect(body).toContain("/metodo");
+  });
+});
+
 test.describe("Narrativa de matriz (HUB casa madre de Startidea)", () => {
   test("hero menciona Startidea y CTA secundario apunta a #ecosistema", async ({ page }) => {
     await page.goto("/");
