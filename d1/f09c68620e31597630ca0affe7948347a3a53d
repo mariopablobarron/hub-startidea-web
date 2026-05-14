@@ -1,0 +1,22 @@
+lib/contact/telegram.ts
+  s_f12e84bac900e4::t_5846ed92c5eb7f 1-78
+lib/contact/actions.ts
+  s_f12e84bac900e4::t_e34ee8b8eecfc4 60-67,73,77-85,89,96-98,105-108,110-137,144
+  s_f12e84bac900e4::t_1304feb6e8993e 8
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "d1f09c68620e31597630ca0affe7948347a3a53d",
+  "prompts": {},
+  "sessions": {
+    "s_f12e84bac900e4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ba62ea7a-a471-4585-b822-8ababb0c1519",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}
