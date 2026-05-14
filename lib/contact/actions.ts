@@ -5,6 +5,7 @@ import { contactSchema } from "./schema";
 import { rateLimit, maybeSweep } from "./rate-limit";
 import { adminEmail, userEmail } from "./emails";
 import { sendEmail, isResendConfigured } from "@/lib/mail/resend";
+import { sendContactToTelegram, isTelegramConfigured } from "./telegram";
 
 export type ContactState =
   | { status: "idle" }
@@ -56,47 +57,91 @@ export async function submitContact(
     };
   }
 
-  // 4. Si Resend no está configurado (preview / desarrollo), no romper la UX:
-  //    confirmar al usuario pero loguear para que el dev sepa que no salió.
-  if (!isResendConfigured()) {
-    console.warn("[contact] RESEND_API_KEY no configurada — mensaje NO enviado:", {
+  // 4. Si Resend NO está configurado (preview / dev), intentamos al menos
+  //    enviar a Telegram para no perder el lead. Si tampoco hay Telegram,
+  //    devolvemos "modo demo" pero la UX no se rompe.
+  const resendOk = isResendConfigured();
+  const telegramOk = isTelegramConfigured();
+
+  if (!resendOk && !telegramOk) {
+    console.warn("[contact] ni Resend ni Telegram configurados — lead NO entregado:", {
       name: data.name,
       email: data.email,
     });
     return {
       status: "ok",
-      message: "¡Recibido! (modo demo — Resend no configurado)",
+      message: "¡Recibido! (modo demo — ni Resend ni Telegram configurados)",
     };
   }
 
-  // 5. Enviar emails
-  try {
+  // 5. Envío en paralelo a TODOS los canales activos. Si falla solo uno,
+  //    seguimos OK (telegram suele entregar incluso si Resend tiene un bache).
+  //    Resend devuelve error con throw → lo capturamos.
+  //    Telegram devuelve { ok, error } sin throw → no rompe el Promise.all.
+  const errors: string[] = [];
+
+  const tasks: Array<Promise<unknown>> = [];
+
+  if (resendOk) {
     const admin = adminEmail(data);
     const user = userEmail(data);
     const adminTo = process.env.ADMIN_EMAIL || "mario@startidea.es";
-
-    await Promise.all([
+    tasks.push(
       sendEmail({
         to: adminTo,
         subject: admin.subject,
         html: admin.html,
         text: admin.text,
         replyTo: data.email,
+      }).catch((e) => {
+        errors.push(`email-admin: ${e instanceof Error ? e.message : String(e)}`);
+        console.error("[contact] email admin falló:", e);
       }),
       sendEmail({
         to: data.email,
         subject: user.subject,
         html: user.html,
         text: user.text,
+      }).catch((e) => {
+        // El email de auto-respuesta es menos crítico — si falla, log y seguir.
+        errors.push(`email-user: ${e instanceof Error ? e.message : String(e)}`);
+        console.error("[contact] email auto-respuesta falló:", e);
       }),
-    ]);
+    );
+  }
+
+  if (telegramOk) {
+    tasks.push(
+      sendContactToTelegram(data).then((r) => {
+        if (!r.ok) {
+          errors.push(`telegram: ${r.error}`);
+          console.error("[contact] Telegram falló:", r.error);
+        }
+      }),
+    );
+  }
+
+  try {
+    await Promise.all(tasks);
+
+    // Si ningún canal entregó (todos fallaron) → error real al usuario.
+    // Si al menos uno entregó (típicamente Telegram, que es síncrono y simple),
+    // damos OK porque Mario va a ver el lead.
+    const channels = (resendOk ? 2 : 0) + (telegramOk ? 1 : 0);
+    if (errors.length >= channels) {
+      return {
+        status: "error",
+        message:
+          "No se pudo entregar el mensaje. Inténtalo de nuevo o escríbenos a hola@hubstartidea.es.",
+      };
+    }
 
     return {
       status: "ok",
       message: "¡Mensaje recibido! Te respondemos en menos de 24 horas.",
     };
   } catch (err) {
-    console.error("[contact] error enviando emails:", err);
+    console.error("[contact] error inesperado:", err);
     return {
       status: "error",
       message:
