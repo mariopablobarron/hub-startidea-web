@@ -13,13 +13,19 @@ import {
   localBusinessSchema,
   coworkingSpaceSchema,
   websiteSchema,
+  organizationSchema,
 } from "@/lib/seo/structuredData";
 
 export default function HomePage() {
   return (
     <>
       <JsonLd
-        data={[localBusinessSchema(), coworkingSpaceSchema(), websiteSchema()]}
+        data={[
+          localBusinessSchema(),
+          coworkingSpaceSchema(),
+          websiteSchema(),
+          organizationSchema(),
+        ]}
       />
       <Hero />
       <Manifesto />

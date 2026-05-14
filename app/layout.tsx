@@ -23,16 +23,30 @@ const fraunces = Fraunces({
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
   title: {
-    default: `${site.name} — Coworking, formación y podcast en Granada`,
+    default: `${site.name} — Casa madre de Startidea en Granada`,
     template: `%s · ${site.name}`,
   },
   description: site.description,
+  keywords: [
+    "coworking Granada",
+    "alquiler salas Granada",
+    "estudio podcast Granada",
+    "innovación social",
+    "Startidea",
+    "formación empresarial Granada",
+    "espacio para eventos Granada",
+    "sala reuniones Granada",
+  ],
+  authors: [{ name: site.parent.name, url: site.parent.url }],
+  creator: site.parent.name,
+  publisher: site.parent.name,
+  robots: { index: true, follow: true, googleBot: { index: true, follow: true } },
   openGraph: {
     type: "website",
     locale: "es_ES",
     url: site.url,
     siteName: site.name,
-    title: `${site.name} — Coworking en el centro de Granada`,
+    title: `${site.name} — Casa madre de Startidea en Granada`,
     description: site.description,
     images: [
       {
@@ -45,6 +59,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
+    title: `${site.name} — Casa madre de Startidea en Granada`,
+    description: site.description,
     images: ["/images/og/og-default.jpg"],
   },
   alternates: { canonical: site.url },

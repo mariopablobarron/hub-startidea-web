@@ -112,6 +112,42 @@ export function breadcrumbSchema(items: Array<{ name: string; url: string }>) {
   };
 }
 
+/**
+ * Organization schema con Startidea como entidad matriz Y el hub como
+ * sede. Refuerza la relación "Startidea opera el HUB" para Google y
+ * enlaza los proyectos hermanos como subOrganization/sameAs para que
+ * Google entienda el ecosistema completo (knowledge graph).
+ */
+export function organizationSchema() {
+  const projects = content.ecosystem?.projects || [];
+  return {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "@id": `${site.parent.url}/#organization`,
+    name: site.parent.name,
+    url: site.parent.url,
+    description:
+      "Agencia de innovación social que diseña, lanza y acompaña proyectos con propósito.",
+    location: {
+      "@type": "Place",
+      name: site.name,
+      address: {
+        "@type": "PostalAddress",
+        streetAddress: site.address.street,
+        addressLocality: site.address.city,
+        postalCode: site.address.postal,
+        addressCountry: "ES",
+      },
+    },
+    subOrganization: projects.map((p) => ({
+      "@type": "Organization",
+      name: p.name,
+      url: p.url,
+    })),
+    sameAs: projects.map((p) => p.url),
+  };
+}
+
 /** ItemList del catálogo de salas. */
 export function roomsItemListSchema() {
   return {
