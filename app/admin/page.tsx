@@ -20,6 +20,7 @@ import {
   Users,
   CalendarCheck,
   CalendarDays,
+  MessageSquareText,
 } from "lucide-react";
 
 type Card = {
@@ -51,6 +52,13 @@ const CARDS: Card[] = [
     title: "Eventos",
     desc: "Crear talleres y encuentros. Inscripciones automáticas con .ics.",
     icon: CalendarDays,
+    group: "plataforma",
+  },
+  {
+    href: "/admin/foro",
+    title: "Foro",
+    desc: "Moderar hilos de la comunidad — fijar, cerrar, eliminar.",
+    icon: MessageSquareText,
     group: "plataforma",
   },
   // Narrativa principal
@@ -145,10 +153,47 @@ const GROUPS: Array<{ id: Card["group"]; label: string }> = [
   { id: "site", label: "SEO y analítica" },
 ];
 
+function Metric({
+  label,
+  value,
+  href,
+  subtitle,
+  highlight = false,
+}: {
+  label: string;
+  value: string | number;
+  href: string;
+  subtitle?: string;
+  highlight?: boolean;
+}) {
+  return (
+    <Link
+      href={href}
+      className={`block rounded-xl border p-3 transition hover:-translate-y-0.5 hover:shadow-sm ${
+        highlight
+          ? "border-amber-300 bg-amber-50 hover:border-amber-400"
+          : "border-[var(--color-line)] bg-[var(--color-paper-2)] hover:border-[var(--color-ink)]"
+      }`}
+    >
+      <div className="text-xs uppercase tracking-[0.12em] text-[var(--color-mute)]">{label}</div>
+      <div className="mt-1 font-display text-2xl tracking-tight">{value}</div>
+      {subtitle && <div className="mt-0.5 text-xs text-[var(--color-mute)]">{subtitle}</div>}
+    </Link>
+  );
+}
+
 export default async function AdminDashboard() {
-  const [userCount, pendingBookings] = await Promise.all([
+  const now = new Date();
+  const [userCount, pendingBookings, upcomingEvents, openTopics, paidBondsCount, totalRevenueCents] = await Promise.all([
     prisma.user.count(),
     prisma.booking.count({ where: { status: "PENDING" } }),
+    prisma.event.count({ where: { published: true, startsAt: { gte: now } } }),
+    prisma.topic.count(),
+    prisma.prepaidBond.count({ where: { payment: { status: "PAID" } } }),
+    prisma.payment.aggregate({
+      where: { status: "PAID" },
+      _sum: { amountCents: true },
+    }).then((r) => r._sum.amountCents || 0),
   ]);
 
   return (
@@ -156,18 +201,18 @@ export default async function AdminDashboard() {
       <header className="rounded-2xl border border-[var(--color-line)] bg-[var(--color-paper)] p-6">
         <h1 className="font-display text-3xl tracking-tight">Panel de administración</h1>
         <p className="mt-2 max-w-2xl text-sm text-[var(--color-mute)]">
-          {userCount} usuario{userCount === 1 ? "" : "s"} en la plataforma. Los cambios de contenido
-          se commitean a GitHub y se redeployan en 1-2 minutos. Los cambios de plataforma
-          (usuarios, reservas) son inmediatos.
+          Plataforma comunitaria del HUB Startidea. Cambios inmediatos en BD;
+          cambios de contenido (Hero, Salas, etc.) se commitean a GitHub y se redeployan en 1-2 min.
         </p>
-        {pendingBookings > 0 && (
-          <div className="mt-4 inline-flex items-center gap-2 rounded-full bg-amber-50 px-3 py-1.5 text-sm text-amber-800">
-            <CalendarCheck size={14} />
-            <Link href="/admin/reservas?status=PENDING" className="font-medium underline underline-offset-2">
-              {pendingBookings} reserva{pendingBookings === 1 ? "" : "s"} pendiente{pendingBookings === 1 ? "" : "s"} de aprobación
-            </Link>
-          </div>
-        )}
+
+        {/* Métricas vivas */}
+        <div className="mt-6 grid grid-cols-2 gap-4 md:grid-cols-5">
+          <Metric label="Usuarios" value={userCount} href="/admin/users" />
+          <Metric label="Reservas pendientes" value={pendingBookings} href="/admin/reservas?status=PENDING" highlight={pendingBookings > 0} />
+          <Metric label="Eventos próximos" value={upcomingEvents} href="/admin/eventos" />
+          <Metric label="Hilos foro" value={openTopics} href="/admin/foro" />
+          <Metric label="Ingresos" value={`${(totalRevenueCents / 100).toFixed(0)}€`} href="/admin/reservas" subtitle={`${paidBondsCount} bonos`} />
+        </div>
       </header>
 
       {GROUPS.map((g) => {
