@@ -1,6 +1,9 @@
 import Link from "next/link";
 import { content } from "@/lib/content";
 import { prisma } from "@/lib/db/prisma";
+
+// Página admin con queries BD en runtime — no prerender estático
+export const dynamic = "force-dynamic";
 import {
   ArrowRight,
   MessageSquareQuote,
@@ -16,6 +19,7 @@ import {
   Search,
   Users,
   CalendarCheck,
+  CalendarDays,
 } from "lucide-react";
 
 type Card = {
@@ -40,6 +44,13 @@ const CARDS: Card[] = [
     title: "Reservas",
     desc: "Aprobar pendientes, ver agenda, gestionar incidencias.",
     icon: CalendarCheck,
+    group: "plataforma",
+  },
+  {
+    href: "/admin/eventos",
+    title: "Eventos",
+    desc: "Crear talleres y encuentros. Inscripciones automáticas con .ics.",
+    icon: CalendarDays,
     group: "plataforma",
   },
   // Narrativa principal
