@@ -1,0 +1,43 @@
+app/layout.tsx
+  s_f12e84bac900e4::t_f0b57268778dc1 3,10-13,15-16,20,22-24
+  s_f12e84bac900e4::t_5d8b146ce0e650 97
+components/Hero.tsx
+  s_f12e84bac900e4::t_9cd13a26eae5b2 15-20,28,30,32,36,39
+app/ecosistema/opengraph-image.tsx
+  s_f12e84bac900e4::t_d28211cc9f5331 8-10,12,15
+  s_f12e84bac900e4::t_b65f3a5d29cc00 32-33
+  s_f12e84bac900e4::t_08580110e3d87a 36-42
+  s_f12e84bac900e4::t_59033a431dede7 60,84
+app/opengraph-image.tsx
+  s_f12e84bac900e4::t_e5f82c71d5f147 51
+  s_f12e84bac900e4::t_c00a8243f53eb5 21-22,25-31
+  s_f12e84bac900e4::t_b4cd4ff2774179 60,63,73-74
+components/Footer.tsx
+  s_f12e84bac900e4::t_41df3ed7ce05a0 38-41,43-44
+components/Contact.tsx
+  s_f12e84bac900e4::t_bd10015fffed4d 13-19
+app/globals.css
+  s_f12e84bac900e4::t_4a24ebde54c999 106-110,112
+  s_f12e84bac900e4::t_e0ac4f602752cf 3-15,17-29,31-43,47-48
+components/Header.tsx
+  s_f12e84bac900e4::t_edf4ec0074cf65 56-70
+app/metodo/opengraph-image.tsx
+  s_f12e84bac900e4::t_9e2e3cfcf145d0 28-32,34-38
+  s_f12e84bac900e4::t_973c70787c3088 39,42-43
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "f9d7798b4ff8b7c6a57d3a0e68929387d58ca997",
+  "prompts": {},
+  "sessions": {
+    "s_f12e84bac900e4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ba62ea7a-a471-4585-b822-8ababb0c1519",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}
