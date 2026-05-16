@@ -1,0 +1,21 @@
+docker-entrypoint.sh
+  s_f12e84bac900e4::t_816f302c4a2be6 1-17
+Dockerfile
+  s_f12e84bac900e4::t_5ee4479b7fed98 6,9,14,20,25-26,38-46,50
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "e993cda81109aebe7c2843e3c0051855b1d78991",
+  "prompts": {},
+  "sessions": {
+    "s_f12e84bac900e4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ba62ea7a-a471-4585-b822-8ababb0c1519",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}
