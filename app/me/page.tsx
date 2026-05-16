@@ -21,7 +21,11 @@ export default async function MePage() {
       take: 5,
     }),
     prisma.prepaidBond.findMany({
-      where: { userId: user.id, OR: [{ expiresAt: null }, { expiresAt: { gte: new Date() } }] },
+      where: {
+        userId: user.id,
+        payment: { status: "PAID" },
+        OR: [{ expiresAt: null }, { expiresAt: { gte: new Date() } }],
+      },
       orderBy: { createdAt: "desc" },
     }),
     prisma.topic.findMany({
@@ -82,18 +86,28 @@ export default async function MePage() {
 
         <Card icon={<Ticket size={18} />} title="Bonos activos" count={activeBonds.length}>
           {activeBonds.length === 0 ? (
-            <p className="text-sm text-[var(--color-mute)]">Sin bonos comprados todavía.</p>
+            <p className="text-sm text-[var(--color-mute)]">
+              Sin bonos comprados.{" "}
+              <Link href="/me/bonos" className="font-medium underline underline-offset-2 hover:text-[var(--color-coral-600)]">
+                Comprar bono
+              </Link>
+            </p>
           ) : (
-            <ul className="space-y-2 text-sm">
-              {activeBonds.map((b) => (
-                <li key={b.id} className="flex items-center justify-between gap-2">
-                  <span>{b.type.replace(/_/g, " ").toLowerCase()}</span>
-                  <span className="text-[var(--color-mute)]">
-                    {b.hoursTotal - b.hoursUsed} restantes
-                  </span>
-                </li>
-              ))}
-            </ul>
+            <>
+              <ul className="space-y-2 text-sm">
+                {activeBonds.map((b) => (
+                  <li key={b.id} className="flex items-center justify-between gap-2">
+                    <span>{b.type.replace(/_/g, " ").toLowerCase()}</span>
+                    <span className="text-[var(--color-mute)]">
+                      {b.hoursTotal - b.hoursUsed} restantes
+                    </span>
+                  </li>
+                ))}
+              </ul>
+              <Link href="/me/bonos" className="mt-3 inline-block text-sm font-medium text-[var(--color-coral-600)] hover:underline">
+                Ver todos →
+              </Link>
+            </>
           )}
         </Card>
 

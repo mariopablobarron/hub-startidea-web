@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowLeft, Calendar, X } from "lucide-react";
+import { ArrowLeft, Calendar, X, CreditCard } from "lucide-react";
 import { prisma } from "@/lib/db/prisma";
 import { requireAuth } from "@/lib/auth/roles";
 import { cancelOwnBooking } from "@/lib/bookings/actions";
+import { createCheckoutForBooking } from "@/lib/stripe/actions";
 import { formatEuros } from "@/lib/bookings/pricing";
 import { content } from "@/lib/content";
 import type { BookingStatus } from "@prisma/client";
@@ -172,15 +173,29 @@ function BookingCard({
         </div>
       </div>
       {canCancel && (booking.status === "PENDING" || booking.status === "CONFIRMED") && (
-        <form action={cancelOwnBooking} className="mt-3">
-          <input type="hidden" name="bookingId" value={booking.id} />
-          <button
-            type="submit"
-            className="inline-flex items-center gap-1 text-xs text-[var(--color-mute)] hover:text-red-700"
-          >
-            <X size={12} /> Cancelar reserva
-          </button>
-        </form>
+        <div className="mt-3 flex flex-wrap items-center gap-3">
+          {/* Pagar si está PENDING con importe > 0 */}
+          {booking.status === "PENDING" && booking.totalCents > 0 && (
+            <form action={createCheckoutForBooking}>
+              <input type="hidden" name="bookingId" value={booking.id} />
+              <button
+                type="submit"
+                className="inline-flex items-center gap-1.5 rounded-full bg-[var(--color-ink)] px-4 py-1.5 text-xs font-medium text-[var(--color-paper)] hover:bg-[var(--color-coral-500)]"
+              >
+                <CreditCard size={12} /> Pagar ahora · {formatEuros(booking.totalCents)}
+              </button>
+            </form>
+          )}
+          <form action={cancelOwnBooking}>
+            <input type="hidden" name="bookingId" value={booking.id} />
+            <button
+              type="submit"
+              className="inline-flex items-center gap-1 text-xs text-[var(--color-mute)] hover:text-red-700"
+            >
+              <X size={12} /> Cancelar reserva
+            </button>
+          </form>
+        </div>
       )}
     </li>
   );
