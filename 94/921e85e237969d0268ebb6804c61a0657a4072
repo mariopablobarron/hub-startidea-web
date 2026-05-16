@@ -1,0 +1,28 @@
+tests/e2e/public.spec.ts
+  s_f12e84bac900e4::t_9ae0dcd663773b 128-129,131
+  s_f12e84bac900e4::t_c7498631f5ea36 136,138-140
+data/content.json
+  s_f12e84bac900e4::t_5708676cc2a8e2 329-331,334,336,340,347-350,353-356
+  s_f12e84bac900e4::t_c2e8c4ce2bec67 26-30,32,34,36,38,40-41
+  s_f12e84bac900e4::t_c2027066e41075 392-394
+  s_f12e84bac900e4::t_2fe4ba6736e208 4-5
+app/ecosistema/page.tsx
+  s_f12e84bac900e4::t_14197486480bc3 143,145,150-151,161-164,169,172
+  s_f12e84bac900e4::t_a29bed2285f72f 12-13,16
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "94921e85e237969d0268ebb6804c61a0657a4072",
+  "prompts": {},
+  "sessions": {
+    "s_f12e84bac900e4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ba62ea7a-a471-4585-b822-8ababb0c1519",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}
