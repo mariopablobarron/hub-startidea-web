@@ -1,0 +1,30 @@
+app/api/cron/event-reminders/route.ts
+  s_f12e84bac900e4::t_5f08900b191c10 1-112
+app/admin/_components/AdminSidebar.tsx
+  s_f12e84bac900e4::t_e839a214e8b2f4 32
+  s_f12e84bac900e4::t_b25e1a3c8293ef 22
+app/admin/foro/page.tsx
+  s_f12e84bac900e4::t_17d02c26ad06c8 1-114
+app/admin/page.tsx
+  s_f12e84bac900e4::t_27065f2101b860 23
+  s_f12e84bac900e4::t_b0b7b16f6c8d28 57-63
+  s_f12e84bac900e4::t_0f0a06cc0cc517 186-187,190-196
+  s_f12e84bac900e4::t_a6de86488c6e49 156-184
+  s_f12e84bac900e4::t_1813e36703f5a5 204-205,207-215
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "31ced0c593f2215da3742716199cdee8c2941639",
+  "prompts": {},
+  "sessions": {
+    "s_f12e84bac900e4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ba62ea7a-a471-4585-b822-8ababb0c1519",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}
