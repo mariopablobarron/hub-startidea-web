@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { content } from "@/lib/content";
+import { prisma } from "@/lib/db/prisma";
 import {
   ArrowRight,
   MessageSquareQuote,
@@ -13,6 +14,7 @@ import {
   BookOpen,
   MessageSquare,
   Search,
+  Users,
 } from "lucide-react";
 
 type Card = {
@@ -20,10 +22,18 @@ type Card = {
   title: string;
   desc: string;
   icon: React.ComponentType<{ size?: number; className?: string }>;
-  group: "narrativa" | "alquiler" | "site" | "chatbot" | "datos";
+  group: "plataforma" | "narrativa" | "alquiler" | "site" | "chatbot" | "datos";
 };
 
 const CARDS: Card[] = [
+  // Plataforma — BD
+  {
+    href: "/admin/users",
+    title: "Usuarios",
+    desc: "Coworkers, clientes, colaboradores. Asignar roles e invitar.",
+    icon: Users,
+    group: "plataforma",
+  },
   // Narrativa principal
   {
     href: "/admin/hero",
@@ -108,6 +118,7 @@ const CARDS: Card[] = [
 ];
 
 const GROUPS: Array<{ id: Card["group"]; label: string }> = [
+  { id: "plataforma", label: "Plataforma (usuarios y operativa)" },
   { id: "narrativa", label: "Narrativa principal" },
   { id: "alquiler", label: "Coworking · método · comunidad" },
   { id: "datos", label: "Datos del sitio" },
@@ -115,18 +126,17 @@ const GROUPS: Array<{ id: Card["group"]; label: string }> = [
   { id: "site", label: "SEO y analítica" },
 ];
 
-export default function AdminDashboard() {
+export default async function AdminDashboard() {
+  const userCount = await prisma.user.count();
+
   return (
     <div className="space-y-8">
       <header className="rounded-2xl border border-[var(--color-line)] bg-[var(--color-paper)] p-6">
         <h1 className="font-display text-3xl tracking-tight">Panel de administración</h1>
         <p className="mt-2 max-w-2xl text-sm text-[var(--color-mute)]">
-          Cada cambio se guarda como commit en GitHub y dispara un redeploy automático.
-          En 1-2 minutos verás los cambios reflejados en{" "}
-          <a href="/" target="_blank" className="text-[var(--color-coral-600)] underline">
-            hubstartidea.es
-          </a>
-          .
+          {userCount} usuario{userCount === 1 ? "" : "s"} en la plataforma. Los cambios de contenido
+          se commitean a GitHub y se redeployan en 1-2 minutos. Los cambios de plataforma
+          (usuarios, reservas) son inmediatos.
         </p>
       </header>
 

@@ -16,11 +16,15 @@ import {
   Megaphone,
   Network,
   GitBranch,
+  Users,
 } from "lucide-react";
 import { cn } from "@/lib/cn";
 
 const NAV = [
   { href: "/admin", label: "Dashboard", icon: Home, exact: true },
+  // Plataforma (BD)
+  { href: "/admin/users", label: "Usuarios", icon: Users },
+  // Contenido (git-based)
   { href: "/admin/hero", label: "Hero", icon: MessageSquareQuote },
   { href: "/admin/manifiesto", label: "Manifiesto", icon: Megaphone },
   { href: "/admin/ecosistema", label: "Ecosistema", icon: Network },
@@ -29,6 +33,7 @@ const NAV = [
   { href: "/admin/comunidad", label: "Comunidad", icon: Sparkles },
   { href: "/admin/contacto", label: "Contacto", icon: Phone },
   { href: "/admin/sitio", label: "Datos del sitio", icon: Settings },
+  // Operativa
   { href: "/admin/faq", label: "FAQ chatbot", icon: BookOpen },
   { href: "/admin/conversaciones", label: "Conversaciones", icon: MessageSquare },
   { href: "/admin/seo", label: "SEO (Search Console)", icon: Search },
