@@ -1,0 +1,48 @@
+app/admin/_components/AdminSidebar.tsx
+  s_f12e84bac900e4::t_4f09a9f9458dd1 30
+  s_f12e84bac900e4::t_a188c3579f0fbb 21
+app/admin/eventos/nuevo/page.tsx
+  s_f12e84bac900e4::t_e175ea9fdbc2b5 1-27
+app/eventos/page.tsx
+  s_f12e84bac900e4::t_28eb0172fbb218 1-23,27-200
+  s_f12e84bac900e4::t_1a358418ba326b 24-26
+lib/events/actions.ts
+  s_f12e84bac900e4::t_8d244b04f058cd 1-348
+app/admin/eventos/page.tsx
+  s_f12e84bac900e4::t_26de8aba4e8ad4 1-89
+app/sitemap.ts
+  s_f12e84bac900e4::t_ef2a6464e94eda 65-70
+  s_f12e84bac900e4::t_04c1045637a2f9 5-7
+  s_f12e84bac900e4::t_f86a96943593ac 3,8,12-31
+app/admin/eventos/[id]/page.tsx
+  s_f12e84bac900e4::t_8a3a938bb38ea5 1-111
+app/admin/page.tsx
+  s_f12e84bac900e4::t_27949e01afa4b8 49-55
+  s_f12e84bac900e4::t_fb2c7c84bc4800 22
+  s_f12e84bac900e4::t_cff44a86bd2994 4-6
+components/Header.tsx
+  s_f12e84bac900e4::t_2cb339d141f2b9 14
+app/eventos/[slug]/ics/route.ts
+  s_f12e84bac900e4::t_ecc49d87610ae2 1-70
+app/eventos/[slug]/page.tsx
+  s_f12e84bac900e4::t_5fae5ab97dce1e 20-22
+  s_f12e84bac900e4::t_d58e75d8ebb2b0 1-19,23-256
+app/admin/eventos/_components/EventFields.tsx
+  s_f12e84bac900e4::t_3f8a0589fb6f48 1-154
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "755d0862f99a1a9d248ec62784a6b65fc9e93ad9",
+  "prompts": {},
+  "sessions": {
+    "s_f12e84bac900e4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ba62ea7a-a471-4585-b822-8ababb0c1519",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}
