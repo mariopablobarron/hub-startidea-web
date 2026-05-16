@@ -1,0 +1,29 @@
+app/layout.tsx
+  s_f12e84bac900e4::t_3ca61a0c6835d4 92,94-98
+  s_f12e84bac900e4::t_594223f3f8c4a3 66-81
+app/metodo/opengraph-image.tsx
+  s_f12e84bac900e4::t_98927e4888ffa0 113
+  s_f12e84bac900e4::t_f35fdc081844a0 1-112,114-129
+app/page.tsx
+  s_f12e84bac900e4::t_63637e459a19b3 17-18,30-31
+app/ecosistema/opengraph-image.tsx
+  s_f12e84bac900e4::t_57eb417eb91a23 1-119
+lib/seo/structuredData.ts
+  s_f12e84bac900e4::t_851e1340ac87d4 151-261
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "11f4e24f16306df9edb195862ae7e1e122830c25",
+  "prompts": {},
+  "sessions": {
+    "s_f12e84bac900e4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ba62ea7a-a471-4585-b822-8ababb0c1519",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}
