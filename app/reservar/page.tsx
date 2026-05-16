@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Calendar, ArrowRight } from "lucide-react";
-import { content } from "@/lib/content";
+import { content, bookableRooms } from "@/lib/content";
 import { requireAuth, ROLE_LABEL } from "@/lib/auth/roles";
 import { createBooking } from "@/lib/bookings/actions";
 import { quotePrice, formatEuros, UNIT_LABEL } from "@/lib/bookings/pricing";
@@ -26,9 +26,11 @@ export default async function ReservarPage({ searchParams }: Props) {
   const user = await requireAuth("/reservar");
   const sp = await searchParams;
 
-  // Sala seleccionada (por query o primera del catálogo)
-  const selectedSlug = sp.sala || content.rooms[0].slug;
-  const room = content.rooms.find((r) => r.slug === selectedSlug) || content.rooms[0];
+  // Solo salas reservables (las marcadas bookable !== false en content.json).
+  // Aulas inactivas y coworking abierto NO entran aquí.
+  const rooms = bookableRooms.length > 0 ? bookableRooms : content.rooms;
+  const selectedSlug = sp.sala || rooms[0].slug;
+  const room = rooms.find((r) => r.slug === selectedSlug) || rooms[0];
 
   // Fecha por defecto: hoy
   const defaultDate = sp.fecha || new Date().toISOString().slice(0, 10);
@@ -86,9 +88,9 @@ export default async function ReservarPage({ searchParams }: Props) {
         </div>
       )}
 
-      {/* Selector de sala — tabs */}
+      {/* Selector de sala — tabs (solo reservables) */}
       <div className="mt-10 flex flex-wrap gap-2">
-        {content.rooms.map((r) => (
+        {rooms.map((r) => (
           <Link
             key={r.slug}
             href={`/reservar?sala=${r.slug}&fecha=${defaultDate}`}
@@ -143,9 +145,10 @@ export default async function ReservarPage({ searchParams }: Props) {
                 required
                 min="08:00"
                 max="20:00"
-                step="900"
+                step="3600"
                 className="mt-1 block w-full rounded-xl border border-[var(--color-line)] bg-white px-3 py-2 outline-none focus:border-[var(--color-ink)]"
               />
+              <span className="mt-1 block text-xs text-[var(--color-mute)]">Horas completas (08:00 - 20:00).</span>
             </label>
             <label className="block text-sm">
               <span className="font-medium">Hora fin</span>
@@ -156,9 +159,10 @@ export default async function ReservarPage({ searchParams }: Props) {
                 required
                 min="09:00"
                 max="21:00"
-                step="900"
+                step="3600"
                 className="mt-1 block w-full rounded-xl border border-[var(--color-line)] bg-white px-3 py-2 outline-none focus:border-[var(--color-ink)]"
               />
+              <span className="mt-1 block text-xs text-[var(--color-mute)]">Horas completas (09:00 - 21:00).</span>
             </label>
           </div>
 

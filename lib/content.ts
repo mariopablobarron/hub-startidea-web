@@ -7,6 +7,8 @@ export type Room = {
   name: string;
   subtitle: string;
   category: RoomCategory;
+  /** Si false, no se puede reservar por horas desde /reservar. */
+  bookable?: boolean;
   area: number;
   capacity: {
     school: number;
@@ -29,8 +31,17 @@ export const content = contentJson as Content;
 
 export const rooms = content.rooms as Room[];
 
+/** Solo las salas reservables por horas (excluye coworking, aulas inactivas). */
+export const bookableRooms = rooms.filter((r) => r.bookable !== false);
+
 export function getRoom(slug: string): Room | undefined {
   return rooms.find((r) => r.slug === slug);
+}
+
+/** ¿Esta sala es reservable? */
+export function isBookable(slug: string): boolean {
+  const r = getRoom(slug);
+  return !!r && r.bookable !== false;
 }
 
 export const totalArea = Math.round(rooms.reduce((s, r) => s + r.area, 0));

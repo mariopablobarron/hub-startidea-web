@@ -12,6 +12,10 @@ export const roomSchema = z.object({
   name: z.string().min(1),
   subtitle: z.string().min(1),
   category: z.enum(["sala", "coworking", "estudio", "office", "comun"]),
+  // Si false, la sala NO aparece en /reservar ni acepta reservas
+  // (típicamente coworking-open, aulas inactivas, espacios comunes).
+  // Default true para no romper salas existentes en migración.
+  bookable: z.boolean().optional().default(true),
   area: z.coerce.number().min(0),
   capacity: capacitySchema,
   short: z.string().min(1),

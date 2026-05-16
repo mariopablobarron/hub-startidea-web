@@ -49,8 +49,9 @@ async function withFeedback(
 const createSchema = z.object({
   roomSlug: z.string().min(1),
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
-  startTime: z.string().regex(/^\d{2}:\d{2}$/),
-  endTime: z.string().regex(/^\d{2}:\d{2}$/),
+  // Horas completas: HH:00 — rechazamos minutos 15, 30, 45
+  startTime: z.string().regex(/^\d{2}:00$/, { message: "Reserva por horas completas (ej. 10:00)" }),
+  endTime: z.string().regex(/^\d{2}:00$/, { message: "Reserva por horas completas (ej. 12:00)" }),
   attendees: z.coerce.number().int().min(1).max(200).optional(),
   purpose: z.string().min(1).max(500),
   notes: z.string().max(2000).optional(),
@@ -70,9 +71,14 @@ export async function createBooking(formData: FormData) {
       notes: formData.get("notes") || undefined,
     });
 
-    // Verificar que la sala existe en content.json
+    // Verificar que la sala existe Y es reservable. Las salas marcadas
+    // como bookable=false (aulas inactivas, coworking abierto) no se
+    // pueden reservar por horas — solo a través de Mario o por bono.
     const room = content.rooms.find((r) => r.slug === data.roomSlug);
     if (!room) throw new Error(`Sala "${data.roomSlug}" no encontrada.`);
+    if (room.bookable === false) {
+      throw new Error(`La sala ${room.name} no se reserva por horas. Escríbenos para coordinar.`);
+    }
 
     const startsAt = new Date(`${data.date}T${data.startTime}:00`);
     const endsAt = new Date(`${data.date}T${data.endTime}:00`);

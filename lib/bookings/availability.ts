@@ -64,13 +64,18 @@ export async function bookingsInRange(opts: {
  */
 export const OPENING_HOUR = 8; // 08:00
 export const CLOSING_HOUR = 21; // 21:00
-export const SLOT_MINUTES = 60; // bloques de 1h
+export const SLOT_MINUTES = 60; // bloques de 1h — las reservas son por horas completas
 
-/** ¿Está el rango dentro del horario laboral? */
+/** ¿Está el rango dentro del horario laboral?
+ *  Además exige horas completas — minutos a 0 — porque el HUB reserva por
+ *  bloques de 1h. La validación zod del action también lo verifica, pero
+ *  añadimos doble red aquí por si algún consumidor crea reservas internamente.
+ */
 export function isWithinOpeningHours(startsAt: Date, endsAt: Date): boolean {
-  const startHour = startsAt.getHours() + startsAt.getMinutes() / 60;
-  const endHour = endsAt.getHours() + endsAt.getMinutes() / 60;
-  // Para reservas de un solo día. Si endsAt termina al cierre exacto, es OK.
+  if (startsAt.getMinutes() !== 0 || endsAt.getMinutes() !== 0) return false;
+  if (startsAt.getSeconds() !== 0 || endsAt.getSeconds() !== 0) return false;
+  const startHour = startsAt.getHours();
+  const endHour = endsAt.getHours();
   return (
     startHour >= OPENING_HOUR &&
     endHour <= CLOSING_HOUR &&

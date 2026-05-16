@@ -67,6 +67,7 @@
       "name": "CC33",
       "subtitle": "La sala grande del HUB",
       "category": "sala",
+      "bookable": true,
       "area": 47.3,
       "capacity": {
         "school": 30,
@@ -98,6 +99,7 @@
       "name": "Serendipia",
       "subtitle": "Sala de reuniones premium",
       "category": "sala",
+      "bookable": true,
       "area": 23.58,
       "capacity": {
         "school": 12,
@@ -126,6 +128,7 @@
       "name": "Sócrates",
       "subtitle": "Aula de formación",
       "category": "sala",
+      "bookable": true,
       "area": 45.2,
       "capacity": {
         "school": 28,
@@ -153,6 +156,7 @@
       "name": "Aula 3",
       "subtitle": "Formación + grupos medianos",
       "category": "sala",
+      "bookable": false,
       "area": 40.33,
       "capacity": {
         "school": 24,
@@ -179,6 +183,7 @@
       "name": "Aula 1",
       "subtitle": "Eventos y comunidad",
       "category": "sala",
+      "bookable": false,
       "area": 45.95,
       "capacity": {
         "school": 28,
@@ -207,6 +212,7 @@
       "name": "Estudio podcast",
       "subtitle": "Grabación y radio",
       "category": "estudio",
+      "bookable": true,
       "area": 13,
       "capacity": {
         "school": 0,
@@ -236,6 +242,7 @@
       "name": "Coworking abierto",
       "subtitle": "Puestos flexibles",
       "category": "coworking",
+      "bookable": false,
       "area": 23.77,
       "capacity": {
         "school": 12,
@@ -263,6 +270,7 @@
       "name": "Office privado",
       "subtitle": "Despacho cerrado",
       "category": "office",
+      "bookable": true,
       "area": 13.71,
       "capacity": {
         "school": 4,
