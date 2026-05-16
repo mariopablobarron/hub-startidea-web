@@ -8,7 +8,8 @@ set -e
 
 if [ -n "$DATABASE_URL" ]; then
   echo "[entrypoint] Running prisma migrate deploy..."
-  /app/node_modules/.bin/prisma migrate deploy --schema /app/prisma/schema.prisma
+  # prisma instalado globalmente en el runtime stage (ver Dockerfile)
+  prisma migrate deploy --schema /app/prisma/schema.prisma
 else
   echo "[entrypoint] WARN DATABASE_URL no configurada — saltando migraciones"
 fi

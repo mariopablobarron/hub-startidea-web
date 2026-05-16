@@ -35,12 +35,16 @@ COPY --from=builder /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
-# Prisma: copiar schema, migraciones y binarios para `migrate deploy`
-# en startup. Sin esto las migraciones nuevas no se aplican en deploys.
+# Prisma: schema + migraciones (necesarios para `migrate deploy`).
 COPY --from=builder --chown=nextjs:nodejs /app/prisma ./prisma
-COPY --from=builder --chown=nextjs:nodejs /app/node_modules/prisma ./node_modules/prisma
-COPY --from=builder --chown=nextjs:nodejs /app/node_modules/.bin/prisma ./node_modules/.bin/prisma
-COPY --from=builder --chown=nextjs:nodejs /app/node_modules/@prisma ./node_modules/@prisma
+
+# Instalar Prisma CLI y engines en el runtime stage. Más robusto que
+# copiar selectivamente del builder porque arrastra todas las
+# dependencias transitivas (@prisma/engines, etc.).
+RUN npm install -g prisma@6 && \
+    chown -R nextjs:nodejs /usr/local/lib/node_modules/prisma && \
+    chown -R nextjs:nodejs /usr/local/bin/prisma
+
 COPY --chown=nextjs:nodejs docker-entrypoint.sh ./docker-entrypoint.sh
 RUN chmod +x ./docker-entrypoint.sh
 
