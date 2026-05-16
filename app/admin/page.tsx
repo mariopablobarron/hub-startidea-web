@@ -15,6 +15,7 @@ import {
   MessageSquare,
   Search,
   Users,
+  CalendarCheck,
 } from "lucide-react";
 
 type Card = {
@@ -32,6 +33,13 @@ const CARDS: Card[] = [
     title: "Usuarios",
     desc: "Coworkers, clientes, colaboradores. Asignar roles e invitar.",
     icon: Users,
+    group: "plataforma",
+  },
+  {
+    href: "/admin/reservas",
+    title: "Reservas",
+    desc: "Aprobar pendientes, ver agenda, gestionar incidencias.",
+    icon: CalendarCheck,
     group: "plataforma",
   },
   // Narrativa principal
@@ -127,7 +135,10 @@ const GROUPS: Array<{ id: Card["group"]; label: string }> = [
 ];
 
 export default async function AdminDashboard() {
-  const userCount = await prisma.user.count();
+  const [userCount, pendingBookings] = await Promise.all([
+    prisma.user.count(),
+    prisma.booking.count({ where: { status: "PENDING" } }),
+  ]);
 
   return (
     <div className="space-y-8">
@@ -138,6 +149,14 @@ export default async function AdminDashboard() {
           se commitean a GitHub y se redeployan en 1-2 minutos. Los cambios de plataforma
           (usuarios, reservas) son inmediatos.
         </p>
+        {pendingBookings > 0 && (
+          <div className="mt-4 inline-flex items-center gap-2 rounded-full bg-amber-50 px-3 py-1.5 text-sm text-amber-800">
+            <CalendarCheck size={14} />
+            <Link href="/admin/reservas?status=PENDING" className="font-medium underline underline-offset-2">
+              {pendingBookings} reserva{pendingBookings === 1 ? "" : "s"} pendiente{pendingBookings === 1 ? "" : "s"} de aprobación
+            </Link>
+          </div>
+        )}
       </header>
 
       {GROUPS.map((g) => {

@@ -17,6 +17,7 @@ import {
   Network,
   GitBranch,
   Users,
+  CalendarCheck,
 } from "lucide-react";
 import { cn } from "@/lib/cn";
 
@@ -24,6 +25,7 @@ const NAV = [
   { href: "/admin", label: "Dashboard", icon: Home, exact: true },
   // Plataforma (BD)
   { href: "/admin/users", label: "Usuarios", icon: Users },
+  { href: "/admin/reservas", label: "Reservas", icon: CalendarCheck },
   // Contenido (git-based)
   { href: "/admin/hero", label: "Hero", icon: MessageSquareQuote },
   { href: "/admin/manifiesto", label: "Manifiesto", icon: Megaphone },
