@@ -1,0 +1,21 @@
+docker-entrypoint.sh
+  s_f12e84bac900e4::t_901011e249fabf 11-12
+Dockerfile
+  ai_agent 38,40-47
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "237d405108400bd6a1a77edcd3a39726c31cf25f",
+  "prompts": {},
+  "sessions": {
+    "s_f12e84bac900e4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ba62ea7a-a471-4585-b822-8ababb0c1519",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}
