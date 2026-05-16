@@ -95,8 +95,8 @@ test.describe("Páginas dedicadas (SEO)", () => {
     ]) {
       await expect(page.getByRole("heading", { name, level: 2 })).toBeVisible();
     }
-    // CTA hacia /metodo en el cierre
-    await expect(page.getByRole("link", { name: /Conoce el método Raíz y Acción/i })).toBeVisible();
+    // CTA hacia /metodo en el cierre (texto: "Entrar por el método")
+    await expect(page.getByRole("link", { name: /Entrar por el método/i })).toBeVisible();
   });
 
   test("/metodo carga con title, fases y CTA externo", async ({ page }) => {
