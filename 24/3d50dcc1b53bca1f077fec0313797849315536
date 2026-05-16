@@ -1,0 +1,36 @@
+app/me/page.tsx
+  s_f12e84bac900e4::t_9c42ba64c35c76 1-168
+auth.config.ts
+  s_f12e84bac900e4::t_b2b903f81f9ded 3-13,16-17,21-24,26-27,29-36,38-44
+auth.ts
+  s_f12e84bac900e4::t_16844fdbfd3f00 43-44
+  s_f12e84bac900e4::t_90c832e461bfa7 3-4,7-8,10-26,28-30,32-39,45,48-51,53,55,65-69,71-117,121-143
+package.json
+  s_f12e84bac900e4::t_ac241395ac6352 26
+pnpm-lock.yaml
+  ai_agent 14-16,157-175,1956-1958,2429-2433,2437-2439,2905-2921,4133-4134,4153,4164,4168,4175,4179,4190,4749-4750,5330-5333,5336
+app/login/page.tsx
+  s_f12e84bac900e4::t_6bdd9f5cebb875 1-146
+app/registro/page.tsx
+  s_f12e84bac900e4::t_d657834ee5d4d0 1-106
+lib/auth/roles.ts
+  s_f12e84bac900e4::t_82d8cc9ac50117 1-91
+middleware.ts
+  s_f12e84bac900e4::t_ec057cb743e0c6 7-9
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "243d50dcc1b53bca1f077fec0313797849315536",
+  "prompts": {},
+  "sessions": {
+    "s_f12e84bac900e4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ba62ea7a-a471-4585-b822-8ababb0c1519",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}
