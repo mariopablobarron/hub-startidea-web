@@ -151,6 +151,8 @@ export async function updateRoom(slug: string, formData: FormData) {
     name: formData.get("name"),
     subtitle: formData.get("subtitle"),
     category: existing.category,
+    // Checkbox: si está marcado viene como "on"; si no, no viene la key.
+    bookable: formData.get("bookable") === "on",
     area: formData.get("area"),
     capacity: {
       school: formData.get("capacitySchool") || 0,

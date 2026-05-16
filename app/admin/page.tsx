@@ -21,6 +21,7 @@ import {
   CalendarCheck,
   CalendarDays,
   MessageSquareText,
+  Euro,
 } from "lucide-react";
 
 type Card = {
@@ -45,6 +46,13 @@ const CARDS: Card[] = [
     title: "Reservas",
     desc: "Aprobar pendientes, ver agenda, gestionar incidencias.",
     icon: CalendarCheck,
+    group: "plataforma",
+  },
+  {
+    href: "/admin/tarifas",
+    title: "Tarifas",
+    desc: "Precios por sala/unidad/rol. Descuentos coworker y colaborador.",
+    icon: Euro,
     group: "plataforma",
   },
   {

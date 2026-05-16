@@ -76,6 +76,24 @@ export default async function RoomEditPage({ params, searchParams }: Props) {
             <Field label="Etiqueta plano"><Input name="planLabel" defaultValue={room.planLabel} required /></Field>
             <Field label="Highlight (badge)" hint="Vacío = sin badge."><Input name="highlight" defaultValue={room.highlight || ""} /></Field>
           </div>
+
+          {/* Toggle bookable: si false, la sala NO aparece en /reservar */}
+          <label className="flex items-start gap-3 rounded-xl border border-[var(--color-line)] bg-[var(--color-paper-2)] p-4 text-sm">
+            <input
+              type="checkbox"
+              name="bookable"
+              defaultChecked={room.bookable !== false}
+              className="mt-0.5 h-4 w-4"
+            />
+            <span>
+              <span className="font-medium text-[var(--color-ink)]">Reservable por horas online</span>
+              <span className="mt-0.5 block text-xs text-[var(--color-mute)]">
+                Si está marcado, esta sala aparece en <code>/reservar</code> y se puede
+                reservar por horas. Desmárcalo para salas que se gestionan offline
+                (Aula 1/3) o que tienen su propia lógica (Coworking abierto).
+              </span>
+            </span>
+          </label>
         </section>
 
         <section className="space-y-4 rounded-2xl border border-[var(--color-line)] bg-[var(--color-paper)] p-6">
