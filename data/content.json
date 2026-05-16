@@ -1,8 +1,8 @@
 {
   "site": {
     "name": "HUB Startidea",
-    "tagline": "Casa madre de Startidea en Granada — coworking, formación, podcast y ecosistema de proyectos con propósito.",
-    "description": "El HUB es la sede física de Startidea (agencia de innovación social): coworking, salas de formación, estudio de podcast y comunidad de proyectos con propósito en el centro de Granada. C/ Conde Cifuentes 33.",
+    "tagline": "El universo Startidea en Granada — coworking, salas, podcast y proyectos con propósito bajo un mismo techo.",
+    "description": "El HUB es el universo Startidea hecho sitio: coworking, salas de formación, estudio de podcast y los proyectos que cocinamos aquí (Tres mil millones de latidos, Raíz y Acción, TodoMerchandising). En el centro de Granada, C/ Conde Cifuentes 33.",
     "url": "https://hubstartidea.es",
     "phone": "+34 958 04 57 89",
     "phoneDisplay": "958 04 57 89",
@@ -23,22 +23,22 @@
     }
   },
   "hero": {
-    "eyebrow": "HUB Startidea · Casa madre de Startidea",
-    "titleStart": "El espacio donde se cocina la ",
-    "titleEm": "innovación social",
-    "titleEnd": " en el centro de Granada.",
-    "subtitle": "El HUB es a la vez espacio físico (coworking, salas de formación, estudio de podcast) y la casa madre de los proyectos de Startidea. 330 m² en pleno centro de Granada (C/ Conde Cifuentes 33).",
+    "eyebrow": "Startidea · Granada",
+    "titleStart": "Entra al ",
+    "titleEm": "universo Startidea",
+    "titleEnd": ". Por la puerta o por la idea.",
+    "subtitle": "El HUB es donde Startidea se hace tangible. Coworking, salas de formación y estudio de podcast en pleno centro — y los proyectos que cocinamos aquí: Tres mil millones de latidos, Raíz y Acción, TodoMerchandising. C/ Conde Cifuentes 33, Granada.",
     "ctaPrimary": "Reserva tu visita",
-    "ctaSecondary": "Conoce el ecosistema",
+    "ctaSecondary": "Conoce el universo",
     "ctaSecondaryHref": "#ecosistema",
-    "rotatingTagline": "Aquí pasa de todo:",
+    "rotatingTagline": "Aquí pasa todo lo que es Startidea:",
     "rotatingWords": [
-      "Coworking",
-      "formación",
+      "Salas",
       "podcast",
-      "comunidad",
+      "coworking",
       "proyectos",
-      "mentoría"
+      "método",
+      "comunidad"
     ],
     "stats": [
       {
@@ -326,34 +326,34 @@
     }
   ],
   "manifesto": {
-    "eyebrow": "Qué es el HUB",
-    "title": "Un espacio físico y un ecosistema vivo bajo el mismo techo.",
-    "intro": "El HUB no es solo un coworking. Es la sede donde Startidea diseña, lanza y acompaña proyectos con propósito. Lo que aquí se cuece sale a la calle como iniciativas, formaciones, podcasts y comunidades.",
+    "eyebrow": "Cómo entrar",
+    "title": "Un universo, dos puertas.",
+    "intro": "El HUB no es solo un coworking ni solo una agencia. Es el universo Startidea hecho sitio. Puedes entrar por la puerta —y trabajar aquí, alquilar una sala, grabar un podcast— o entrar por una idea, uniéndote a alguno de los proyectos que viven dentro. Las dos formas son Startidea.",
     "pillars": [
       {
-        "label": "Como espacio físico",
+        "label": "Por la puerta",
         "title": "Coworking, salas y estudio en pleno centro",
-        "description": "Alquila salas para tu formación, evento o reunión. Reserva el estudio para grabar tu podcast. O instala tu proyecto en el coworking con todas las facilidades.",
+        "description": "Cruza la puerta y ocupa el sitio. Alquila una sala para tu formación o evento. Graba un podcast en el estudio. Instala tu proyecto en el coworking. El espacio es tuyo mientras lo necesites.",
         "ctaLabel": "Ver salas y reservar",
         "ctaHref": "#salas",
         "items": [
-          "8 salas multifunción (47 a 12 m²)",
+          "8 salas multifunción (de 12 a 47 m²)",
           "Estudio de podcast profesional",
           "Coworking con plazas fijas y flex",
           "Cocina, fibra, accesible, terraza"
         ]
       },
       {
-        "label": "Como ecosistema",
-        "title": "La matriz donde se cocinan los proyectos de Startidea",
-        "description": "El HUB es la base operativa de Startidea: agencia, productora y método. Cuatro proyectos vivos nacen y se acompañan desde aquí.",
-        "ctaLabel": "Conoce el ecosistema",
+        "label": "Por la idea",
+        "title": "Cuatro proyectos vivos del universo Startidea",
+        "description": "El HUB es la base operativa de Startidea. Aquí se cocinan los proyectos que salen al mundo. Súmate como cliente, como colaborador o trae tu propia idea — la trabajamos con el método de la casa.",
+        "ctaLabel": "Conoce el universo",
         "ctaHref": "#ecosistema",
         "items": [
-          "Startidea — Agencia de innovación social",
-          "Tres mil millones de latidos — Proyecto de propósito vital",
-          "Raíz y Acción — Método para llevar ideas a la calle",
-          "TodoMerchandising — Merchandising con impacto"
+          "Startidea — agencia de innovación social",
+          "Tres mil millones de latidos — producto digital de propósito",
+          "Raíz y Acción — método para llevar ideas a la calle",
+          "TodoMerchandising — merchandising con impacto"
         ]
       }
     ]
@@ -389,9 +389,9 @@
     ]
   },
   "ecosystem": {
-    "eyebrow": "Forma parte de Startidea",
-    "title": "Un espacio físico dentro de una agencia de innovación social.",
-    "description": "El HUB es la sede de Startidea, pero Startidea es mucho más que un coworking: es la productora detrás de proyectos con propósito que conviven aquí.",
+    "eyebrow": "El universo en proyectos",
+    "title": "Cuatro proyectos cocinándose bajo el mismo techo.",
+    "description": "Cada uno con su propia identidad, su propio método de trabajo y su propia voz. Todos parte del universo Startidea, todos cocinados desde el HUB.",
     "ctaLabel": "Conoce Startidea",
     "ctaUrl": "https://startidea.es",
     "projects": [

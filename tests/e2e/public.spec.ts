@@ -125,18 +125,19 @@ test.describe("Páginas dedicadas (SEO)", () => {
 test.describe("Narrativa de matriz (HUB casa madre de Startidea)", () => {
   test("hero menciona Startidea y CTA secundario apunta a #ecosistema", async ({ page }) => {
     await page.goto("/");
-    // El eyebrow del hero contiene "Casa madre de Startidea"
-    await expect(page.locator("text=Casa madre de Startidea").first()).toBeVisible();
+    // Hero refleja la narrativa "universo Startidea"
+    await expect(page.locator("text=universo Startidea").first()).toBeVisible();
     // CTA secundario debe enlazar a #ecosistema (NO a #tour como antes)
-    const cta = page.getByRole("link", { name: /Conoce el ecosistema/i }).first();
+    const cta = page.getByRole("link", { name: /Conoce el universo/i }).first();
     await expect(cta).toBeVisible();
     await expect(cta).toHaveAttribute("href", "#ecosistema");
   });
 
-  test("sección #manifiesto presenta los dos pilares", async ({ page }) => {
+  test("sección #manifiesto presenta los dos pilares (puertas)", async ({ page }) => {
     await page.goto("/#manifiesto");
-    await expect(page.getByText(/Como espacio físico/i)).toBeVisible();
-    await expect(page.getByText("Como ecosistema", { exact: true })).toBeVisible();
+    // Narrativa "universo, dos puertas" — pilares "Por la puerta" / "Por la idea"
+    await expect(page.getByText("Por la puerta", { exact: true })).toBeVisible();
+    await expect(page.getByText("Por la idea", { exact: true })).toBeVisible();
     // Cada pilar debe tener CTA con su texto característico
     await expect(page.getByRole("link", { name: /Ver salas y reservar/i })).toBeVisible();
   });

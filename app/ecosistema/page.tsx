@@ -9,11 +9,11 @@ const site = content.site;
 const eco = content.ecosystem;
 
 export const metadata: Metadata = {
-  title: "Ecosistema Startidea — los proyectos detrás del HUB",
-  description: `${eco.description} Conoce ${site.parent.name} y los proyectos vivos que se cocinan en el HUB.`,
+  title: "El universo Startidea — proyectos cocinándose en Granada",
+  description: `${eco.description} Conoce ${site.parent.name} y los cuatro proyectos vivos que cocinamos desde el HUB.`,
   alternates: { canonical: `${site.url}/ecosistema` },
   openGraph: {
-    title: "Ecosistema Startidea — los proyectos detrás del HUB",
+    title: "El universo Startidea — proyectos cocinándose en Granada",
     description: eco.description,
     url: `${site.url}/ecosistema`,
     type: "website",
@@ -140,15 +140,15 @@ export default function EcosistemaPage() {
           {/* Sección de cierre: cómo trabajan juntos */}
           <section className="mt-24 rounded-3xl border border-[var(--color-line)] bg-[var(--color-paper-2)] p-10 md:p-16">
             <div className="max-w-3xl">
-              <span className="eyebrow">¿Cómo encajan?</span>
+              <span className="eyebrow">Cómo encaja todo</span>
               <h2 className="mt-4 font-display text-3xl tracking-tight md:text-4xl">
-                Cuatro proyectos, un mismo principio: ideas con propósito que se llevan a la acción.
+                Un mismo universo, cuatro formas de manifestarse.
               </h2>
               <div className="mt-6 space-y-4 text-[var(--color-mute)]">
                 <p>
                   <strong className="text-[var(--color-ink)]">Startidea</strong> es la agencia
-                  matriz que diseña y acompaña. <strong className="text-[var(--color-ink)]">Raíz
-                  y Acción</strong> es el método que se ha decantado tras más de una década de
+                  que diseña y acompaña. <strong className="text-[var(--color-ink)]">Raíz y
+                  Acción</strong> es el método que se ha decantado tras más de una década de
                   proyectos: lo abrimos como bien común para que cualquiera lo use.
                 </p>
                 <p>
@@ -158,18 +158,18 @@ export default function EcosistemaPage() {
                   (camisetas, totebags, packaging con impacto), aquí lo producimos.
                 </p>
                 <p>
-                  El <strong className="text-[var(--color-ink)]">HUB Startidea</strong> es la
-                  sede donde todo eso se cocina. También es coworking abierto a la calle: quien
-                  alquila una sala o una plaza forma parte (mientras está aquí) de este
-                  ecosistema.
+                  El <strong className="text-[var(--color-ink)]">HUB</strong> es el sitio donde
+                  todo eso se cocina y donde el universo se hace tangible. También es coworking
+                  abierto: quien alquila una sala o una plaza entra al universo Startidea
+                  (mientras está aquí).
                 </p>
               </div>
               <div className="mt-8 flex flex-wrap gap-3">
                 <Link href="/#salas" className="btn-primary">
-                  Ver salas y coworking
+                  Entrar por las salas
                 </Link>
                 <Link href="/metodo" className="btn-ghost">
-                  Conoce el método Raíz y Acción
+                  Entrar por el método
                 </Link>
               </div>
             </div>
