@@ -14,6 +14,8 @@ import {
   coworkingSpaceSchema,
   websiteSchema,
   organizationSchema,
+  faqSchema,
+  servicesSchema,
 } from "@/lib/seo/structuredData";
 
 export default function HomePage() {
@@ -25,6 +27,8 @@ export default function HomePage() {
           coworkingSpaceSchema(),
           websiteSchema(),
           organizationSchema(),
+          faqSchema(),
+          ...servicesSchema(),
         ]}
       />
       <Hero />

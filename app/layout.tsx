@@ -63,7 +63,22 @@ export const metadata: Metadata = {
     description: site.description,
     images: ["/images/og/og-default.jpg"],
   },
-  alternates: { canonical: site.url },
+  alternates: {
+    canonical: site.url,
+    languages: { "es-ES": site.url, "x-default": site.url },
+  },
+  // Refuerzo de verificación de propiedad (además del TXT DNS).
+  verification: {
+    google: "mb3J5VBxlNUOCaJ97vMoEQ4VpP7yVwAhcx3em93wY60",
+  },
+  // En móvil iOS Safari hay autodetección de números/emails que añade un link
+  // azul a "phone:" — lo dejamos solo para el teléfono real, no autoenlazamos.
+  formatDetection: {
+    telephone: false,
+    email: false,
+    address: false,
+  },
+  category: "business",
 };
 
 export const viewport: Viewport = {
@@ -74,8 +89,13 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="es" className={`${inter.variable} ${fraunces.variable}`}>
+    <html lang="es-ES" className={`${inter.variable} ${fraunces.variable}`}>
       <head>
+        {/* Resource hints — acelera primer paint reduciendo handshakes */}
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+        <link rel="dns-prefetch" href="https://analytics.hubstartidea.es" />
+
         {/* Umami analytics (privacy-first, sin cookies) */}
         <Script
           defer
