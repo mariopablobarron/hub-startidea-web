@@ -1,0 +1,27 @@
+app/layout.tsx
+  s_f12e84bac900e4::t_324b320ea939d9 90-91
+app/salas/[slug]/opengraph-image.tsx
+  s_f12e84bac900e4::t_15c03378148d21 40-41,68-74,83
+app/apple-icon.tsx
+  s_f12e84bac900e4::t_0b33f2d901853e 1-32
+app/icon.tsx
+  s_f12e84bac900e4::t_7ed0fc1ae04e43 1-33
+app/manifest.ts
+  s_f12e84bac900e4::t_17acf653823353 7,11-13,22
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "c353f9d125b86a9eeec39f5ab5bfa2389b85d40d",
+  "prompts": {},
+  "sessions": {
+    "s_f12e84bac900e4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ba62ea7a-a471-4585-b822-8ababb0c1519",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}
