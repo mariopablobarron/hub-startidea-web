@@ -1,0 +1,31 @@
+app/admin/tarifas/page.tsx
+  s_f12e84bac900e4::t_32dc1b35b7f92d 1-164
+app/admin/_components/AdminSidebar.tsx
+  s_f12e84bac900e4::t_f2b93c5d18759f 23
+  s_f12e84bac900e4::t_6e4c7cc71fa41f 32
+lib/pricing/actions.ts
+  s_f12e84bac900e4::t_9be6cada46a51c 1-135
+app/admin/page.tsx
+  s_f12e84bac900e4::t_c02e4486095d3e 52-57
+  s_f12e84bac900e4::t_1b1853125ddc20 24
+app/admin/salas/[slug]/page.tsx
+  s_f12e84bac900e4::t_b55de567f630a1 79-96
+lib/admin/actions.ts
+  s_f12e84bac900e4::t_d1156ad007b3d9 154-155
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "cc1d5a9a5c71b17b3f9ef7edea76b88661655ce5",
+  "prompts": {},
+  "sessions": {
+    "s_f12e84bac900e4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ba62ea7a-a471-4585-b822-8ababb0c1519",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}
