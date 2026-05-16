@@ -1,0 +1,38 @@
+prisma/schema.prisma
+  s_f12e84bac900e4::t_2fccde82773c3d 1-385
+.env.example
+  s_f12e84bac900e4::t_30ff68d6ce5b50 34-51
+docs/PLATFORM-ROADMAP.md
+  s_f12e84bac900e4::t_352a838228e99a 1-135
+prisma/migrations/migration_lock.toml
+  s_f12e84bac900e4::t_2d4d1800550d41 1-3
+pnpm-lock.yaml
+  ai_agent 20-22,99-101,105-107,163-318,712-741,1191-1198,1237-1246,1267-1273,1330-1333,1342-1344,1349-1351,1363-1366,1374-1376,1380-1383,1420-1424,1556-1558,1562-1565,1647-1651,1689-1692,2270-2272,2277-2281,2317-2319,2354-2359,2371-2373,2414-2423,2434-2436,2444-2446,2465-2468,2678-2681,2708-2712,2888-2965,3300-3334,3760-3774,3811-3820,3835-3838,3887-3888,3901-3902,3905-3906,3917-3918,3929-3933,3936-3937,4044-4072,4083-4084,4103,4114,4118,4125,4129,4140,4277-4278,4281-4284,4356-4358,4418-4426,5130-5131,5138-5143,5188-5189,5233-5236,5243-5248,5284-5292,5303-5304,5311-5315,5343-5344,5632-5633,5660-5664
+prisma/seed.ts
+  s_f12e84bac900e4::t_311a02ac1677c0 1-83
+prisma/migrations/20260516134239_init/migration.sql
+  s_f12e84bac900e4::t_2d4d1800550d41 1-381
+package.json
+  s_f12e84bac900e4::t_6f4b667a3bcc4c 58
+  s_f12e84bac900e4::t_4bceba90e2db54 9,15-19
+  s_f12e84bac900e4::t_f92e0d68f2a127 28,56
+  s_f12e84bac900e4::t_94879f42e9ce3f 21-22
+lib/db/prisma.ts
+  s_f12e84bac900e4::t_b7f48e3c0e3fb9 1-24
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "c4524d95549c599105731cb2dcca1ca146dfc156",
+  "prompts": {},
+  "sessions": {
+    "s_f12e84bac900e4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ba62ea7a-a471-4585-b822-8ababb0c1519",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}
