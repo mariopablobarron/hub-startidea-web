@@ -37,8 +37,8 @@ export default async function OG({ params }: Props) {
           width: "100%",
           height: "100%",
           display: "flex",
-          background: "#0a0a0b",
-          color: "#faf8f4",
+          background: "#2a2a2a", // Grafito Startidea (era negro casi puro)
+          color: "#f4efe6",      // Crema Startidea
           fontFamily: "system-ui, sans-serif",
         }}
       >
@@ -65,24 +65,13 @@ export default async function OG({ params }: Props) {
             padding: "60px 56px",
           }}
         >
-          <div style={{ display: "flex", alignItems: "center", gap: 12, fontSize: 22, fontWeight: 600 }}>
-            <div
-              style={{
-                width: 40,
-                height: 40,
-                borderRadius: 10,
-                background: "#ff6b35",
-                color: "#0a0a0b",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontSize: 22,
-                fontWeight: 800,
-              }}
-            >
-              H
-            </div>
-            <div>{content.site.name}</div>
+          {/* Wordmark startidea. — Manual de Identidad */}
+          <div style={{ display: "flex", alignItems: "baseline", gap: 10, fontSize: 26, fontWeight: 600, letterSpacing: "-0.02em" }}>
+            <span style={{ color: "#f4efe6" }}>startidea</span>
+            <span style={{ color: "#e63e73" }}>.</span>
+            <span style={{ marginLeft: 8, fontSize: 11, fontWeight: 500, letterSpacing: "0.18em", textTransform: "uppercase", opacity: 0.55 }}>
+              HUB · Granada
+            </span>
           </div>
 
           <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
@@ -91,7 +80,7 @@ export default async function OG({ params }: Props) {
                 fontSize: 18,
                 letterSpacing: "0.16em",
                 textTransform: "uppercase",
-                color: "#ffae84",
+                color: "#e63e73",
               }}
             >
               {room.subtitle}

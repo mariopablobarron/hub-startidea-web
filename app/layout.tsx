@@ -87,7 +87,8 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0a0a0b",
+  // Grafito Startidea — barra de navegador en móvil
+  themeColor: "#2a2a2a",
   width: "device-width",
   initialScale: 1,
 };
