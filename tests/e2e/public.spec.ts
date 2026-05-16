@@ -84,7 +84,7 @@ test.describe("Páginas dedicadas (SEO)", () => {
   test("/ecosistema carga con title, intro y 4 proyectos", async ({ page }) => {
     const res = await page.goto("/ecosistema");
     expect(res?.status()).toBe(200);
-    await expect(page).toHaveTitle(/Ecosistema Startidea/i);
+    await expect(page).toHaveTitle(/universo Startidea/i);
     await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
     // 4 cards de proyectos
     for (const name of [
