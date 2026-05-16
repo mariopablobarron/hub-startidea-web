@@ -1,0 +1,35 @@
+package.json
+  s_f12e84bac900e4::t_202e3095fbda53 45
+lib/stripe/actions.ts
+  s_f12e84bac900e4::t_1f03e1e6b1eae8 1-158
+lib/stripe/client.ts
+  s_f12e84bac900e4::t_9c3f2df8bc9a05 1-70
+app/me/reservas/page.tsx
+  s_f12e84bac900e4::t_46f1101dc02edd 176-198
+  s_f12e84bac900e4::t_daced5c4a99163 3,7
+app/me/bonos/page.tsx
+  s_f12e84bac900e4::t_eeae3c798a33f2 1-139
+app/api/webhooks/stripe/route.ts
+  s_f12e84bac900e4::t_7df7122ed31b65 1-173
+pnpm-lock.yaml
+  ai_agent 71-73,2671-2679,5673-5675
+app/me/page.tsx
+  s_f12e84bac900e4::t_88c504aa9da927 24-28
+  s_f12e84bac900e4::t_a30f0388c21f8c 89-94,96-110
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "1d029281affd0de607bcdaccd44d001b9607867c",
+  "prompts": {},
+  "sessions": {
+    "s_f12e84bac900e4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ba62ea7a-a471-4585-b822-8ababb0c1519",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}
