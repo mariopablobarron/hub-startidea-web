@@ -1,0 +1,40 @@
+app/admin/page.tsx
+  s_f12e84bac900e4::t_45c66990df388d 18
+  s_f12e84bac900e4::t_f8639182110b07 38-44
+  s_f12e84bac900e4::t_32a6326ee77d48 138-141,152-159
+lib/bookings/availability.ts
+  s_f12e84bac900e4::t_dc0512dca35687 1-79
+pnpm-lock.yaml
+  ai_agent 35-37,1329-1331,3927
+lib/bookings/actions.ts
+  s_f12e84bac900e4::t_a67881131bb868 1-365
+app/admin/reservas/page.tsx
+  s_f12e84bac900e4::t_f86c28dcc927ac 1-210
+app/me/reservas/page.tsx
+  s_f12e84bac900e4::t_d0835d811f5ea3 1-187
+lib/bookings/pricing.ts
+  s_f12e84bac900e4::t_7a16e4cb06af21 1-126
+app/admin/_components/AdminSidebar.tsx
+  s_f12e84bac900e4::t_5929a85819010a 20
+  s_f12e84bac900e4::t_d4faa91f66c8ba 28
+app/reservar/page.tsx
+  s_f12e84bac900e4::t_2bfe837c5af55e 1-263
+package.json
+  s_f12e84bac900e4::t_a4a0cc0c1aa8c0 33
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "0775a6ec142d57c549245f39399665fcaa65de5a",
+  "prompts": {},
+  "sessions": {
+    "s_f12e84bac900e4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ba62ea7a-a471-4585-b822-8ababb0c1519",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}
