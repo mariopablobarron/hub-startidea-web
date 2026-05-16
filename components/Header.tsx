@@ -53,11 +53,22 @@ export function Header() {
       )}
     >
       <div className="container-page flex h-16 items-center justify-between">
-        <Link href="/" className="group flex items-center gap-2 font-display text-lg font-semibold tracking-tight">
-          <span className="grid h-8 w-8 place-items-center rounded-lg bg-[var(--color-ink)] text-[var(--color-paper)] transition group-hover:bg-[var(--color-coral-500)]">
-            H
+        {/*
+          Wordmark del Manual de Identidad Startidea — "startidea." en
+          Montserrat Alternates con punto magenta corporativo. El HUB
+          hereda la marca matriz (no logotipo propio, sigue la regla del
+          manual para iniciativas sin marca independiente).
+        */}
+        <Link
+          href="/"
+          aria-label={`${site.name} — inicio`}
+          className="group inline-flex items-baseline font-display text-xl tracking-tight"
+        >
+          <span className="text-[var(--color-ink)]">startidea</span>
+          <span className="text-[var(--color-coral-500)] transition group-hover:text-[var(--color-coral-600)]">.</span>
+          <span className="ml-3 hidden text-xs uppercase tracking-[0.18em] text-[var(--color-mute)] md:inline-block">
+            HUB · Granada
           </span>
-          <span>{site.name}</span>
         </Link>
 
         <nav className="hidden items-center gap-8 text-sm md:flex">

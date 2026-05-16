@@ -5,11 +5,14 @@ export const alt = "Ecosistema Startidea — los proyectos detrás del HUB";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
+// Acentos por proyecto. Mantenemos identidades individuales como el Manual
+// permite (Granada Social tiene marca/color propios; lo mismo para los
+// proyectos del ecosistema). "coral" mapea a magenta Startidea oficial.
 const ACCENT_HEX: Record<string, string> = {
-  coral: "#ed4f15",
+  coral: "#e63e73",
   warm: "#ffae84",
   earth: "#9c6b3f",
-  ink: "#0a0a0b",
+  ink: "#2a2a2a",
 };
 
 export default async function OG() {
@@ -26,34 +29,17 @@ export default async function OG() {
           justifyContent: "space-between",
           padding: "70px",
           fontFamily: "system-ui, sans-serif",
-          background: "linear-gradient(135deg, #faf8f4 0%, #fff3ed 40%, #ffd2bd 100%)",
-          color: "#0a0a0b",
+          background: "#f4efe6", // Crema Startidea
+          color: "#2a2a2a",      // Grafito Startidea
         }}
       >
-        {/* Top — branding */}
-        <div style={{ display: "flex", alignItems: "center", gap: 14, fontSize: 24, fontWeight: 600 }}>
-          <div
-            style={{
-              width: 50,
-              height: 50,
-              borderRadius: 12,
-              background: "#0a0a0b",
-              color: "#faf8f4",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontSize: 28,
-              fontWeight: 800,
-            }}
-          >
-            H
-          </div>
-          <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
-            <div>{content.site.name}</div>
-            <div style={{ fontSize: 14, opacity: 0.6, letterSpacing: "0.14em", textTransform: "uppercase" }}>
-              Ecosistema
-            </div>
-          </div>
+        {/* Wordmark startidea. — Manual de Identidad */}
+        <div style={{ display: "flex", alignItems: "baseline", gap: 14, fontSize: 34, fontWeight: 600, letterSpacing: "-0.02em" }}>
+          <span style={{ color: "#2a2a2a" }}>startidea</span>
+          <span style={{ color: "#e63e73" }}>.</span>
+          <span style={{ marginLeft: 14, fontSize: 14, fontWeight: 500, letterSpacing: "0.18em", textTransform: "uppercase", color: "#6b6b6b" }}>
+            Ecosistema
+          </span>
         </div>
 
         {/* Middle — title + grid de 4 proyectos */}
@@ -71,7 +57,7 @@ export default async function OG() {
             }}
           >
             <span>Cuatro proyectos, una</span>
-            <span style={{ color: "#ed4f15", fontStyle: "italic" }}>casa madre</span>
+            <span style={{ color: "#e63e73", fontStyle: "italic" }}>casa madre</span>
             <span>en Granada.</span>
           </div>
 
@@ -95,7 +81,7 @@ export default async function OG() {
                     width: 14,
                     height: 14,
                     borderRadius: 999,
-                    background: ACCENT_HEX[p.accent] || "#ed4f15",
+                    background: ACCENT_HEX[p.accent] || "#e63e73",
                   }}
                 />
                 <div style={{ fontSize: 19, fontWeight: 600, lineHeight: 1.15 }}>{p.name}</div>

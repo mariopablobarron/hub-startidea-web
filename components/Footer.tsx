@@ -35,10 +35,13 @@ export function Footer() {
       </div>
       <div className="container-page grid gap-12 py-20 md:grid-cols-[1.4fr_1fr_1fr]">
         <div>
-          <div className="font-display text-3xl tracking-tight">{site.name}</div>
+          <div className="font-display text-4xl tracking-tight">
+            <span>startidea</span>
+            <span className="text-[var(--color-coral-500)]">.</span>
+          </div>
           <p className="mt-4 max-w-sm text-[var(--color-paper)]/70">
-            Coworking, salas de formación y estudio de podcast en el centro de Granada.
-            Donde se cocinan los proyectos con propósito.
+            Una agencia de innovación social con sede en Granada. El HUB es nuestro espacio:
+            coworking, salas de formación y estudio de podcast donde se cocinan los proyectos.
           </p>
           <div className="mt-8 flex gap-3">
             <Link

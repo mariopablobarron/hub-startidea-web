@@ -10,7 +10,13 @@ export function Contact() {
   return (
     <section id="contacto" className="py-24 md:py-32">
       <div className="container-page">
-        <div className="overflow-hidden rounded-3xl bg-[var(--color-coral-500)] text-white">
+        {/*
+          Manual Startidea: magenta es acento (10%). Un bloque CTA tan
+          grande sobre fondo magenta rompería la proporción 60/30/10.
+          Lo pasamos a grafito (la "tinta" del manual) y mantenemos el
+          magenta como acento puntual en separadores/badges/links hover.
+        */}
+        <div className="overflow-hidden rounded-3xl bg-[var(--color-ink)] text-[var(--color-paper)]">
           <div className="grid gap-12 p-10 md:grid-cols-[1.4fr_1fr] md:p-16">
             <div>
               <span className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.18em] text-white/80">

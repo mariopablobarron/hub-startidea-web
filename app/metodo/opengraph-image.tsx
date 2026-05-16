@@ -25,37 +25,22 @@ export default async function OG() {
         }}
       >
         {/* Top — branding */}
-        <div style={{ display: "flex", alignItems: "center", gap: 14, fontSize: 24, fontWeight: 600 }}>
-          <div
+        {/* Wordmark startidea. (magenta) — Manual reconoce a la matriz */}
+        <div style={{ display: "flex", alignItems: "baseline", gap: 14, fontSize: 34, fontWeight: 600, letterSpacing: "-0.02em" }}>
+          <span style={{ color: "#faf8f4" }}>startidea</span>
+          <span style={{ color: "#e63e73" }}>.</span>
+          <span
             style={{
-              width: 50,
-              height: 50,
-              borderRadius: 12,
-              background: "#c98d5b",
-              color: "#2a1f15",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontSize: 28,
-              fontWeight: 800,
+              marginLeft: 14,
+              fontSize: 14,
+              fontWeight: 500,
+              letterSpacing: "0.18em",
+              textTransform: "uppercase",
+              color: "#c98d5b",
             }}
           >
-            R
-          </div>
-          <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
-            <div>{content.site.name}</div>
-            <div
-              style={{
-                fontSize: 14,
-                opacity: 0.65,
-                letterSpacing: "0.18em",
-                textTransform: "uppercase",
-                color: "#c98d5b",
-              }}
-            >
-              Método de la casa
-            </div>
-          </div>
+            Método de la casa
+          </span>
         </div>
 
         {/* Middle — title */}

@@ -1,32 +1,51 @@
 @import "tailwindcss";
 
+/*
+ * Paleta y tipografía oficiales del Manual de Identidad de Startidea
+ * (v1.0 · Mayo 2026). Aplicadas al HUB porque hereda de la matriz.
+ *
+ * Proporción: 60% crema (fondo) · 30% grafito (texto) · 10% magenta (acento).
+ * El magenta es acento — nunca fondo de bloques grandes, solo titulares
+ * cortos, llamadas a la acción y datos relevantes.
+ *
+ * Mantenemos los nombres de variable legados (`--color-coral-*`,
+ * `--color-ink`, `--color-paper`) para no romper la cascada de componentes;
+ * solo cambiamos sus hex al sistema de Startidea. Si un día hace falta,
+ * renombrar es una refactorización trivial con sed.
+ */
 @theme {
-  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif;
-  --font-display: "Fraunces", ui-serif, Georgia, serif;
+  /* Montserrat para todo — Manual de Identidad Startidea, capítulo 07. */
+  --font-sans: "Montserrat", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-display: "Montserrat Alternates", "Montserrat", ui-sans-serif, system-ui, sans-serif;
 
-  --color-ink: #0a0a0b;
-  --color-ink-2: #1a1a1d;
-  --color-ink-3: #2a2a2e;
-  --color-paper: #faf8f4;
-  --color-paper-2: #f1ede5;
+  /* Tinta corporativa (Grafito) — cuerpo de texto. */
+  --color-ink: #2a2a2a;
+  --color-ink-2: #1a1a1a;
+  --color-ink-3: #3a3a3a;
+
+  /* Fondos crema/hueso. */
+  --color-paper: #f4efe6;   /* Crema · fondo por defecto */
+  --color-paper-2: #eae3d3; /* Hueso · bandas y cards */
+
   --color-mute: #6b6b6b;
-  --color-line: #e6e1d6;
-  --color-line-dark: #2a2a2e;
+  --color-line: #ddd5c4;
+  --color-line-dark: #2a2a2a;
 
-  /* Coral cálido — Granada, sol, energía emprendedora */
-  --color-coral-50: #fff3ed;
-  --color-coral-100: #ffe0d0;
-  --color-coral-300: #ffae84;
-  --color-coral-500: #ff6b35;
-  --color-coral-600: #ed4f15;
-  --color-coral-700: #c43c0d;
+  /* Magenta Startidea — acento primario. Mantenemos la escala con nombre
+     `coral-*` por compatibilidad pero los hex son magentas. */
+  --color-coral-50: #fde8ef;
+  --color-coral-100: #fbc7d6;
+  --color-coral-300: #f088ac;
+  --color-coral-500: #e63e73; /* Magenta Startidea oficial */
+  --color-coral-600: #c52d5c;
+  --color-coral-700: #9c2148;
 
-  /* Verde innovación social */
+  /* Verde reservado a contextos de ecosistema (no usar en home). */
   --color-moss-500: #4a9d7f;
   --color-moss-600: #38826a;
 
-  --shadow-soft: 0 1px 2px rgb(10 10 11 / 0.04), 0 4px 16px rgb(10 10 11 / 0.06);
-  --shadow-glow: 0 0 0 1px rgb(255 107 53 / 0.2), 0 8px 32px rgb(255 107 53 / 0.16);
+  --shadow-soft: 0 1px 2px rgb(42 42 42 / 0.05), 0 4px 16px rgb(42 42 42 / 0.07);
+  --shadow-glow: 0 0 0 1px rgb(230 62 115 / 0.18), 0 8px 32px rgb(230 62 115 / 0.14);
 }
 
 @layer base {
@@ -84,8 +103,13 @@
     @apply mx-auto w-full max-w-7xl px-6 md:px-10;
   }
 
+  /*
+   * Botones primarios — Manual Startidea: grafito (tinta) en reposo,
+   * magenta puntual en hover como acento. Sigue 60/30/10 sin convertir
+   * el botón en "mancha magenta".
+   */
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 rounded-full bg-[var(--color-ink)] px-6 py-3 text-sm font-medium text-[var(--color-paper)] transition hover:bg-[var(--color-coral-600)];
+    @apply inline-flex items-center justify-center gap-2 rounded-full bg-[var(--color-ink)] px-6 py-3 text-sm font-medium text-[var(--color-paper)] transition hover:bg-[var(--color-coral-500)];
   }
 
   .btn-ghost {

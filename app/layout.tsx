@@ -1,23 +1,28 @@
 import type { Metadata, Viewport } from "next";
 import Script from "next/script";
-import { Inter, Fraunces } from "next/font/google";
+import { Montserrat, Montserrat_Alternates } from "next/font/google";
 import "./globals.css";
 import { PublicShell } from "@/components/PublicShell";
 import { content } from "@/lib/content";
 
 const site = content.site;
 
-const inter = Inter({
+// Manual de Identidad Startidea · capítulo 07. Montserrat para todo el
+// sistema; Montserrat Alternates para display puntual (wordmark, portadas
+// de capítulo, palabras destacadas dentro de un titular largo).
+const montserrat = Montserrat({
   subsets: ["latin"],
-  variable: "--font-inter",
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-inter", // nombre legado para no romper className en <html>
   display: "swap",
 });
 
-const fraunces = Fraunces({
+const montserratAlternates = Montserrat_Alternates({
   subsets: ["latin"],
-  variable: "--font-fraunces",
+  weight: ["400", "500", "600"],
+  style: ["normal", "italic"],
+  variable: "--font-fraunces", // nombre legado
   display: "swap",
-  axes: ["opsz", "SOFT"],
 });
 
 export const metadata: Metadata = {
@@ -89,7 +94,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="es-ES" className={`${inter.variable} ${fraunces.variable}`}>
+    <html lang="es-ES" className={`${montserrat.variable} ${montserratAlternates.variable}`}>
       <head>
         {/* Resource hints — acelera primer paint reduciendo handshakes */}
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
