@@ -56,8 +56,8 @@ export default async function OG() {
               gap: "0 0.25em",
             }}
           >
-            <span>Cuatro proyectos, una</span>
-            <span style={{ color: "#e63e73", fontStyle: "italic" }}>casa madre</span>
+            <span>Cuatro proyectos, un</span>
+            <span style={{ color: "#e63e73", fontStyle: "italic" }}>universo</span>
             <span>en Granada.</span>
           </div>
 

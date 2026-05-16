@@ -160,16 +160,20 @@ export function faqSchema() {
 
   const faqs: Array<{ q: string; a: string }> = [
     {
+      q: "¿Qué es el universo Startidea?",
+      a: `Startidea es una agencia de innovación social con sede en Granada que diseña, lanza y acompaña proyectos con propósito. El "universo Startidea" es el conjunto de espacios físicos (el HUB en C/ Conde Cifuentes 33) y proyectos vivos cocinados desde aquí: ${(projects.length ? projects.map((p) => p.name).join(", ") : "Startidea, Tres mil millones de latidos, Raíz y Acción y TodoMerchandising")}.`,
+    },
+    {
       q: "¿Dónde está el HUB Startidea?",
       a: `En el centro de Granada, en ${site.address.street}, ${site.address.postal} ${site.address.city}. Bien comunicado con metro y autobús (paradas de Recogidas y Camino de Ronda) y con parking cercano (Granados / Ronda Centro).`,
     },
     {
       q: "¿Qué se puede hacer en el HUB Startidea?",
-      a: "Alquilar salas para formaciones, eventos y reuniones; grabar en el estudio de podcast; trabajar desde el coworking; participar en la comunidad y los proyectos de Startidea. El HUB es tanto un espacio físico abierto a la calle como la sede operativa de la agencia de innovación social Startidea.",
+      a: "Dos cosas: entrar por la puerta (alquilar una sala para una formación, evento o reunión; grabar en el estudio de podcast; trabajar desde el coworking) o entrar por una idea (sumarte a alguno de los proyectos del universo Startidea como cliente, colaborador o socio).",
     },
     {
       q: "¿Quién está detrás del HUB?",
-      a: `${site.parent.name}, una agencia de innovación social con más de una década acompañando proyectos con propósito. El HUB es su sede física y el lugar donde se cocinan sus proyectos: Tres mil millones de latidos, Raíz y Acción y TodoMerchandising.`,
+      a: `${site.parent.name}, una agencia de innovación social con más de una década acompañando proyectos con propósito. El HUB es donde el universo Startidea se hace tangible y donde se cocinan los proyectos: Tres mil millones de latidos, Raíz y Acción y TodoMerchandising.`,
     },
     {
       q: "¿Cuántas salas tiene el HUB y para qué sirven?",
@@ -192,8 +196,8 @@ export function faqSchema() {
       a: "Sí. El HUB tiene un estudio de podcast profesional acondicionado, con equipo de grabación, micrófonos de calidad y soporte técnico opcional. Se puede reservar por sesiones o por bonos para series. Escríbenos al formulario para presupuesto.",
     },
     {
-      q: "¿Qué proyectos forman parte del ecosistema Startidea?",
-      a: `Hoy son cuatro: ${projects.map((p) => p.name).join(", ")}. Todos se gestionan desde el HUB y comparten un mismo principio: ideas con propósito que se llevan a la acción.`,
+      q: "¿Qué proyectos forman parte del universo Startidea?",
+      a: `Hoy son cuatro: ${projects.map((p) => p.name).join(", ")}. Cada uno con su propia identidad y su propia voz. Todos se cocinan desde el HUB y comparten un mismo principio: ideas con propósito que se llevan a la acción.`,
     },
   ];
 
