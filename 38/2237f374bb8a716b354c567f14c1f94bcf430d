@@ -1,0 +1,42 @@
+app/reservar/page.tsx
+  s_f12e84bac900e4::t_1c6408868ecd7d 91,93
+  s_f12e84bac900e4::t_82851b38c8609a 4
+  s_f12e84bac900e4::t_91e04332fd7d95 148,151,162,165
+  s_f12e84bac900e4::t_698affbc2d23fb 29-33
+data/content.json
+  s_f12e84bac900e4::t_58ff74283a3dbd 186
+  s_f12e84bac900e4::t_2db42bcb192cb0 273
+  s_f12e84bac900e4::t_0999860888d457 215
+  s_f12e84bac900e4::t_e4899726cbc1b7 245
+  s_f12e84bac900e4::t_9f6c453f9840b3 102
+  s_f12e84bac900e4::t_28ac7934c3717f 159
+  s_f12e84bac900e4::t_df12e7ac4b056b 70
+  s_f12e84bac900e4::t_32af79da9e66a3 131
+lib/content.ts
+  s_f12e84bac900e4::t_4f597d01c7e398 10-11
+  s_f12e84bac900e4::t_dddab7c94ad27c 34-36,41-44
+lib/admin/schema.ts
+  s_f12e84bac900e4::t_7e8860faba1e93 15-18
+lib/bookings/actions.ts
+  s_f12e84bac900e4::t_4dd93976dcd8f4 52-54
+  s_f12e84bac900e4::t_edc26efc18ef0b 74-76,79-81
+lib/bookings/availability.ts
+  s_f12e84bac900e4::t_54099b64bad588 67
+  s_f12e84bac900e4::t_0c7b4a7ee532ae 69-73,75-78
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "382237f374bb8a716b354c567f14c1f94bcf430d",
+  "prompts": {},
+  "sessions": {
+    "s_f12e84bac900e4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ba62ea7a-a471-4585-b822-8ababb0c1519",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}
