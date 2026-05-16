@@ -1,0 +1,385 @@
+// Plataforma HUB Startidea — schema completo
+// Ver docs/PLATFORM-ROADMAP.md para contexto y decisiones.
+//
+// Convenciones:
+// - cuid() para IDs (compatible Coolify y otras apps Startidea)
+// - createdAt/updatedAt en todas las tablas relevantes
+// - Soft delete NO (preferimos auditoría). Si hace falta, se añade luego.
+// - Cantidades monetarias en céntimos (Int), no decimales
+
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl", "linux-musl-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================================
+// USUARIOS Y ROLES
+// ============================================================
+
+enum Role {
+  VISITOR       // sin login o cuenta básica
+  CLIENT        // cliente puntual: reserva con pago, sin descuento
+  MEMBER        // coworker activo, plaza fija o flex
+  COLLABORATOR  // red Startidea: -20% en reservas
+  ADMIN         // Mario y equipo
+}
+
+enum MembershipType {
+  COWORKER_FIXED    // plaza fija mensual
+  COWORKER_FLEX     // pase flex (X días/mes)
+  OFFICE_PRIVATE    // office privado
+}
+
+model User {
+  id              String          @id @default(cuid())
+  email           String          @unique
+  emailVerified   DateTime?
+  name            String?
+  image           String?
+  phone           String?
+  passwordHash    String?         // null si solo usa magic-link
+  role            Role            @default(VISITOR)
+  membershipType  MembershipType?
+  membershipUntil DateTime?
+  bio             String?         @db.Text
+  // Visibilidad pública del usuario en /comunidad
+  publicProfile   Boolean         @default(false)
+
+  bookings        Booking[]
+  payments        Payment[]
+  bonds           PrepaidBond[]
+  eventsOrganized Event[]         @relation("EventOrganizer")
+  eventRegistrations EventRegistration[]
+  topics          Topic[]
+  posts           Post[]
+  reactions       Reaction[]
+  sessions        Session[]
+  accounts        Account[]
+  verificationTokens VerificationToken[]
+
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  lastLoginAt     DateTime?
+
+  @@index([role])
+}
+
+// NextAuth v5 — modelos requeridos por el adapter Prisma
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+  // Mantenemos relación opcional con User si el email coincide (no obligatoria)
+  user       User?    @relation(fields: [identifier], references: [email])
+
+  @@unique([identifier, token])
+}
+
+// ============================================================
+// RESERVAS Y PAGOS
+// ============================================================
+
+enum BookingStatus {
+  PENDING       // creada, espera aprobación o pago
+  CONFIRMED     // confirmada
+  CANCELLED     // cancelada por usuario o admin
+  COMPLETED     // pasó OK
+  NO_SHOW       // no apareció
+}
+
+model Booking {
+  id          String        @id @default(cuid())
+  userId      String
+  user        User          @relation(fields: [userId], references: [id])
+  // referencia a content.json (cc33, serendipia, socrates, etc.) — no FK porque
+  // el catálogo de salas vive en git, no en BD (es estable y bajo cambio)
+  roomSlug    String
+  startsAt    DateTime
+  endsAt      DateTime
+  attendees   Int?
+  purpose     String?       @db.Text     // "Formación equipo X", evento, etc.
+  status      BookingStatus @default(PENDING)
+  totalCents  Int           @default(0)
+  paymentId   String?
+  payment     Payment?      @relation(fields: [paymentId], references: [id])
+  bondId      String?
+  bond        PrepaidBond?  @relation(fields: [bondId], references: [id])
+  notes       String?       @db.Text     // notas del cliente
+  adminNotes  String?       @db.Text     // notas del admin (internas)
+
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  // Validación de overlaps se hace en server action (no en exclusion constraint
+  // de Postgres — más simple y portable). Índices para query eficiente.
+  @@index([roomSlug, startsAt, endsAt])
+  @@index([userId, startsAt])
+  @@index([status, startsAt])
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+}
+
+model Payment {
+  id                    String        @id @default(cuid())
+  userId                String
+  user                  User          @relation(fields: [userId], references: [id])
+  amountCents           Int
+  currency              String        @default("EUR")
+  status                PaymentStatus @default(PENDING)
+  description           String?
+  stripeSessionId       String?       @unique
+  stripePaymentIntentId String?       @unique
+  bookings              Booking[]
+  bondPurchase          PrepaidBond?
+
+  createdAt             DateTime      @default(now())
+  updatedAt             DateTime      @updatedAt
+
+  @@index([userId, createdAt])
+}
+
+enum BondType {
+  ROOM_HOURS_10
+  ROOM_HOURS_50
+  PODCAST_SESSIONS_5
+  COWORKING_DAYS_10
+}
+
+model PrepaidBond {
+  id          String    @id @default(cuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id])
+  type        BondType
+  hoursTotal  Int
+  hoursUsed   Int       @default(0)
+  expiresAt   DateTime?
+  paymentId   String?   @unique
+  payment     Payment?  @relation(fields: [paymentId], references: [id])
+  bookings    Booking[]
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([userId])
+}
+
+// Catálogo de tarifas — editable desde admin. Cada sala puede tener
+// múltiples tarifas (hora, media jornada, jornada completa, evento) y
+// diferentes precios según rol (CLIENT, MEMBER, COLLABORATOR).
+enum PricingUnit {
+  PER_HOUR
+  HALF_DAY
+  FULL_DAY
+  EVENT
+  PER_SESSION   // podcast por sesión
+  PER_DAY       // coworking por día
+}
+
+model Pricing {
+  id          String       @id @default(cuid())
+  roomSlug    String       // referencia content.json
+  unit        PricingUnit
+  // Precios en céntimos por rol. NULL = no aplica para ese rol.
+  clientCents       Int?
+  memberCents       Int?
+  collaboratorCents Int?
+  // Notas internas opcionales (ej. "incluye proyector + agua")
+  notes       String?      @db.Text
+  active      Boolean      @default(true)
+
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  @@unique([roomSlug, unit])
+  @@index([roomSlug, active])
+}
+
+// ============================================================
+// EVENTOS
+// ============================================================
+
+model Event {
+  id            String              @id @default(cuid())
+  slug          String              @unique
+  title         String
+  description   String              @db.Text
+  startsAt      DateTime
+  endsAt        DateTime
+  // Ubicación: sala del HUB o texto libre (eventos externos del ecosistema)
+  roomSlug      String?
+  externalLocation String?          // para eventos fuera del HUB
+  cover         String?             // path a /public/images/events/...
+  isPublic      Boolean             @default(true)
+  // Si es false, no aparece en /eventos hasta que se publica
+  published     Boolean             @default(false)
+  capacity      Int?
+  organizerId   String
+  organizer     User                @relation("EventOrganizer", fields: [organizerId], references: [id])
+  registrations EventRegistration[]
+
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
+
+  @@index([startsAt, published])
+  @@index([slug])
+}
+
+enum RegistrationStatus {
+  REGISTERED
+  ATTENDED
+  CANCELLED
+  WAITLIST
+}
+
+model EventRegistration {
+  id        String              @id @default(cuid())
+  eventId   String
+  event     Event               @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  // userId opcional: permitimos invitados externos sin cuenta (registro guest)
+  userId    String?
+  user      User?               @relation(fields: [userId], references: [id])
+  email     String
+  name      String?
+  phone     String?
+  status    RegistrationStatus  @default(REGISTERED)
+  notes     String?             @db.Text
+
+  createdAt DateTime            @default(now())
+  updatedAt DateTime            @updatedAt
+
+  // Una persona (por email) solo se registra una vez al mismo evento
+  @@unique([eventId, email])
+  @@index([userId])
+}
+
+// ============================================================
+// FORO
+// ============================================================
+
+enum TopicCategory {
+  GENERAL
+  ANUNCIOS
+  PROYECTOS
+  EVENTOS
+  COWORKING
+  AYUDA
+}
+
+model Topic {
+  id          String        @id @default(cuid())
+  slug        String        @unique
+  title       String
+  body        String        @db.Text
+  authorId    String
+  author      User          @relation(fields: [authorId], references: [id])
+  category    TopicCategory @default(GENERAL)
+  pinned      Boolean       @default(false)
+  locked      Boolean       @default(false)
+  views       Int           @default(0)
+  // Última actividad del hilo: max(createdAt, último post) — denormalizado
+  // para sort eficiente sin agregar la tabla Post en cada query.
+  lastActivityAt DateTime   @default(now())
+  posts       Post[]
+  reactions   Reaction[]
+
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@index([category, lastActivityAt])
+  @@index([pinned, lastActivityAt])
+}
+
+model Post {
+  id        String     @id @default(cuid())
+  topicId   String
+  topic     Topic      @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  authorId  String
+  author    User       @relation(fields: [authorId], references: [id])
+  body      String     @db.Text
+  reactions Reaction[]
+  // Marcado como respuesta aceptada (útil en categoría AYUDA)
+  isAnswer  Boolean    @default(false)
+
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  @@index([topicId, createdAt])
+}
+
+enum ReactionType {
+  LIKE
+  CELEBRATE
+  IDEA
+  THANK
+}
+
+model Reaction {
+  id        String       @id @default(cuid())
+  userId    String
+  user      User         @relation(fields: [userId], references: [id])
+  topicId   String?
+  topic     Topic?       @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  postId    String?
+  post      Post?        @relation(fields: [postId], references: [id], onDelete: Cascade)
+  type      ReactionType
+
+  createdAt DateTime     @default(now())
+
+  // Un usuario solo puede reaccionar una vez al mismo item con el mismo type
+  @@unique([userId, topicId, postId, type])
+}
+
+// ============================================================
+// LOGS / AUDITORÍA (mínimo — extender después)
+// ============================================================
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  actorId   String?  // userId del que hizo la acción
+  actorEmail String? // copia denormalizada por si se borra el user
+  action    String   // "booking.approved", "user.role_changed", etc.
+  target    String?  // id del recurso afectado
+  metadata  Json?    // datos adicionales
+
+  createdAt DateTime @default(now())
+
+  @@index([actorId, createdAt])
+  @@index([action, createdAt])
+}
