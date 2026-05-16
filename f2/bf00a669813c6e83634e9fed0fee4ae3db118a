@@ -1,0 +1,22 @@
+app/ecosistema/opengraph-image.tsx
+  s_f12e84bac900e4::t_b381bf7c310e3d 59-60
+lib/seo/structuredData.ts
+  s_f12e84bac900e4::t_f2d8df866552f0 163-165,172,176
+  s_f12e84bac900e4::t_28caac6f3c5bce 199-200
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "f2bf00a669813c6e83634e9fed0fee4ae3db118a",
+  "prompts": {},
+  "sessions": {
+    "s_f12e84bac900e4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ba62ea7a-a471-4585-b822-8ababb0c1519",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}
