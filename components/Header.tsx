@@ -14,7 +14,7 @@ const nav = [
   { href: "/eventos", label: "Eventos" },
   { href: "/metodo", label: "Método" },
   { href: "/#podcast", label: "Podcast" },
-  { href: "/#comunidad", label: "Comunidad" },
+  { href: "/comunidad", label: "Comunidad" },
 ];
 
 export function Header() {

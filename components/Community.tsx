@@ -1,3 +1,5 @@
+import Link from "next/link";
+import { ArrowRight } from "lucide-react";
 import { content } from "@/lib/content";
 import { getIcon } from "@/lib/icons";
 
@@ -5,7 +7,7 @@ const community = content.community;
 
 export function Community() {
   return (
-    <section id="comunidad" className="py-24 md:py-32">
+    <section id="comunidad-intro" className="py-24 md:py-32">
       <div className="container-page">
         <div className="max-w-3xl">
           <span className="eyebrow">{community.eyebrow}</span>
@@ -28,6 +30,16 @@ export function Community() {
               </div>
             );
           })}
+        </div>
+
+        {/* CTA al foro de la comunidad */}
+        <div className="mt-10">
+          <Link
+            href="/comunidad"
+            className="inline-flex items-center gap-2 rounded-full bg-[var(--color-ink)] px-6 py-3 text-sm font-medium text-[var(--color-paper)] transition hover:bg-[var(--color-coral-500)]"
+          >
+            Entrar al foro de la comunidad <ArrowRight size={14} />
+          </Link>
         </div>
       </div>
     </section>
