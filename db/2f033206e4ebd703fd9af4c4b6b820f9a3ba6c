@@ -1,0 +1,27 @@
+app/admin/reservas/page.tsx
+  s_f12e84bac900e4::t_9b1072df712418 2,5,16,20-21,42,44-52,54-56,58-59,61-64,66,68,75-77,86,90,92-97,100-184,187-196,199-240,242-253,258-267,286-314,323,325-329,334
+components/RoomsGrid.tsx
+  s_f12e84bac900e4::t_5599d1f9ae90f3 6
+  s_f12e84bac900e4::t_ae5d602c1e173b 22-32
+  s_f12e84bac900e4::t_5349d0e90e678e 44-50,63-68,71,75,78,95-109,112
+app/salas/[slug]/page.tsx
+  s_f12e84bac900e4::t_83898ab5553a4c 90-98,101-106
+app/salas/page.tsx
+  s_f12e84bac900e4::t_ad5067f9cf5c69 46-59
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "db2f033206e4ebd703fd9af4c4b6b820f9a3ba6c",
+  "prompts": {},
+  "sessions": {
+    "s_f12e84bac900e4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ba62ea7a-a471-4585-b822-8ababb0c1519",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}
