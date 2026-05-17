@@ -1,0 +1,25 @@
+app/layout.tsx
+  s_f12e84bac900e4::t_d034608103a5ec 31,54,67
+components/Podcast.tsx
+  s_f12e84bac900e4::t_18cf1181fc482a 79-82
+components/Hero.tsx
+  s_f12e84bac900e4::t_0fc6dd120a1c76 144-147,149-152,156
+components/CookieBanner.tsx
+  s_f12e84bac900e4::t_c1b8f6b63eaecd 44
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "b32b3bce375910e1fabf4112bf2134cc21e400cf",
+  "prompts": {},
+  "sessions": {
+    "s_f12e84bac900e4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ba62ea7a-a471-4585-b822-8ababb0c1519",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}
