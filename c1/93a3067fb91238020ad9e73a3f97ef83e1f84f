@@ -1,0 +1,28 @@
+components/admin/ConfirmSubmit.tsx
+  s_f12e84bac900e4::t_a42e0a15439da6 1-38
+app/admin/foro/page.tsx
+  s_f12e84bac900e4::t_5a55607b883949 77-85
+  s_f12e84bac900e4::t_e769fa1ca51888 8
+app/admin/tarifas/page.tsx
+  s_f12e84bac900e4::t_edf075dddeb3c4 145-146,150
+  s_f12e84bac900e4::t_13a72975100632 7
+app/admin/eventos/[id]/page.tsx
+  s_f12e84bac900e4::t_f60fb7418dab2a 11
+  s_f12e84bac900e4::t_3de1693f727b65 97-98,102
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "c193a3067fb91238020ad9e73a3f97ef83e1f84f",
+  "prompts": {},
+  "sessions": {
+    "s_f12e84bac900e4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ba62ea7a-a471-4585-b822-8ababb0c1519",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}
