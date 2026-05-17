@@ -43,6 +43,20 @@ export default function SalasPage() {
           grabación o trabajo individual. Toca cualquiera para ver capacidad,
           equipamiento y para qué se usa habitualmente.
         </p>
+        <div className="mt-8 flex flex-wrap gap-3">
+          <Link
+            href="/reservar"
+            className="inline-flex items-center gap-2 rounded-full bg-[var(--color-ink)] px-6 py-3 text-sm font-medium text-[var(--color-paper)] transition hover:bg-[var(--color-coral-500)]"
+          >
+            Reservar una sala por horas
+          </Link>
+          <Link
+            href="/#contacto"
+            className="inline-flex items-center gap-2 rounded-full border border-[var(--color-line)] px-6 py-3 text-sm font-medium hover:border-[var(--color-ink)]"
+          >
+            Otras consultas
+          </Link>
+        </div>
       </header>
 
       <div className="container-page mt-16 mb-32 grid gap-4 md:grid-cols-2">

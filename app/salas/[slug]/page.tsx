@@ -87,9 +87,23 @@ export default async function SalaPage({ params }: Props) {
           </div>
 
           <div className="flex flex-wrap gap-3">
-            <Link href="/#contacto" className="btn-primary">Reservar esta sala</Link>
+            {room.bookable !== false ? (
+              <Link href={`/reservar?sala=${room.slug}`} className="btn-primary">
+                Reservar esta sala por horas
+              </Link>
+            ) : (
+              <Link href="/#contacto" className="btn-primary">
+                Consultar disponibilidad
+              </Link>
+            )}
             <Link href="/#tour" className="btn-ghost">Ver en el plano</Link>
           </div>
+          {room.bookable !== false && (
+            <p className="mt-3 text-xs text-[var(--color-mute)]">
+              ¿Necesitas algo distinto a una reserva por horas?{" "}
+              <Link href="/#contacto" className="underline underline-offset-2">Escríbenos</Link>.
+            </p>
+          )}
         </header>
 
         <div className="mt-12 relative aspect-[21/9] overflow-hidden rounded-3xl bg-[var(--color-paper-2)]">

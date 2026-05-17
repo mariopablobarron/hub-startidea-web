@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { ArrowUpRight, Maximize2, Users } from "lucide-react";
+import { ArrowUpRight, Maximize2, Users, CalendarCheck } from "lucide-react";
 import { rooms, formatArea } from "@/lib/content";
 
 export function RoomsGrid() {
@@ -19,9 +19,17 @@ export function RoomsGrid() {
               Cada sala tiene nombre porque cada sala tiene historia.
             </h2>
           </div>
-          <Link href="/salas" className="inline-flex items-center gap-2 text-sm font-medium text-[var(--color-coral-600)] hover:text-[var(--color-coral-700)]">
-            Ver todas las salas <ArrowUpRight size={14} />
-          </Link>
+          <div className="flex flex-wrap items-center gap-3">
+            <Link
+              href="/reservar"
+              className="inline-flex items-center gap-2 rounded-full bg-[var(--color-ink)] px-5 py-2.5 text-sm font-medium text-[var(--color-paper)] transition hover:bg-[var(--color-coral-500)]"
+            >
+              <CalendarCheck size={14} /> Reservar una sala
+            </Link>
+            <Link href="/salas" className="inline-flex items-center gap-2 text-sm font-medium text-[var(--color-coral-600)] hover:text-[var(--color-coral-700)]">
+              Ver todas <ArrowUpRight size={14} />
+            </Link>
+          </div>
         </div>
 
         <div className="mt-12 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -33,11 +41,13 @@ export function RoomsGrid() {
               viewport={{ once: true, margin: "-80px" }}
               transition={{ duration: 0.4, delay: i * 0.05 }}
             >
-              <Link
-                href={`/salas/${room.slug}`}
-                className="group flex h-full flex-col overflow-hidden rounded-3xl border border-[var(--color-line)] bg-[var(--color-paper)] transition hover:border-[var(--color-ink)] hover:shadow-[var(--shadow-soft)]"
-              >
-                <div className="relative aspect-[4/3] w-full overflow-hidden bg-[var(--color-paper-2)]">
+              {/*
+                Card SIN link entero — dos CTAs al pie ("Ver detalle" y
+                "Reservar") evitan la ambigüedad y dan acción clara.
+                La imagen + título siguen siendo Link al detalle.
+              */}
+              <article className="flex h-full flex-col overflow-hidden rounded-3xl border border-[var(--color-line)] bg-[var(--color-paper)] transition hover:border-[var(--color-ink)] hover:shadow-[var(--shadow-soft)]">
+                <Link href={`/salas/${room.slug}`} className="group relative block aspect-[4/3] w-full overflow-hidden bg-[var(--color-paper-2)]">
                   <Image
                     src={room.image}
                     alt={`${room.name} — ${room.subtitle}`}
@@ -50,17 +60,22 @@ export function RoomsGrid() {
                       {room.highlight}
                     </span>
                   )}
-                </div>
+                  {room.bookable !== false && (
+                    <span className="absolute right-4 top-4 rounded-full bg-white/95 px-2.5 py-1 text-xs font-medium text-[var(--color-ink)] shadow-sm">
+                      Reservable
+                    </span>
+                  )}
+                </Link>
 
                 <div className="flex flex-1 flex-col p-7">
-                  <div>
+                  <Link href={`/salas/${room.slug}`} className="block">
                     <div className="text-xs uppercase tracking-[0.18em] text-[var(--color-coral-600)]">
                       {room.subtitle}
                     </div>
-                    <h3 className="mt-2 font-display text-2xl tracking-tight">
+                    <h3 className="mt-2 font-display text-2xl tracking-tight hover:text-[var(--color-coral-600)]">
                       {room.name}
                     </h3>
-                  </div>
+                  </Link>
 
                   <p className="mt-4 text-sm text-[var(--color-mute)]">
                     {room.short}
@@ -77,16 +92,24 @@ export function RoomsGrid() {
                     </span>
                   </div>
 
-                  <div className="mt-auto flex items-center justify-between pt-8">
-                    <span className="text-xs text-[var(--color-mute)]">
-                      {room.uses.slice(0, 2).join(" · ")}
-                    </span>
-                    <span className="grid h-9 w-9 place-items-center rounded-full border border-[var(--color-line)] transition group-hover:border-[var(--color-ink)] group-hover:bg-[var(--color-ink)] group-hover:text-[var(--color-paper)]">
-                      <ArrowUpRight size={14} />
-                    </span>
+                  <div className="mt-auto flex flex-wrap items-center gap-2 pt-6">
+                    {room.bookable !== false && (
+                      <Link
+                        href={`/reservar?sala=${room.slug}`}
+                        className="inline-flex items-center gap-1.5 rounded-full bg-[var(--color-ink)] px-4 py-2 text-xs font-medium text-[var(--color-paper)] transition hover:bg-[var(--color-coral-500)]"
+                      >
+                        <CalendarCheck size={12} /> Reservar
+                      </Link>
+                    )}
+                    <Link
+                      href={`/salas/${room.slug}`}
+                      className="inline-flex items-center gap-1.5 rounded-full border border-[var(--color-line)] px-4 py-2 text-xs font-medium text-[var(--color-ink)] transition hover:border-[var(--color-ink)]"
+                    >
+                      Ver detalle <ArrowUpRight size={12} />
+                    </Link>
                   </div>
                 </div>
-              </Link>
+              </article>
             </motion.div>
           ))}
         </div>
