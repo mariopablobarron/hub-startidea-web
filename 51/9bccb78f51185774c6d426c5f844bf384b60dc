@@ -1,0 +1,28 @@
+app/admin/conversaciones/[id]/page.tsx
+  s_f12e84bac900e4::t_4ea0ab4704a2db 41
+  s_f12e84bac900e4::t_c7c219164d7345 3
+app/admin/salas/page.tsx
+  s_f12e84bac900e4::t_f4c9b906257cfe 16-25,27-48
+app/admin/seo/page.tsx
+  s_f12e84bac900e4::t_9623cf571ba42c 3
+  s_f12e84bac900e4::t_21143891d1c211 55
+app/admin/conversaciones/page.tsx
+  s_f12e84bac900e4::t_bb0de7760dd5ee 3
+  s_f12e84bac900e4::t_08ecaf298c9371 47
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "519bccb78f51185774c6d426c5f844bf384b60dc",
+  "prompts": {},
+  "sessions": {
+    "s_f12e84bac900e4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ba62ea7a-a471-4585-b822-8ababb0c1519",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}
