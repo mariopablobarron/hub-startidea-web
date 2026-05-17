@@ -28,7 +28,7 @@ const montserratAlternates = Montserrat_Alternates({
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
   title: {
-    default: `${site.name} — Casa madre de Startidea en Granada`,
+    default: `${site.name} — Entra al universo Startidea en Granada`,
     template: `%s · ${site.name}`,
   },
   description: site.description,
@@ -51,7 +51,7 @@ export const metadata: Metadata = {
     locale: "es_ES",
     url: site.url,
     siteName: site.name,
-    title: `${site.name} — Casa madre de Startidea en Granada`,
+    title: `${site.name} — Entra al universo Startidea en Granada`,
     description: site.description,
     images: [
       {
@@ -64,7 +64,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: `${site.name} — Casa madre de Startidea en Granada`,
+    title: `${site.name} — Entra al universo Startidea en Granada`,
     description: site.description,
     images: ["/images/og/og-default.jpg"],
   },

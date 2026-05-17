@@ -76,7 +76,10 @@ function Waveform() {
   return (
     <svg className="absolute inset-x-0 bottom-1/2 h-1/2 w-full -translate-y-6 opacity-40" viewBox="0 0 320 80" preserveAspectRatio="none">
       {Array.from({ length: bars }).map((_, i) => {
-        const h = 10 + Math.sin(i * 0.7) * 22 + Math.random() * 18;
+        // h determinista (sin Math.random) — evita hydration mismatch
+        // y garantiza height >= 4 (nunca negativo en SVG).
+        const wave = 30 + Math.sin(i * 0.7) * 18 + Math.cos(i * 0.31) * 8;
+        const h = Math.max(4, wave);
         return (
           <motion.rect
             key={i}

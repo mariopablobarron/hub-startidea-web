@@ -141,12 +141,19 @@ function Stat({
 }
 
 function RotatingWords({ items }: { items: string[] }) {
+  // Ancho dinámico: usa la palabra más larga + buffer. Antes era w-40 fijo
+  // que cortaba palabras como "proyectos" o "comunidad" en algunos zooms.
+  const longest = items.reduce((m, w) => (w.length > m ? w.length : m), 0);
+  const widthCh = `${longest + 1}ch`;
   return (
-    <span className="relative inline-block h-6 w-40 overflow-hidden align-middle">
+    <span
+      className="relative inline-block h-6 overflow-hidden align-middle"
+      style={{ width: widthCh }}
+    >
       {items.map((word, i) => (
         <motion.span
           key={word}
-          className="absolute inset-0 inline-flex items-center font-medium text-[var(--color-ink)]"
+          className="absolute inset-0 inline-flex items-center font-medium text-[var(--color-ink)] whitespace-nowrap"
           initial={{ y: 24, opacity: 0 }}
           animate={{
             y: [24, 0, 0, -24],

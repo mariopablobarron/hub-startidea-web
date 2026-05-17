@@ -41,7 +41,7 @@ export function CookieBanner() {
         transition={{ duration: 0.3 }}
         role="dialog"
         aria-label="Aviso de cookies"
-        className="fixed bottom-4 left-4 right-4 z-40 mx-auto max-w-xl rounded-2xl border border-[var(--color-line)] bg-[var(--color-paper)] p-4 shadow-[var(--shadow-soft)] sm:right-auto sm:left-4 sm:bottom-4"
+        className="fixed bottom-4 left-4 z-40 max-w-[calc(100vw-32px)] sm:max-w-xl rounded-2xl border border-[var(--color-line)] bg-[var(--color-paper)] p-4 shadow-[var(--shadow-soft)] right-20 sm:right-auto"
       >
         <div className="flex items-start gap-3">
           <div className="flex-1 text-sm text-[var(--color-mute)]">
