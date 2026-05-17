@@ -4,6 +4,7 @@ import { Calendar, Ticket, MessageCircle, Settings } from "lucide-react";
 import { requireAuth, ROLE_LABEL } from "@/lib/auth/roles";
 import { signOut } from "@/auth";
 import { prisma } from "@/lib/db/prisma";
+import { content } from "@/lib/content";
 
 export const metadata: Metadata = {
   title: "Mi cuenta",
@@ -72,14 +73,17 @@ export default async function MePage() {
             </p>
           ) : (
             <ul className="space-y-2 text-sm">
-              {upcomingBookings.map((b) => (
-                <li key={b.id} className="flex items-center justify-between gap-2">
-                  <span className="font-medium">{b.roomSlug}</span>
-                  <span className="text-[var(--color-mute)]">
-                    {new Date(b.startsAt).toLocaleString("es-ES", { dateStyle: "medium", timeStyle: "short" })}
-                  </span>
-                </li>
-              ))}
+              {upcomingBookings.map((b) => {
+                const roomName = content.rooms.find((r) => r.slug === b.roomSlug)?.name || b.roomSlug;
+                return (
+                  <li key={b.id} className="flex items-center justify-between gap-2">
+                    <span className="font-medium">{roomName}</span>
+                    <span className="text-[var(--color-mute)]">
+                      {new Date(b.startsAt).toLocaleString("es-ES", { dateStyle: "medium", timeStyle: "short" })}
+                    </span>
+                  </li>
+                );
+              })}
             </ul>
           )}
         </Card>

@@ -91,8 +91,16 @@ export default async function ComunidadPage({ searchParams }: Props) {
         {/* Lista de topics */}
         <ul className="mt-8 space-y-3">
           {topics.length === 0 && (
-            <li className="rounded-2xl border border-[var(--color-line)] bg-[var(--color-paper)] p-8 text-center text-[var(--color-mute)]">
-              {cat ? "Sin hilos en esta categoría todavía." : "Sin hilos todavía. Sé el primero."}
+            <li className="rounded-2xl border border-[var(--color-line)] bg-[var(--color-paper)] p-10 text-center">
+              <p className="text-[var(--color-mute)]">
+                {cat ? "Sin hilos en esta categoría todavía." : "Sin hilos todavía. Empieza la conversación."}
+              </p>
+              <Link
+                href={me ? "/comunidad/nuevo" : "/login?callbackUrl=/comunidad/nuevo"}
+                className="mt-5 inline-flex items-center gap-2 rounded-full bg-[var(--color-ink)] px-5 py-2.5 text-sm font-medium text-[var(--color-paper)] hover:bg-[var(--color-coral-500)]"
+              >
+                <Plus size={14} /> {me ? "Abrir el primer hilo" : "Entrar y abrir hilo"}
+              </Link>
             </li>
           )}
           {topics.map((t) => (

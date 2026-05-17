@@ -103,13 +103,33 @@ export default async function EventosPage() {
           <section className="mt-16">
             <h2 className="font-display text-2xl tracking-tight">Próximamente</h2>
             {upcoming.length === 0 ? (
-              <p className="mt-6 rounded-2xl border border-[var(--color-line)] bg-[var(--color-paper)] p-6 text-[var(--color-mute)]">
-                Sin eventos por ahora. Vuelve la semana que viene o{" "}
-                <Link href="/#contacto" className="font-medium text-[var(--color-ink)] underline underline-offset-2">
-                  suscríbete
-                </Link>{" "}
-                para enterarte.
-              </p>
+              <div className="mt-6 rounded-2xl border border-[var(--color-line)] bg-[var(--color-paper)] p-8">
+                <p className="text-[var(--color-mute)]">
+                  Sin eventos publicados ahora mismo. Estamos cocinando los próximos.
+                </p>
+                <div className="mt-5 flex flex-wrap gap-3">
+                  <Link
+                    href={site.social.instagram}
+                    target="_blank"
+                    rel="noreferrer noopener"
+                    className="inline-flex items-center gap-1.5 rounded-full bg-[var(--color-ink)] px-4 py-2 text-sm font-medium text-[var(--color-paper)] hover:bg-[var(--color-coral-500)]"
+                  >
+                    Síguenos en Instagram
+                  </Link>
+                  <Link
+                    href="/salas"
+                    className="inline-flex items-center gap-1.5 rounded-full border border-[var(--color-line)] px-4 py-2 text-sm hover:border-[var(--color-ink)]"
+                  >
+                    Conoce las salas
+                  </Link>
+                  <Link
+                    href="/#contacto"
+                    className="inline-flex items-center gap-1.5 rounded-full border border-[var(--color-line)] px-4 py-2 text-sm hover:border-[var(--color-ink)]"
+                  >
+                    Escríbenos para co-organizar
+                  </Link>
+                </div>
+              </div>
             ) : (
               <ul className="mt-6 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                 {upcoming.map((e) => (
