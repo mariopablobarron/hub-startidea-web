@@ -1,0 +1,23 @@
+components/Hero.tsx
+  s_f12e84bac900e4::t_9771867c9df3d3 132-137,140,144
+components/ChatWidget.tsx
+  s_f12e84bac900e4::t_cbcc9934be49b8 86-88,91
+components/Header.tsx
+  s_f12e84bac900e4::t_e8782fea5fddd9 116-128
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "7488b335f71c4a683d6a0a251dd4667d7d1e28ec",
+  "prompts": {},
+  "sessions": {
+    "s_f12e84bac900e4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ba62ea7a-a471-4585-b822-8ababb0c1519",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}
