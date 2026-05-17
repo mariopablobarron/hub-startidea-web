@@ -129,13 +129,19 @@ function Stat({
   label: string;
   isText?: boolean;
 }) {
+  // Stats con valor numérico (330, 6, 1) usan tipografía display grande.
+  // Stats con valor textual ("Granada", "Centro") usan tipografía más
+  // moderada para no romper el grid cuando la palabra es larga.
+  const valueClass = isText
+    ? "font-display text-2xl tracking-tight md:text-3xl"
+    : "font-display text-4xl tracking-tight md:text-5xl";
   return (
     <div>
-      <div className="font-display text-4xl tracking-tight md:text-5xl">
+      <div className={valueClass}>
         {value}
         {suffix && <span className="ml-1 text-[var(--color-coral-500)]">{suffix}</span>}
       </div>
-      <div className={`mt-2 text-sm ${isText ? "" : ""} text-[var(--color-mute)]`}>{label}</div>
+      <div className="mt-2 text-sm text-[var(--color-mute)]">{label}</div>
     </div>
   );
 }

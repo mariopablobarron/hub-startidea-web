@@ -83,10 +83,12 @@ export function ChatWidget() {
             whileTap={{ scale: 0.95 }}
             onClick={() => setOpen(true)}
             aria-label="Abrir chat con el HUB Startidea"
-            className="fixed bottom-5 right-5 z-50 flex items-center gap-2 rounded-full bg-[var(--color-coral-500)] px-5 py-3 text-sm font-medium text-white shadow-xl transition hover:bg-[var(--color-coral-600)]"
+            // Mobile: FAB compacto (solo icono) para no tapar CTAs del hero/cards.
+            // Desktop (sm+): pill con texto "Pregúntale al HUB".
+            className="fixed bottom-5 right-5 z-50 flex items-center gap-2 rounded-full bg-[var(--color-coral-500)] p-3 text-sm font-medium text-white shadow-xl transition hover:bg-[var(--color-coral-600)] sm:px-5 sm:py-3"
           >
             <MessageCircle size={18} />
-            Pregúntale al HUB
+            <span className="hidden sm:inline">Pregúntale al HUB</span>
           </motion.button>
         )}
       </AnimatePresence>

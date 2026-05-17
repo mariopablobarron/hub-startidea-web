@@ -113,6 +113,19 @@ export function Header() {
             <Link href="/reservar" onClick={() => setOpen(false)} className="btn-primary mt-2 self-start">
               Reservar sala
             </Link>
+            {/*
+              Link a /login funciona también para usuarios logueados: el
+              middleware (auth.config.ts) detecta sesión activa y redirige
+              a /me o /admin automáticamente, así no necesitamos saber el
+              estado de sesión en este Client Component (evita SessionProvider).
+            */}
+            <Link
+              href="/login"
+              onClick={() => setOpen(false)}
+              className="mt-2 inline-flex w-fit items-center gap-1 rounded-full border border-[var(--color-line)] px-4 py-2 text-sm text-[var(--color-ink)] hover:border-[var(--color-ink)]"
+            >
+              Entrar al HUB
+            </Link>
           </div>
         </div>
       )}
