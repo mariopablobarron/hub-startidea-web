@@ -83,8 +83,8 @@ export function Header() {
           ))}
         </nav>
 
-        <Link href="/#contacto" className="hidden md:inline-flex btn-primary">
-          Reservar visita
+        <Link href="/reservar" className="hidden md:inline-flex btn-primary">
+          Reservar sala
         </Link>
 
         <button
@@ -110,8 +110,8 @@ export function Header() {
                 {item.label}
               </Link>
             ))}
-            <Link href="/#contacto" onClick={() => setOpen(false)} className="btn-primary mt-2 self-start">
-              Reservar visita
+            <Link href="/reservar" onClick={() => setOpen(false)} className="btn-primary mt-2 self-start">
+              Reservar sala
             </Link>
           </div>
         </div>

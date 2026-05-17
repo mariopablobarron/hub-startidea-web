@@ -54,7 +54,12 @@ export default async function SalaPage({ params }: Props) {
   const room = getRoom(slug);
   if (!room) notFound();
 
-  const others = rooms.filter((r) => r.slug !== room.slug).slice(0, 3);
+  // "Otras salas" muestra solo reservables — coherente con el CTA principal.
+  // Si la sala actual no es reservable, mostramos también las que no lo son
+  // (para que aulas inactivas se sigan visitando entre ellas).
+  const others = rooms
+    .filter((r) => r.slug !== room.slug && (room.bookable === false || r.bookable !== false))
+    .slice(0, 3);
 
   return (
     <>

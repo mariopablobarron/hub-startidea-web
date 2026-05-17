@@ -94,10 +94,13 @@ export function Footer() {
         <div>
           <div className="text-xs uppercase tracking-[0.18em] text-[var(--color-paper)]/50">Enlaces</div>
           <ul className="mt-4 space-y-3 text-sm">
-            <li><Link href="/#ecosistema" className="hover:text-[var(--color-coral-500)]">Ecosistema</Link></li>
-            <li><Link href="/#salas" className="hover:text-[var(--color-coral-500)]">Salas</Link></li>
+            <li><Link href="/ecosistema" className="hover:text-[var(--color-coral-500)]">Ecosistema</Link></li>
+            <li><Link href="/salas" className="hover:text-[var(--color-coral-500)]">Salas</Link></li>
+            <li><Link href="/reservar" className="hover:text-[var(--color-coral-500)]">Reservar sala</Link></li>
+            <li><Link href="/eventos" className="hover:text-[var(--color-coral-500)]">Eventos</Link></li>
+            <li><Link href="/comunidad" className="hover:text-[var(--color-coral-500)]">Comunidad</Link></li>
+            <li><Link href="/metodo" className="hover:text-[var(--color-coral-500)]">Método Raíz y Acción</Link></li>
             <li><Link href="/#tour" className="hover:text-[var(--color-coral-500)]">Tour del local</Link></li>
-            <li><Link href="/#metodo" className="hover:text-[var(--color-coral-500)]">Método Raíz y Acción</Link></li>
             <li><Link href="/#podcast" className="hover:text-[var(--color-coral-500)]">Estudio podcast</Link></li>
             <li>
               <a href={site.parent.url} target="_blank" rel="noreferrer noopener" className="hover:text-[var(--color-coral-500)]">
