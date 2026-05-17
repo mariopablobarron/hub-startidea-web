@@ -1,0 +1,24 @@
+components/Header.tsx
+  s_f12e84bac900e4::t_2eb9efd8dfb140 113-114
+  s_f12e84bac900e4::t_e356bad2cf7d43 86-87
+app/salas/[slug]/page.tsx
+  s_f12e84bac900e4::t_5a57261d541f05 57-62
+components/Footer.tsx
+  s_f12e84bac900e4::t_02229d94c23b31 97-102
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "c191ff05ed572a37b8f89261238f7bcc6e863e1d",
+  "prompts": {},
+  "sessions": {
+    "s_f12e84bac900e4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ba62ea7a-a471-4585-b822-8ababb0c1519",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}
