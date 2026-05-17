@@ -1,7 +1,6 @@
 import { Octokit } from "@octokit/rest";
 import { notFound } from "next/navigation";
-import { auth } from "@/auth";
-import { redirect } from "next/navigation";
+import { requireAdmin } from "@/lib/auth/roles";
 import { PageHeader } from "../../_components/Field";
 
 export const dynamic = "force-dynamic";
@@ -39,8 +38,7 @@ async function fetchConv(id: string, date: string) {
 }
 
 export default async function ConvDetail({ params, searchParams }: Props) {
-  const session = await auth();
-  if (!session?.user) redirect("/admin/login");
+  await requireAdmin();
 
   const { id } = await params;
   const { date } = await searchParams;

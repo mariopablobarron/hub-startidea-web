@@ -1,7 +1,6 @@
 import { Octokit } from "@octokit/rest";
 import Link from "next/link";
-import { auth } from "@/auth";
-import { redirect } from "next/navigation";
+import { requireAdmin } from "@/lib/auth/roles";
 import { PageHeader } from "../_components/Field";
 import { ArrowRight, MessageSquare } from "lucide-react";
 
@@ -45,8 +44,7 @@ async function listConversations(): Promise<Conv[]> {
 }
 
 export default async function ConversacionesAdmin() {
-  const session = await auth();
-  if (!session?.user) redirect("/admin/login");
+  await requireAdmin();
 
   const convs = await listConversations();
 

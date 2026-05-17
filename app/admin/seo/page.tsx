@@ -1,6 +1,6 @@
 import { ExternalLink, RefreshCw, AlertCircle } from "lucide-react";
 import { revalidateTag } from "next/cache";
-import { auth } from "@/auth";
+import { requireAdmin } from "@/lib/auth/roles";
 import {
   fetchSummaryCached,
   fetchTopRowsCached,
@@ -52,8 +52,7 @@ async function load(): Promise<LoadResult> {
 }
 
 export default async function AdminSeoPage() {
-  const session = await auth();
-  if (!session?.user) return null;
+  await requireAdmin();
 
   const data = await load();
   const siteUrl = getSiteUrl();

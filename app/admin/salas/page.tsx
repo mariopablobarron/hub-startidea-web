@@ -13,25 +13,39 @@ export default function SalasAdmin() {
         description="Editar nombre, descripción, capacidad, equipamiento y foto de cada sala."
       />
       <div className="grid gap-4 md:grid-cols-2">
-        {content.rooms.map((r) => (
-          <Link
-            key={r.slug}
-            href={`/admin/salas/${r.slug}`}
-            className="group flex gap-4 rounded-2xl border border-[var(--color-line)] bg-[var(--color-paper)] p-4 transition hover:border-[var(--color-ink)]"
-          >
-            <div className="relative h-24 w-32 shrink-0 overflow-hidden rounded-lg bg-[var(--color-paper-2)]">
-              <Image src={r.image} alt={r.name} fill sizes="128px" className="object-cover" />
-            </div>
-            <div className="flex flex-1 flex-col">
-              <div className="text-xs uppercase tracking-[0.18em] text-[var(--color-coral-600)]">{r.subtitle}</div>
-              <div className="mt-1 font-display text-lg tracking-tight">{r.name}</div>
-              <div className="mt-1 text-xs text-[var(--color-mute)]">{r.area} m² · {r.planLabel}</div>
-              <div className="mt-auto flex items-center justify-end text-sm text-[var(--color-mute)] group-hover:text-[var(--color-ink)]">
-                Editar <ArrowRight size={14} className="ml-1" />
+        {content.rooms.map((r) => {
+          const isBookable = r.bookable !== false;
+          return (
+            <Link
+              key={r.slug}
+              href={`/admin/salas/${r.slug}`}
+              className="group flex gap-4 rounded-2xl border border-[var(--color-line)] bg-[var(--color-paper)] p-4 transition hover:border-[var(--color-ink)]"
+            >
+              <div className="relative h-24 w-32 shrink-0 overflow-hidden rounded-lg bg-[var(--color-paper-2)]">
+                <Image src={r.image} alt={r.name} fill sizes="128px" className="object-cover" />
               </div>
-            </div>
-          </Link>
-        ))}
+              <div className="flex flex-1 flex-col">
+                <div className="flex items-center gap-2">
+                  <div className="text-xs uppercase tracking-[0.18em] text-[var(--color-coral-600)]">{r.subtitle}</div>
+                  {isBookable ? (
+                    <span className="inline-flex rounded-full bg-emerald-50 px-1.5 py-0.5 text-[10px] font-medium text-emerald-700">
+                      Reservable online
+                    </span>
+                  ) : (
+                    <span className="inline-flex rounded-full bg-gray-100 px-1.5 py-0.5 text-[10px] font-medium text-gray-600">
+                      Solo manual
+                    </span>
+                  )}
+                </div>
+                <div className="mt-1 font-display text-lg tracking-tight">{r.name}</div>
+                <div className="mt-1 text-xs text-[var(--color-mute)]">{r.area} m² · {r.planLabel}</div>
+                <div className="mt-auto flex items-center justify-end text-sm text-[var(--color-mute)] group-hover:text-[var(--color-ink)]">
+                  Editar <ArrowRight size={14} className="ml-1" />
+                </div>
+              </div>
+            </Link>
+          );
+        })}
       </div>
     </div>
   );
