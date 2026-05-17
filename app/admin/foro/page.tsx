@@ -5,6 +5,7 @@ import { requireAdmin } from "@/lib/auth/roles";
 import { PageHeader, FlashBanner } from "../_components/Field";
 import { CATEGORY_LABEL, CATEGORY_COLOR, timeAgo } from "@/lib/forum/render";
 import { toggleTopicPinned, toggleTopicLocked, deleteTopic } from "@/lib/forum/actions";
+import { ConfirmSubmit } from "@/components/admin/ConfirmSubmit";
 
 type Props = { searchParams: Promise<{ saved?: string; error?: string }> };
 
@@ -73,7 +74,15 @@ export default async function AdminForoPage({ searchParams }: Props) {
                   <div className="inline-flex gap-1">
                     <ModForm action={toggleTopicPinned} slug={t.slug} label={t.pinned ? "Desfijar" : "Fijar"} />
                     <ModForm action={toggleTopicLocked} slug={t.slug} label={t.locked ? "Reabrir" : "Cerrar"} />
-                    <ModForm action={deleteTopic} slug={t.slug} label="Borrar" danger />
+                    <form action={deleteTopic} className="inline">
+                      <input type="hidden" name="slug" value={t.slug} />
+                      <ConfirmSubmit
+                        message={`Borrar el hilo "${t.title}" y todos sus posts? Esta acción no se puede deshacer.`}
+                        className="rounded-full border border-red-200 px-3 py-1 text-xs text-red-700 hover:bg-red-50"
+                      >
+                        Borrar
+                      </ConfirmSubmit>
+                    </form>
                   </div>
                 </td>
               </tr>

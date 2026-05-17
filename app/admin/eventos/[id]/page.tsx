@@ -8,6 +8,7 @@ import { updateEvent, deleteEvent } from "@/lib/events/actions";
 import { content } from "@/lib/content";
 import { PageHeader, FlashBanner } from "../../_components/Field";
 import { EventFields } from "../_components/EventFields";
+import { ConfirmSubmit } from "@/components/admin/ConfirmSubmit";
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -93,13 +94,12 @@ export default async function EditEventoPage({ params, searchParams }: Props) {
 
           <form action={deleteEvent}>
             <input type="hidden" name="id" value={event.id} />
-            <button
-              type="submit"
+            <ConfirmSubmit
+              message={`Eliminar el evento "${event.title}" y sus ${event.registrations.length} inscripcion${event.registrations.length === 1 ? "" : "es"}? Esta acción no se puede deshacer.`}
               className="inline-flex items-center gap-1 rounded-full border border-red-200 px-4 py-2 text-sm text-red-700 hover:bg-red-50"
-              formNoValidate
             >
               <Trash2 size={14} /> Eliminar evento
-            </button>
+            </ConfirmSubmit>
             <p className="mt-2 text-xs text-[var(--color-mute)]">
               Elimina el evento y todas sus inscripciones permanentemente.
             </p>

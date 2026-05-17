@@ -4,6 +4,7 @@ import { content } from "@/lib/content";
 import { PageHeader, FlashBanner } from "../_components/Field";
 import { upsertPricing, deletePricing } from "@/lib/pricing/actions";
 import { UNIT_LABEL } from "@/lib/bookings/pricing";
+import { ConfirmSubmit } from "@/components/admin/ConfirmSubmit";
 import type { PricingUnit } from "@prisma/client";
 
 type Props = { searchParams: Promise<{ saved?: string; error?: string }> };
@@ -141,13 +142,12 @@ export default async function AdminTarifasPage({ searchParams }: Props) {
                         {existing && (
                           <form action={deletePricing} className="ml-1 inline">
                             <input type="hidden" name="id" value={existing.id} />
-                            <button
-                              type="submit"
+                            <ConfirmSubmit
+                              message={`Eliminar la tarifa de ${room.name} · ${UNIT_LABEL[unit]}?`}
                               className="rounded-full border border-red-200 px-3 py-1 text-xs text-red-700 hover:bg-red-50"
-                              title="Eliminar esta tarifa"
                             >
                               ×
-                            </button>
+                            </ConfirmSubmit>
                           </form>
                         )}
                       </td>
