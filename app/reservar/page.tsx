@@ -4,9 +4,8 @@ import { Calendar, ArrowRight } from "lucide-react";
 import { content, bookableRooms } from "@/lib/content";
 import { requireAuth, ROLE_LABEL } from "@/lib/auth/roles";
 import { createBooking } from "@/lib/bookings/actions";
-import { quotePrice, formatEuros, UNIT_LABEL } from "@/lib/bookings/pricing";
+import { quotePrice, formatEuros } from "@/lib/bookings/pricing";
 import { bookingsInRange } from "@/lib/bookings/availability";
-import { prisma } from "@/lib/db/prisma";
 
 export const metadata: Metadata = {
   title: "Reservar sala",
@@ -35,12 +34,6 @@ export default async function ReservarPage({ searchParams }: Props) {
   // Fecha por defecto: hoy
   const defaultDate = sp.fecha || new Date().toISOString().slice(0, 10);
 
-  // Tarifas disponibles para esta sala
-  const pricings = await prisma.pricing.findMany({
-    where: { roomSlug: room.slug, active: true },
-    orderBy: { unit: "asc" },
-  });
-
   // Reservas del día seleccionado para mostrar slots ocupados
   const from = new Date(`${defaultDate}T00:00:00`);
   const to = new Date(`${defaultDate}T23:59:59`);
@@ -50,12 +43,13 @@ export default async function ReservarPage({ searchParams }: Props) {
     to,
   });
 
-  // Quote inicial: 2h por defecto
-  const quote = await quotePrice({
-    roomSlug: room.slug,
-    durationHours: 2,
-    role: user.role,
-  });
+  // Quotes para 1h, 2h y 4h para que el usuario vea la tarifa por hora
+  // sin tener que rellenar el form. Todas incluyen IVA desglosado.
+  const [quote1h, quote2h, quote4h] = await Promise.all([
+    quotePrice({ roomSlug: room.slug, durationHours: 1, role: user.role }),
+    quotePrice({ roomSlug: room.slug, durationHours: 2, role: user.role }),
+    quotePrice({ roomSlug: room.slug, durationHours: 4, role: user.role }),
+  ]);
 
   return (
     <main className="mx-auto max-w-5xl px-6 py-16">
@@ -208,33 +202,49 @@ export default async function ReservarPage({ searchParams }: Props) {
           {/* Tarifas */}
           <div className="rounded-2xl border border-[var(--color-line)] bg-[var(--color-paper)] p-5">
             <h3 className="font-display text-base">Tarifas — {ROLE_LABEL[user.role]}</h3>
-            {pricings.length === 0 ? (
+            {!quote1h.quoted ? (
               <p className="mt-3 text-sm text-[var(--color-mute)]">
-                Sin tarifas configuradas. Tu reserva quedará pendiente para presupuestar.
+                Sala sin tarifa por hora configurada. Tu reserva quedará pendiente para
+                presupuestar a medida.
               </p>
             ) : (
-              <ul className="mt-3 space-y-1.5 text-sm">
-                {pricings.map((p) => {
-                  const cents =
-                    user.role === "MEMBER"
-                      ? p.memberCents
-                      : user.role === "COLLABORATOR"
-                        ? p.collaboratorCents
-                        : p.clientCents;
-                  if (!cents) return null;
-                  return (
-                    <li key={p.id} className="flex justify-between gap-2">
-                      <span className="text-[var(--color-mute)]">{UNIT_LABEL[p.unit]}</span>
-                      <span className="font-medium">{formatEuros(cents)}</span>
-                    </li>
-                  );
-                })}
-              </ul>
-            )}
-            {quote.quoted && (
-              <div className="mt-4 rounded-xl bg-[var(--color-paper-2)] p-3 text-xs text-[var(--color-mute)]">
-                Estimación 2h: {formatEuros(quote.totalCents)}
-              </div>
+              <>
+                <div className="mt-3 text-sm">
+                  <div className="flex items-baseline justify-between gap-2">
+                    <span className="text-[var(--color-mute)]">Base por hora</span>
+                    <span className="font-medium">{formatEuros(quote1h.baseHourCents)}</span>
+                  </div>
+                  <div className="mt-0.5 flex items-baseline justify-between gap-2 text-xs text-[var(--color-mute)]">
+                    <span>+ IVA {quote1h.vatRatePct}%</span>
+                    <span>{formatEuros(quote1h.vatCents)}</span>
+                  </div>
+                  <div className="mt-2 flex items-baseline justify-between gap-2 border-t border-[var(--color-line)] pt-2">
+                    <span className="font-medium">PVP por hora</span>
+                    <span className="font-display text-lg tracking-tight">
+                      {formatEuros(quote1h.totalCents)}
+                    </span>
+                  </div>
+                  {quote1h.discountPct > 0 && (
+                    <p className="mt-1 text-xs text-[var(--color-coral-600)]">
+                      Incluye {quote1h.discountPct}% descuento {ROLE_LABEL[user.role].toLowerCase()}.
+                    </p>
+                  )}
+                </div>
+
+                <div className="mt-4 grid grid-cols-2 gap-2 rounded-xl bg-[var(--color-paper-2)] p-3 text-xs">
+                  <div>
+                    <div className="text-[var(--color-mute)]">2 horas</div>
+                    <div className="font-medium">{formatEuros(quote2h.totalCents)}</div>
+                  </div>
+                  <div>
+                    <div className="text-[var(--color-mute)]">4 horas</div>
+                    <div className="font-medium">{formatEuros(quote4h.totalCents)}</div>
+                  </div>
+                </div>
+                <p className="mt-2 text-[10px] text-[var(--color-mute)]">
+                  Todos los precios incluyen IVA. Stripe cobra el importe total final.
+                </p>
+              </>
             )}
           </div>
 

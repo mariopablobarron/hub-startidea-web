@@ -35,15 +35,28 @@ export default async function AdminTarifasPage({ searchParams }: Props) {
       <PageHeader
         title="Tarifas"
         back={{ href: "/admin", label: "Dashboard" }}
-        description="Precios en € por sala, unidad y rol. Los descuentos para coworkers (-30%) y colaboradores (-20%) se aplican aquí. Cambios inmediatos en /reservar."
+        description="Editor legacy. Las tarifas ya no se leen de aquí."
       />
       <FlashBanner saved={sp.saved === "1"} error={sp.error} />
 
-      <div className="rounded-2xl border border-[var(--color-line)] bg-[var(--color-paper-2)] p-4 text-xs text-[var(--color-mute)]">
-        <strong className="text-[var(--color-ink)]">Cómo funciona:</strong> introduce precios en
-        euros (puedes usar coma o punto decimal). Si dejas un precio vacío,
-        ese rol no podrá reservar con esa unidad. Las tarifas con todos los
-        precios vacíos no se guardan.
+      <div className="rounded-2xl border border-amber-300 bg-amber-50 p-5 text-sm">
+        <div className="font-medium text-amber-900">⚠ Editor deprecated desde 2026-05-18</div>
+        <p className="mt-2 text-amber-900/90">
+          Las tarifas reales que usa el chatbot, el calculador de presupuesto del
+          agente de voz y el flujo de reserva en /reservar ahora se leen de{" "}
+          <code className="rounded bg-amber-100 px-1">data/faq.json</code> (fuente única).
+        </p>
+        <p className="mt-2 text-amber-900/90">
+          Para cambiar tarifas, edita desde{" "}
+          <a href="/admin/faq" className="font-medium underline">/admin/faq</a> → sección
+          &ldquo;Tarifas por sala&rdquo;. Los cambios se commitean a GitHub y aplican
+          en el siguiente redeploy.
+        </p>
+        <p className="mt-2 text-amber-900/90">
+          Este panel sigue editando el modelo Prisma <code>Pricing</code> antiguo, pero{" "}
+          <strong>NO afecta a precios reales</strong>. Se mantiene para no romper la BD
+          mientras dura el sistema custom; muere cuando Cal.com Fase 6 esté lista.
+        </p>
       </div>
 
       {rooms.map((room) => (
