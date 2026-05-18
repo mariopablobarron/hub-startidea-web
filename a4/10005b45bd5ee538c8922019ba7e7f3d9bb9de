@@ -1,0 +1,19 @@
+data/faq.json
+  s_f12e84bac900e4::t_cb8a47bbb3c7e6 4-5,8-9,15,20,24,28-29,32,35-36,39,42,49,55,58,61,64-67
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "a410005b45bd5ee538c8922019ba7e7f3d9bb9de",
+  "prompts": {},
+  "sessions": {
+    "s_f12e84bac900e4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ba62ea7a-a471-4585-b822-8ababb0c1519",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}
