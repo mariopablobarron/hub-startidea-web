@@ -1,66 +1,70 @@
 {
   "_meta": {
     "description": "Datos que el chatbot público usa para responder. Editable desde /admin/faq. Cada cambio aquí se commitea a GitHub y dispara un redeploy.",
-    "lastUpdated": "2026-04-29",
-    "version": 1
+    "lastUpdated": "2026-05-18",
+    "version": 2
   },
   "tariffs": {
-    "_note": "PENDIENTE: rellenar con tarifas reales. Mientras estén vacíos, el bot derivará al humano.",
+    "_note": "Precios SIN IVA (base imponible). El IVA aplicable es 21% (servicios). Descuentos coworker (-30%) y colaborador (-20%) se aplican sobre la base ANTES del IVA.",
+    "vatRate": 21,
     "coworkingOpen": {
       "perDay": null,
       "perWeek": null,
       "perMonth": null,
       "packs": [],
-      "notes": ""
+      "notes": "Tarifa pendiente. Si te lo preguntan, deriva a Mario."
     },
     "officePrivate": {
       "perMonth": null,
       "minStay": "",
-      "notes": ""
+      "notes": "Tarifa pendiente para alquiler mensual. Si el cliente quiere usarlo por horas puntuales, aplica 20€/h + IVA como las demás salas."
     },
     "rooms": {
       "cc33": {
-        "perHour": null,
+        "perHour": 20,
         "halfDay": null,
         "fullDay": null,
         "event": null,
-        "minBooking": "",
-        "notes": ""
+        "minBooking": "1 hora",
+        "notes": "20€/h base imponible. Con IVA 21%: 24,20€/h. Tarifa única para todas las salas reservables."
       },
       "serendipia": {
-        "perHour": null,
+        "perHour": 20,
         "halfDay": null,
         "fullDay": null,
-        "minBooking": "",
-        "notes": ""
+        "minBooking": "1 hora",
+        "notes": "20€/h base imponible (24,20€/h con IVA)."
       },
       "socrates": {
-        "perHour": null,
+        "perHour": 20,
         "halfDay": null,
         "fullDay": null,
-        "notes": ""
+        "notes": "20€/h base imponible (24,20€/h con IVA)."
       },
       "aula-1": {
         "perHour": null,
         "halfDay": null,
         "fullDay": null,
         "event": null,
-        "notes": ""
+        "notes": "Sala no reservable online. Gestión offline."
       },
       "aula-3": {
         "perHour": null,
         "halfDay": null,
         "fullDay": null,
-        "notes": ""
+        "notes": "Sala no reservable online. Gestión offline."
       },
       "estudio-podcast": {
-        "perHour": null,
+        "perHour": 20,
         "session2h": null,
         "editedEpisode": null,
-        "notes": ""
+        "notes": "20€/h base imponible (24,20€/h con IVA). Mismo precio que las salas estándar; la diferencia está en el equipamiento incluido."
       }
     },
-    "discounts": [],
+    "discounts": [
+      "Coworkers (MEMBER): -30% sobre la base imponible",
+      "Colaboradores (COLLABORATOR): -20% sobre la base imponible"
+    ],
     "trial": ""
   },
   "schedule": {
