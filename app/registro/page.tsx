@@ -3,6 +3,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/db/prisma";
 import { signIn } from "@/auth";
+import { sendWelcomeEmail } from "@/lib/mail/welcome";
 
 export const metadata: Metadata = {
   title: "Crear cuenta",
@@ -10,28 +11,43 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-type Props = { searchParams: Promise<{ error?: string }> };
+type Props = { searchParams: Promise<{ error?: string; callbackUrl?: string }> };
 
 export default async function RegistroPage({ searchParams }: Props) {
   const sp = await searchParams;
+  // Dónde aterrizar tras click en magic-link. Por defecto /me; si el
+  // visitor venía de /reservar (u otra ruta protegida), respetamos esa
+  // intención y le llevamos directo allí tras crear cuenta.
+  const callbackUrl = sp.callbackUrl || "/me";
 
   async function register(formData: FormData) {
     "use server";
     const email = String(formData.get("email") || "").trim().toLowerCase();
     const name = String(formData.get("name") || "").trim();
+    const cb = String(formData.get("callbackUrl") || "/me");
     if (!email || !name) {
-      redirect("/registro?error=missing");
+      const qs = new URLSearchParams({ error: "missing" });
+      if (cb !== "/me") qs.set("callbackUrl", cb);
+      redirect(`/registro?${qs.toString()}`);
     }
 
-    // Crear user (rol VISITOR) si no existe, sin password — magic-link
-    await prisma.user.upsert({
-      where: { email },
-      create: { email, name, role: "VISITOR" },
-      update: {}, // si ya existe, no sobrescribir
-    });
+    // Distinguir alta-nueva vs login-de-existente para enviar welcome
+    // email solo a los nuevos. Si ya existía, este flujo equivale a un
+    // login con magic-link (sin spam de bienvenida).
+    const existing = await prisma.user.findUnique({ where: { email } });
+    const isNew = !existing;
 
-    // Disparar magic-link
-    await signIn("resend", { email, redirectTo: "/me" });
+    if (isNew) {
+      await prisma.user.create({
+        data: { email, name, role: "VISITOR" },
+      });
+      // Welcome email "best-effort": si Resend falla, no rompe el registro.
+      // Se envía en paralelo al magic-link para que el user reciba ambos.
+      void sendWelcomeEmail({ to: email, name, callbackUrl: cb });
+    }
+
+    // Disparar magic-link → tras click en el email, aterriza en callbackUrl
+    await signIn("resend", { email, redirectTo: cb });
   }
 
   return (
@@ -60,6 +76,7 @@ export default async function RegistroPage({ searchParams }: Props) {
           action={register}
           className="mt-8 space-y-4 rounded-2xl border border-[var(--color-line)] bg-[var(--color-paper)] p-6"
         >
+          <input type="hidden" name="callbackUrl" value={callbackUrl} />
           <div>
             <label htmlFor="name" className="mb-1 block text-sm font-medium">Nombre</label>
             <input
@@ -96,7 +113,10 @@ export default async function RegistroPage({ searchParams }: Props) {
 
         <p className="mt-6 text-center text-sm text-[var(--color-mute)]">
           ¿Ya tienes cuenta?{" "}
-          <Link href="/login" className="font-medium text-[var(--color-ink)] underline underline-offset-2 hover:text-[var(--color-coral-600)]">
+          <Link
+            href={callbackUrl !== "/me" ? `/login?callbackUrl=${encodeURIComponent(callbackUrl)}` : "/login"}
+            className="font-medium text-[var(--color-ink)] underline underline-offset-2 hover:text-[var(--color-coral-600)]"
+          >
             Entrar
           </Link>
         </p>

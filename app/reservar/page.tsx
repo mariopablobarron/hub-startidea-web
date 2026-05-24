@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Calendar, ArrowRight } from "lucide-react";
+import { Calendar, ArrowRight, UserPlus, LogIn, CheckCircle2 } from "lucide-react";
 import { content, bookableRooms } from "@/lib/content";
-import { requireAuth, ROLE_LABEL } from "@/lib/auth/roles";
+import { getCurrentUser, ROLE_LABEL } from "@/lib/auth/roles";
 import { createBooking } from "@/lib/bookings/actions";
 import { quotePrice, formatEuros } from "@/lib/bookings/pricing";
 import { bookingsInRange } from "@/lib/bookings/availability";
@@ -22,8 +22,16 @@ type Props = {
 };
 
 export default async function ReservarPage({ searchParams }: Props) {
-  const user = await requireAuth("/reservar");
+  const user = await getCurrentUser();
   const sp = await searchParams;
+
+  // Visitor anónimo: en vez de redirigir directo a /login, mostramos
+  // una landing con doble CTA (Registro primario, Login secundario)
+  // para reducir fricción del primer-uso. El sistema sigue siendo
+  // privado — sin sesión NO ven precios reales ni form de reserva.
+  if (!user) {
+    return <AnonymousLanding salaSlug={sp.sala} />;
+  }
 
   // Solo salas reservables (las marcadas bookable !== false en content.json).
   // Aulas inactivas y coworking abierto NO entran aquí.
@@ -272,6 +280,116 @@ export default async function ReservarPage({ searchParams }: Props) {
           </div>
         </aside>
       </div>
+    </main>
+  );
+}
+
+/**
+ * Landing para visitors anónimos en /reservar.
+ *
+ * En vez del redirect directo a /login (fricción alta para nuevos), aquí
+ * explicamos qué pueden reservar + dos CTAs claros:
+ *  - Crear cuenta (primario, magenta) — el camino para nuevos
+ *  - Ya tengo cuenta (secundario) — para los que ya tienen
+ *
+ * Ambos llevan ?callbackUrl=/reservar para que tras login/registro
+ * vuelvan automáticamente al sistema de reservas.
+ *
+ * Si vienen con ?sala=X, lo preservamos para que tras login aterricen
+ * directo en esa sala.
+ */
+function AnonymousLanding({ salaSlug }: { salaSlug?: string }) {
+  const callback = salaSlug ? `/reservar?sala=${salaSlug}` : "/reservar";
+  const cb = encodeURIComponent(callback);
+
+  return (
+    <main className="mx-auto max-w-3xl px-6 py-16 md:py-24">
+      <header className="text-center">
+        <div className="inline-flex items-center gap-2 rounded-full bg-[var(--color-coral-50)] px-3 py-1 text-xs font-medium uppercase tracking-[0.18em] text-[var(--color-coral-700)]">
+          <Calendar size={12} />
+          Reservas privadas
+        </div>
+        <h1 className="mt-6 font-display text-4xl tracking-tight md:text-5xl">
+          Reservar salas del HUB Startidea
+        </h1>
+        <p className="mt-4 text-lg text-[var(--color-mute)]">
+          Las reservas son <strong>solo para personas registradas</strong>.
+          Crear cuenta es gratis, sin contraseña y en 30 segundos.
+        </p>
+      </header>
+
+      {/* Qué reservan */}
+      <section className="mt-10 rounded-2xl border border-[var(--color-line)] bg-[var(--color-paper)] p-6 md:p-8">
+        <h2 className="font-display text-lg tracking-tight">Qué puedes reservar</h2>
+        <ul className="mt-4 grid gap-3 sm:grid-cols-2">
+          {bookableRooms.map((r) => (
+            <li key={r.slug} className="flex gap-3">
+              <CheckCircle2 size={16} className="mt-0.5 shrink-0 text-[var(--color-coral-500)]" />
+              <div>
+                <div className="font-medium text-[var(--color-ink)]">{r.name}</div>
+                <div className="text-xs text-[var(--color-mute)]">{r.subtitle}</div>
+              </div>
+            </li>
+          ))}
+        </ul>
+        <div className="mt-6 rounded-xl bg-[var(--color-paper-2)] p-4 text-sm">
+          <div className="font-medium text-[var(--color-ink)]">Tarifa única — 20€/h base + IVA</div>
+          <p className="mt-1 text-[var(--color-mute)]">
+            PVP <strong>24,20€/h</strong> visitante. Si eres coworker (-30%):{" "}
+            <strong>16,94€/h</strong>. Colaborador (-20%): <strong>19,36€/h</strong>.
+          </p>
+        </div>
+      </section>
+
+      {/* Doble CTA */}
+      <section className="mt-8 grid gap-4 md:grid-cols-2">
+        {/* Crear cuenta — primario */}
+        <Link
+          href={`/registro?callbackUrl=${cb}`}
+          className="group flex flex-col rounded-2xl border-2 border-[var(--color-coral-500)] bg-[var(--color-coral-500)] p-6 text-[var(--color-paper)] transition hover:-translate-y-0.5 hover:bg-[var(--color-coral-600)] hover:border-[var(--color-coral-600)]"
+        >
+          <div className="flex items-center gap-2">
+            <UserPlus size={18} />
+            <span className="text-xs uppercase tracking-[0.18em] opacity-80">Nuevo aquí</span>
+          </div>
+          <div className="mt-3 font-display text-xl tracking-tight">Crear cuenta gratis</div>
+          <p className="mt-2 text-sm opacity-90">
+            Te enviamos un enlace al email. Sin contraseña, sin coste, en 30 s.
+          </p>
+          <div className="mt-auto pt-4 flex items-center gap-1.5 text-sm font-medium">
+            Empezar
+            <ArrowRight size={14} className="transition group-hover:translate-x-0.5" />
+          </div>
+        </Link>
+
+        {/* Login — secundario */}
+        <Link
+          href={`/login?callbackUrl=${cb}`}
+          className="group flex flex-col rounded-2xl border border-[var(--color-line)] bg-[var(--color-paper)] p-6 transition hover:-translate-y-0.5 hover:border-[var(--color-ink)]"
+        >
+          <div className="flex items-center gap-2 text-[var(--color-mute)]">
+            <LogIn size={18} />
+            <span className="text-xs uppercase tracking-[0.18em]">Ya registrado</span>
+          </div>
+          <div className="mt-3 font-display text-xl tracking-tight">Ya tengo cuenta</div>
+          <p className="mt-2 text-sm text-[var(--color-mute)]">
+            Magic-link al email o entra con contraseña si la tienes.
+          </p>
+          <div className="mt-auto pt-4 flex items-center gap-1.5 text-sm font-medium text-[var(--color-ink)]">
+            Entrar
+            <ArrowRight size={14} className="transition group-hover:translate-x-0.5" />
+          </div>
+        </Link>
+      </section>
+
+      <p className="mt-8 text-center text-xs text-[var(--color-mute)]">
+        ¿Buscas algo distinto a una reserva por horas? Eventos, formación,
+        alquiler de larga estancia…{" "}
+        <Link href="/#contacto" className="underline underline-offset-2">
+          escríbenos
+        </Link>
+        .
+      </p>
     </main>
   );
 }

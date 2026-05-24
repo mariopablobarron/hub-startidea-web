@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Calendar, Ticket, MessageCircle, Settings } from "lucide-react";
+import { Calendar, Ticket, MessageCircle, Settings, Sparkles, ArrowRight } from "lucide-react";
 import { requireAuth, ROLE_LABEL } from "@/lib/auth/roles";
 import { signOut } from "@/auth";
 import { prisma } from "@/lib/db/prisma";
@@ -15,7 +15,7 @@ export default async function MePage() {
   const user = await requireAuth("/me");
 
   // Datos resumen — bajo en queries, expandible más adelante
-  const [upcomingBookings, activeBonds, recentTopics] = await Promise.all([
+  const [upcomingBookings, activeBonds, recentTopics, totalBookings] = await Promise.all([
     prisma.booking.findMany({
       where: { userId: user.id, startsAt: { gte: new Date() }, status: { in: ["PENDING", "CONFIRMED"] } },
       orderBy: { startsAt: "asc" },
@@ -34,7 +34,13 @@ export default async function MePage() {
       orderBy: { createdAt: "desc" },
       take: 3,
     }),
+    prisma.booking.count({ where: { userId: user.id } }),
   ]);
+
+  // User "nuevo" = nunca ha hecho ninguna reserva (ni siquiera cancelada).
+  // Mostramos un banner verde de bienvenida con CTA a reservar. Después
+  // del primer booking desaparece para no estorbar.
+  const isFirstTime = totalBookings === 0;
 
   async function logout() {
     "use server";
@@ -61,6 +67,31 @@ export default async function MePage() {
           </button>
         </form>
       </header>
+
+      {/* Banner bienvenida primer-uso (sin reservas todavía) */}
+      {isFirstTime && (
+        <Link
+          href="/reservar"
+          className="group mt-8 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-emerald-200 bg-emerald-50 p-5 transition hover:border-emerald-400 hover:shadow-sm"
+        >
+          <div className="flex items-start gap-3">
+            <Sparkles size={20} className="mt-0.5 shrink-0 text-emerald-700" />
+            <div>
+              <div className="font-display text-base tracking-tight text-emerald-900">
+                ¡Bienvenido al HUB!
+              </div>
+              <p className="mt-1 text-sm text-emerald-900/85">
+                Tu cuenta ya está activa. Reserva tu primera sala — 5 espacios
+                disponibles desde 16,94€/h (con descuento de rol).
+              </p>
+            </div>
+          </div>
+          <span className="inline-flex items-center gap-1.5 text-sm font-medium text-emerald-900">
+            Reservar
+            <ArrowRight size={14} className="transition group-hover:translate-x-0.5" />
+          </span>
+        </Link>
+      )}
 
       <div className="mt-12 grid gap-4 md:grid-cols-2">
         <Card icon={<Calendar size={18} />} title="Próximas reservas" count={upcomingBookings.length}>
