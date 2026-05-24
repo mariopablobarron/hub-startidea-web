@@ -6,6 +6,8 @@ import { getCurrentUser, ROLE_LABEL } from "@/lib/auth/roles";
 import { createBooking } from "@/lib/bookings/actions";
 import { quotePrice, formatEuros } from "@/lib/bookings/pricing";
 import { bookingsInRange } from "@/lib/bookings/availability";
+import { SlotPicker } from "@/components/SlotPicker";
+import { DateNavigator } from "@/components/DateNavigator";
 
 export const metadata: Metadata = {
   title: "Reservar sala",
@@ -115,18 +117,12 @@ export default async function ReservarPage({ searchParams }: Props) {
           <h2 className="font-display text-xl">{room.name}</h2>
           <p className="mt-1 text-sm text-[var(--color-mute)]">{room.short}</p>
 
+          {/* Fecha (hidden en el form, controlada por DateNavigator fuera
+              del form para no anidar). Submit del form usa este value. */}
+          <input type="hidden" name="date" value={defaultDate} />
+
           <div className="mt-6 grid gap-4 md:grid-cols-2">
-            <label className="block text-sm">
-              <span className="font-medium">Fecha</span>
-              <input
-                type="date"
-                name="date"
-                defaultValue={defaultDate}
-                required
-                min={new Date().toISOString().slice(0, 10)}
-                className="mt-1 block w-full rounded-xl border border-[var(--color-line)] bg-white px-3 py-2 outline-none focus:border-[var(--color-ink)]"
-              />
-            </label>
+            <DateNavigator value={defaultDate} />
             <label className="block text-sm">
               <span className="font-medium">Asistentes (opcional)</span>
               <input
@@ -138,34 +134,21 @@ export default async function ReservarPage({ searchParams }: Props) {
                 className="mt-1 block w-full rounded-xl border border-[var(--color-line)] bg-white px-3 py-2 outline-none focus:border-[var(--color-ink)]"
               />
             </label>
-            <label className="block text-sm">
-              <span className="font-medium">Hora inicio</span>
-              <input
-                type="time"
-                name="startTime"
-                defaultValue="10:00"
-                required
-                min="08:00"
-                max="20:00"
-                step="3600"
-                className="mt-1 block w-full rounded-xl border border-[var(--color-line)] bg-white px-3 py-2 outline-none focus:border-[var(--color-ink)]"
-              />
-              <span className="mt-1 block text-xs text-[var(--color-mute)]">Horas completas (08:00 - 20:00).</span>
-            </label>
-            <label className="block text-sm">
-              <span className="font-medium">Hora fin</span>
-              <input
-                type="time"
-                name="endTime"
-                defaultValue="12:00"
-                required
-                min="09:00"
-                max="21:00"
-                step="3600"
-                className="mt-1 block w-full rounded-xl border border-[var(--color-line)] bg-white px-3 py-2 outline-none focus:border-[var(--color-ink)]"
-              />
-              <span className="mt-1 block text-xs text-[var(--color-mute)]">Horas completas (09:00 - 21:00).</span>
-            </label>
+          </div>
+
+          {/* Grid visual de slots horarios — sustituye los inputs de hora.
+              Recibe bookings serializados para que el cliente pinte
+              ocupados sin re-fetchearlos. */}
+          <div className="mt-6">
+            <SlotPicker
+              date={defaultDate}
+              bookings={dayBookings.map((b) => ({
+                startsAt: b.startsAt.toISOString(),
+                endsAt: b.endsAt.toISOString(),
+                status: b.status as "PENDING" | "CONFIRMED",
+              }))}
+              defaultDuration={2}
+            />
           </div>
 
           <label className="mt-4 block text-sm">
