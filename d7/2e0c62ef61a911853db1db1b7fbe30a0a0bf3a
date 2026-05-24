@@ -1,0 +1,33 @@
+app/reservar/page.tsx
+  s_f12e84bac900e4::t_079709809c28d4 286-395
+  s_f12e84bac900e4::t_37164d858e37c8 3,5
+  s_f12e84bac900e4::t_393020fbf43c63 25,28-34
+app/registro/page.tsx
+  s_f12e84bac900e4::t_64abd756452fe4 34-38,40-47
+  s_f12e84bac900e4::t_59e65a8f4eba1e 14,18-21,27,29-31,49-50
+  s_f12e84bac900e4::t_0ff64c9edc89ea 6
+  s_f12e84bac900e4::t_d88533e53b5d5f 79
+  s_f12e84bac900e4::t_6b827e5275f911 116-119
+lib/mail/welcome.ts
+  s_f12e84bac900e4::t_d9242d476467b1 1-110
+app/me/page.tsx
+  s_f12e84bac900e4::t_00d48ca1211e74 18,37,40-43
+  s_f12e84bac900e4::t_acb12df0381f0a 3
+  s_f12e84bac900e4::t_7baffd917fc944 71-95
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.1",
+  "base_commit_sha": "d72e0c62ef61a911853db1db1b7fbe30a0a0bf3a",
+  "prompts": {},
+  "sessions": {
+    "s_f12e84bac900e4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ba62ea7a-a471-4585-b822-8ababb0c1519",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}
