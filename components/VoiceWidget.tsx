@@ -45,9 +45,14 @@ export function VoiceWidget() {
 
   return (
     <>
-      {/* Posicionado encima del ChatWidget (que está en bottom-5 right-5) */}
+      {/*
+        Posicionado abajo-IZQUIERDA para no solapar con el ChatWidget de
+        texto (que vive en bottom-5 right-5). Así el usuario ve dos
+        opciones visualmente separadas: voz a la izquierda, texto a la
+        derecha. En mobile sigue siendo compacto.
+      */}
       <div
-        className="fixed bottom-24 right-5 z-50"
+        className="fixed bottom-5 left-5 z-50"
         aria-label="Asistente de voz HUB Startidea"
       >
         {scriptReady ? (
