@@ -8,7 +8,13 @@ import type { NextAuthConfig } from "next-auth";
  * Rutas protegidas:
  * - /admin/*    → SOLO ADMIN
  * - /me/*       → cualquier sesión válida (CLIENT/MEMBER/COLLABORATOR/ADMIN)
- * - /reservar   → cualquier sesión válida
+ *
+ * /reservar es PÚBLICA: la propia página decide. Si no hay sesión,
+ * renderiza una landing seductora (AnonymousLanding) con CTAs a /registro
+ * y /login para reducir fricción del primer-uso. Si hay sesión, muestra
+ * el form de reserva. El sistema sigue siendo privado: createBooking
+ * server action SÍ requiere requireAuth() y el form solo aparece con
+ * sesión válida.
  */
 
 export const authConfig = {
@@ -36,8 +42,10 @@ export const authConfig = {
         return role === "ADMIN";
       }
 
-      // /me/* y /reservar → cualquier sesión
-      if (path.startsWith("/me") || path.startsWith("/reservar")) {
+      // /me/* → cualquier sesión.
+      // /reservar queda fuera del check: la página decide qué mostrar
+      // según haya sesión o no (landing pública vs form privado).
+      if (path.startsWith("/me")) {
         return isLogged;
       }
 
