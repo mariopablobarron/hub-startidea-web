@@ -6,29 +6,31 @@ import { Mic } from "lucide-react";
 /**
  * Widget de voz de ElevenLabs Conversational AI.
  *
- * Activación condicional: solo se monta si NEXT_PUBLIC_ELEVENLABS_AGENT_ID
- * está definido. Esto permite mergear/deployar sin tener el agente listo;
- * cuando Mario crea el agente y añade la env var en Coolify, el widget
- * aparece en el siguiente deploy.
+ * NOTA: el agent_id está hardcoded porque es público (se sirve en HTML
+ * de todas formas en el atributo agent-id del custom element). Coolify
+ * v3 buildPack=docker NO pasa los Secrets isBuildSecret=1 como
+ * --build-arg al docker buildx, así que el patrón NEXT_PUBLIC_* + ENV
+ * en Dockerfile no funciona. Para rotar agente: editar la constante
+ * AGENT_ID, commit, redeploy.
  *
- * Convive con ChatWidget (texto). El usuario puede usar el que prefiera.
+ * Si en el futuro quieres MÚLTIPLES agentes (ej. uno por tenant), refactor
+ * a leer agent_id de un endpoint API o de content.json. Pero para el
+ * HUB que es un único tenant, hardcoded es lo más simple.
  *
- * ElevenLabs sirve un Web Component <elevenlabs-convai> via su CDN.
- * Lo cargamos como <script> diferido para no penalizar el LCP.
+ * El widget convive con ChatWidget (texto). El usuario puede usar el
+ * que prefiera. ElevenLabs sirve un Web Component <elevenlabs-convai>
+ * via su CDN; lo cargamos diferido para no penalizar el LCP.
  *
- * Posicionamiento en pantalla:
- * - Desktop: arriba del ChatWidget (bottom-24) para no solapar
- * - Mobile: encima del ChatWidget también, pero más compacto
- *
- * El widget de ElevenLabs renderiza su propio botón "speak"; aquí solo
- * lo encapsulamos para controlar visibilidad y posición.
+ * Posicionado encima del ChatWidget (bottom-24) para no solapar.
  */
+
+// Mario · HUB Startidea · es-andalusian voice clone
+const AGENT_ID = "agent_9501kse72fyxevnsk9mseptbtamx";
+
 export function VoiceWidget() {
-  const agentId = process.env.NEXT_PUBLIC_ELEVENLABS_AGENT_ID;
   const [scriptReady, setScriptReady] = useState(false);
 
   useEffect(() => {
-    if (!agentId) return;
     if (document.querySelector('script[data-elevenlabs-convai]')) {
       setScriptReady(true);
       return;
@@ -39,11 +41,7 @@ export function VoiceWidget() {
     s.dataset.elevenlabsConvai = "1";
     s.onload = () => setScriptReady(true);
     document.body.appendChild(s);
-  }, [agentId]);
-
-  if (!agentId) {
-    return null;
-  }
+  }, []);
 
   return (
     <>
@@ -54,7 +52,7 @@ export function VoiceWidget() {
       >
         {scriptReady ? (
           // @ts-expect-error — custom element de ElevenLabs
-          <elevenlabs-convai agent-id={agentId} />
+          <elevenlabs-convai agent-id={AGENT_ID} />
         ) : (
           // Placeholder mientras carga el script externo
           <button
