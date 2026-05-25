@@ -1,0 +1,24 @@
+components/SlotPicker.tsx
+  s_f12e84bac900e4::t_8c61e4314a75f0 48-54,57,59-69
+app/reservar/page.tsx
+  s_f12e84bac900e4::t_04d8cccc504905 146-147,157-159
+  s_f12e84bac900e4::t_be71e7ccb41e99 22-25
+app/admin/agenda/page.tsx
+  s_f12e84bac900e4::t_79dc0b49929cca 179-182,187,191-207
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.1",
+  "base_commit_sha": "6bb968730e704a34a0c04113410c18a2158dcf0e",
+  "prompts": {},
+  "sessions": {
+    "s_f12e84bac900e4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ba62ea7a-a471-4585-b822-8ababb0c1519",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}
