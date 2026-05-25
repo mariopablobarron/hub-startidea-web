@@ -1,0 +1,19 @@
+Dockerfile
+  s_f12e84bac900e4::t_334139b9948248 20-27
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.1",
+  "base_commit_sha": "edf1244a98ff5d6e5f3700c60ae5986abfe8a3d2",
+  "prompts": {},
+  "sessions": {
+    "s_f12e84bac900e4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ba62ea7a-a471-4585-b822-8ababb0c1519",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}
