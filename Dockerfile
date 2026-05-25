@@ -17,6 +17,14 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NEXT_OUTPUT_STANDALONE=1
+
+# NEXT_PUBLIC_* vars deben llegar como ARG al stage de build para que
+# Next.js las inyecte en el bundle del cliente. Coolify v3 pasa los
+# Secrets con isBuildSecret=1 como --build-arg. Si añades más vars
+# NEXT_PUBLIC en el futuro, declárarlas aquí también.
+ARG NEXT_PUBLIC_ELEVENLABS_AGENT_ID=""
+ENV NEXT_PUBLIC_ELEVENLABS_AGENT_ID=$NEXT_PUBLIC_ELEVENLABS_AGENT_ID
+
 # build script ejecuta `prisma generate && next build`
 RUN pnpm build
 
