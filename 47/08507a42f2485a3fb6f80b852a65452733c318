@@ -1,0 +1,19 @@
+components/VoiceWidget.tsx
+  s_f12e84bac900e4::t_82d0ce8c355283 9-14,16-18,20-22,24,26-29,44,55
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.1",
+  "base_commit_sha": "4708507a42f2485a3fb6f80b852a65452733c318",
+  "prompts": {},
+  "sessions": {
+    "s_f12e84bac900e4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ba62ea7a-a471-4585-b822-8ababb0c1519",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}
