@@ -41,13 +41,27 @@ export default async function AdminReservasPage({ searchParams }: Props) {
   const filter = sp.status || "upcoming";
   const salaFilter = sp.sala;
 
+  // Bookings de hoy para el widget de cabecera "Ocupación hoy"
+  const todayStart = new Date();
+  todayStart.setHours(0, 0, 0, 0);
+  const todayEnd = new Date(todayStart);
+  todayEnd.setHours(23, 59, 59, 999);
+
   // Counts globales
-  const [statusCounts, salaCounts] = await Promise.all([
+  const [statusCounts, salaCounts, todayBookings] = await Promise.all([
     prisma.booking.groupBy({ by: ["status"], _count: { _all: true } }),
     prisma.booking.groupBy({
       by: ["roomSlug"],
       where: { startsAt: { gte: new Date() }, status: { in: ["PENDING", "CONFIRMED"] } },
       _count: { _all: true },
+    }),
+    prisma.booking.findMany({
+      where: {
+        startsAt: { gte: todayStart, lte: todayEnd },
+        status: { in: ["PENDING", "CONFIRMED"] },
+      },
+      include: { user: { select: { name: true, email: true } } },
+      orderBy: { startsAt: "asc" },
     }),
   ]);
   const countByStatus: Record<string, number> = {};
@@ -86,6 +100,54 @@ export default async function AdminReservasPage({ searchParams }: Props) {
         description="Aprobar pendientes, ver agenda completa por sala, leer observaciones."
       />
       <FlashBanner saved={sp.saved === "1"} error={sp.error} />
+
+      {/* Widget HOY — vistazo rápido a las reservas del día actual.
+          Para vista visual completa por sala, link a /admin/agenda. */}
+      <div className="rounded-2xl border border-[var(--color-line)] bg-[var(--color-paper-2)] p-4">
+        <div className="flex flex-wrap items-baseline justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <span className="text-xs uppercase tracking-[0.18em] text-[var(--color-mute)]">Hoy</span>
+            <span className="text-sm font-medium">
+              {todayBookings.length === 0
+                ? "Sin reservas"
+                : `${todayBookings.length} reserva${todayBookings.length === 1 ? "" : "s"}`}
+            </span>
+          </div>
+          <Link
+            href="/admin/agenda"
+            className="text-xs text-[var(--color-coral-600)] underline underline-offset-2 hover:text-[var(--color-coral-700)]"
+          >
+            Ver agenda visual →
+          </Link>
+        </div>
+        {todayBookings.length > 0 && (
+          <ul className="mt-3 flex flex-wrap gap-2 text-xs">
+            {todayBookings.map((b) => {
+              const room = content.rooms.find((r) => r.slug === b.roomSlug);
+              const time = b.startsAt.toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" });
+              const endTime = b.endsAt.toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" });
+              const isConfirmed = b.status === "CONFIRMED";
+              return (
+                <li
+                  key={b.id}
+                  className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 ${
+                    isConfirmed
+                      ? "border-emerald-300 bg-emerald-50 text-emerald-900"
+                      : "border-amber-300 bg-amber-50 text-amber-900"
+                  }`}
+                >
+                  <span className="font-mono">
+                    {time}–{endTime}
+                  </span>
+                  <span>·</span>
+                  <span className="font-medium">{room?.name || b.roomSlug}</span>
+                  <span className="opacity-70">{b.user.name || b.user.email.split("@")[0]}</span>
+                </li>
+              );
+            })}
+          </ul>
+        )}
+      </div>
 
       {/* Filtros de estado */}
       <div className="flex flex-wrap gap-1.5">

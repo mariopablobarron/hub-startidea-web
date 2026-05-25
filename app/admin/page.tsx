@@ -42,9 +42,16 @@ const CARDS: Card[] = [
     group: "plataforma",
   },
   {
+    href: "/admin/agenda",
+    title: "Agenda de salas",
+    desc: "Vista visual de ocupación por día. Click en celda → detalle reserva.",
+    icon: CalendarDays,
+    group: "plataforma",
+  },
+  {
     href: "/admin/reservas",
     title: "Reservas",
-    desc: "Aprobar pendientes, ver agenda, gestionar incidencias.",
+    desc: "Aprobar pendientes, ver lista completa, gestionar incidencias.",
     icon: CalendarCheck,
     group: "plataforma",
   },
@@ -215,10 +222,10 @@ export default async function AdminDashboard() {
 
         {/* Métricas vivas */}
         <div className="mt-6 grid grid-cols-2 gap-4 md:grid-cols-5">
-          <Metric label="Usuarios" value={userCount} href="/admin/users" />
+          <Metric label="Agenda hoy" value="Ver" href="/admin/agenda" subtitle="Ocupación visual" />
           <Metric label="Reservas pendientes" value={pendingBookings} href="/admin/reservas?status=PENDING" highlight={pendingBookings > 0} />
+          <Metric label="Usuarios" value={userCount} href="/admin/users" />
           <Metric label="Eventos próximos" value={upcomingEvents} href="/admin/eventos" />
-          <Metric label="Hilos foro" value={openTopics} href="/admin/foro" />
           <Metric label="Ingresos" value={`${(totalRevenueCents / 100).toFixed(0)}€`} href="/admin/reservas" subtitle={`${paidBondsCount} bonos`} />
         </div>
       </header>
