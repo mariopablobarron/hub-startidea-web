@@ -1,0 +1,23 @@
+components/PublicShell.tsx
+  s_f12e84bac900e4::t_759fadf6879987 8,11-17,33
+.env.example
+  s_f12e84bac900e4::t_d8a0b097612c05 52-58
+components/VoiceWidget.tsx
+  s_f12e84bac900e4::t_a43d84eb0abe78 1-72
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.1",
+  "base_commit_sha": "1b910b554e8382cfe5537a6538607e28bd4d925e",
+  "prompts": {},
+  "sessions": {
+    "s_f12e84bac900e4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ba62ea7a-a471-4585-b822-8ababb0c1519",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}
