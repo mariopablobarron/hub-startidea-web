@@ -1,0 +1,25 @@
+app/admin/agenda/page.tsx
+  s_f12e84bac900e4::t_25a2c99b67446d 1-290
+app/admin/reservas/page.tsx
+  s_f12e84bac900e4::t_aa803fcc0ba899 44-49,51,58-64
+  s_f12e84bac900e4::t_6bb6d6b85ad6d8 104-151
+app/admin/page.tsx
+  s_f12e84bac900e4::t_cd484a7fd4ff6b 45-50,54
+  s_f12e84bac900e4::t_1dd7669cb5f1e9 225,227
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.1",
+  "base_commit_sha": "d1c1c72814194b28c3169795ff12635f6b3fdd80",
+  "prompts": {},
+  "sessions": {
+    "s_f12e84bac900e4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ba62ea7a-a471-4585-b822-8ababb0c1519",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}
