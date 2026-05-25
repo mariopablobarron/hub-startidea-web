@@ -176,17 +176,35 @@ export default async function AdminAgendaPage({ searchParams }: Props) {
                   </td>
                   {bookableRooms.map((r) => {
                     const cell = grid[r.slug]?.[h];
+                    // Slot pasado en el día de hoy: deshabilitamos para no
+                    // permitir reservar en el pasado.
+                    const isPastSlot =
+                      isToday && h <= new Date().getHours();
                     return (
                       <td
                         key={r.slug}
                         className={`border-l border-[var(--color-line)] p-1 align-top ${
-                          cell ? "" : "bg-emerald-50/40"
+                          cell ? "" : isPastSlot ? "" : "bg-emerald-50/40"
                         }`}
                       >
                         {!cell ? (
-                          <div className="grid h-12 place-items-center text-[10px] uppercase tracking-[0.12em] text-emerald-700/40">
-                            libre
-                          </div>
+                          isPastSlot ? (
+                            <div className="grid h-12 place-items-center text-[10px] uppercase tracking-[0.12em] text-[var(--color-mute)]/30">
+                              pasado
+                            </div>
+                          ) : (
+                            // Slot libre → link a /reservar pre-rellenando
+                            // sala + fecha + hora. Admin click = reserva
+                            // rápida sin tener que volver a teclear nada.
+                            <Link
+                              href={`/reservar?sala=${r.slug}&fecha=${dateISO}&hora=${h}`}
+                              className="group grid h-12 place-items-center rounded-md border border-transparent text-[10px] uppercase tracking-[0.12em] text-emerald-700/40 transition hover:border-emerald-400 hover:bg-emerald-100 hover:text-emerald-900"
+                              title={`Reservar ${r.name} a las ${FMT_HOUR(h)}`}
+                            >
+                              <span className="group-hover:hidden">libre</span>
+                              <span className="hidden group-hover:inline">+ Reservar</span>
+                            </Link>
+                          )
                         ) : cell.cellType === "first" ? (
                           <BookingCard cell={cell} />
                         ) : (

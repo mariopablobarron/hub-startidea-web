@@ -19,6 +19,10 @@ type Props = {
   searchParams: Promise<{
     sala?: string;
     fecha?: string;
+    /** Hora pre-seleccionada en formato HH (08-20). Permite que el
+        admin pinche en una celda libre de /admin/agenda y aterrice
+        en /reservar con el slot ya marcado. */
+    hora?: string;
     error?: string;
   }>;
 };
@@ -139,6 +143,8 @@ export default async function ReservarPage({ searchParams }: Props) {
           {/* Grid visual de slots horarios — sustituye los inputs de hora.
               Recibe bookings serializados para que el cliente pinte
               ocupados sin re-fetchearlos. */}
+          {/* Si vienen con ?hora=HH (admin desde /admin/agenda), parseamos
+              el slot pre-seleccionado para el SlotPicker. */}
           <div className="mt-6">
             <SlotPicker
               date={defaultDate}
@@ -148,6 +154,9 @@ export default async function ReservarPage({ searchParams }: Props) {
                 status: b.status as "PENDING" | "CONFIRMED",
               }))}
               defaultDuration={2}
+              defaultStart={
+                sp.hora && /^\d{1,2}$/.test(sp.hora) ? parseInt(sp.hora, 10) : undefined
+              }
             />
           </div>
 

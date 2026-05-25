@@ -45,12 +45,28 @@ type SlotPickerProps = {
   bookings: Booking[];
   /** Cuántas horas por defecto cuando hace primer click. */
   defaultDuration?: number;
+  /**
+   * Hora de inicio pre-seleccionada (8-20). Si se pasa, el SlotPicker
+   * se monta con esa hora ya seleccionada + defaultDuration horas
+   * después. Útil cuando se llega desde /admin/agenda con un click
+   * sobre un slot libre concreto.
+   */
+  defaultStart?: number;
 };
 
-export function SlotPicker({ date, bookings, defaultDuration = 2 }: SlotPickerProps) {
+export function SlotPicker({ date, bookings, defaultDuration = 2, defaultStart }: SlotPickerProps) {
   // Estado interno: hora inicio + horas seleccionadas. Si null, sin selección.
-  const [start, setStart] = useState<number | null>(null);
-  const [end, setEnd] = useState<number | null>(null);
+  // Si defaultStart está definido, lo aplicamos como selección inicial.
+  const [start, setStart] = useState<number | null>(
+    defaultStart != null && defaultStart >= HOUR_START && defaultStart < HOUR_END
+      ? defaultStart
+      : null,
+  );
+  const [end, setEnd] = useState<number | null>(
+    defaultStart != null && defaultStart >= HOUR_START && defaultStart < HOUR_END
+      ? Math.min(defaultStart + defaultDuration, HOUR_END)
+      : null,
+  );
   const [errorFlash, setErrorFlash] = useState<number | null>(null);
 
   const now = new Date();
