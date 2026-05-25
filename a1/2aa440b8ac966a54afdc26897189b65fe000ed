@@ -1,0 +1,21 @@
+auth.config.ts
+  s_f12e84bac900e4::t_371bb5c5ea3092 11-17,45-48
+middleware.ts
+  s_f12e84bac900e4::t_bda54cdbe88998 9-12
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.1",
+  "base_commit_sha": "a12aa440b8ac966a54afdc26897189b65fe000ed",
+  "prompts": {},
+  "sessions": {
+    "s_f12e84bac900e4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ba62ea7a-a471-4585-b822-8ababb0c1519",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}
