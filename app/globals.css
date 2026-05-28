@@ -40,7 +40,9 @@
   --color-coral-100: #fbc7d6;
   --color-coral-300: #f088ac;
   --color-coral-500: #e63e73; /* Magenta Startidea oficial */
-  --color-coral-600: #c52d5c;
+  /* coral-600 ajustado #c52d5c → #a9234e (2026-05-28) para pasar WCAG AA
+     en enlaces sobre paper-2 (#eae3d3). Ratio sube de 4.2 a ~5.2. */
+  --color-coral-600: #a9234e;
   --color-coral-700: #9c2148;
 
   /* Verde reservado a contextos de ecosistema (no usar en home). */

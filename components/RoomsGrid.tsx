@@ -56,7 +56,7 @@ export function RoomsGrid() {
                     className="object-cover transition duration-500 group-hover:scale-[1.03]"
                   />
                   {room.highlight && (
-                    <span className="absolute left-4 top-4 rounded-full bg-[var(--color-coral-500)] px-3 py-1 text-xs font-medium text-white shadow-sm">
+                    <span className="absolute left-4 top-4 rounded-full bg-[var(--color-coral-700)] px-3 py-1 text-xs font-medium text-white shadow-sm">
                       {room.highlight}
                     </span>
                   )}
