@@ -25,6 +25,20 @@ ENV NEXT_OUTPUT_STANDALONE=1
 ARG NEXT_PUBLIC_ELEVENLABS_AGENT_ID=""
 ENV NEXT_PUBLIC_ELEVENLABS_AGENT_ID=$NEXT_PUBLIC_ELEVENLABS_AGENT_ID
 
+# Sentry build-time args:
+# - NEXT_PUBLIC_SENTRY_DSN: público (va al bundle del cliente). Sin él
+#   el SDK no inicializa nada en runtime, sigue compilando.
+# - SENTRY_AUTH_TOKEN: privado, solo usado durante el build para subir
+#   source maps a Sentry. NO se propaga a runtime.
+ARG NEXT_PUBLIC_SENTRY_DSN=""
+ENV NEXT_PUBLIC_SENTRY_DSN=$NEXT_PUBLIC_SENTRY_DSN
+ARG SENTRY_AUTH_TOKEN=""
+ENV SENTRY_AUTH_TOKEN=$SENTRY_AUTH_TOKEN
+ARG SENTRY_ORG="startidea"
+ARG SENTRY_PROJECT="hub-startidea-web"
+ENV SENTRY_ORG=$SENTRY_ORG
+ENV SENTRY_PROJECT=$SENTRY_PROJECT
+
 # build script ejecuta `prisma generate && next build`
 RUN pnpm build
 
