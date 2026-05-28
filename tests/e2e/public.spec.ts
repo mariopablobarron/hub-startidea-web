@@ -211,3 +211,28 @@ test.describe("Cabeceras de seguridad", () => {
     expect(h["x-powered-by"]).toBeUndefined();
   });
 });
+
+test.describe("VoiceWidget (ElevenLabs)", () => {
+  test("home inyecta script de ElevenLabs convai-widget-embed", async ({ page }) => {
+    await page.goto("/");
+    // El widget es client-side y se inyecta vía useEffect. Esperamos a que el
+    // <script data-elevenlabs-convai> aparezca en el DOM (hasta 5s).
+    const script = page.locator('script[data-elevenlabs-convai]');
+    await expect(script).toHaveCount(1, { timeout: 5_000 });
+    const src = await script.getAttribute("src");
+    expect(src).toContain("@elevenlabs/convai-widget-embed");
+  });
+});
+
+test.describe("Reservar — desglose IVA", () => {
+  test("/reservar (anónimo) muestra tarifa base + IVA + descuentos por rol", async ({ page }) => {
+    await page.goto("/reservar");
+    // AnonymousLanding muestra tarifa base "20€/h base + IVA" y PVP final
+    // por rol: visitante 24,20€/h, coworker 16,94€/h, colaborador 19,36€/h.
+    // Si cualquiera de estos cambia por error, queremos enterarnos.
+    await expect(page.getByText(/20€\/h base \+ IVA/i)).toBeVisible();
+    await expect(page.getByText(/24,20€\/h/)).toBeVisible(); // PVP visitante con IVA
+    await expect(page.getByText(/16,94€\/h/)).toBeVisible(); // coworker -30%
+    await expect(page.getByText(/19,36€\/h/)).toBeVisible(); // colaborador -20%
+  });
+});
