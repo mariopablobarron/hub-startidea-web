@@ -4,9 +4,11 @@ import { requireAdmin } from "@/lib/auth/roles";
 import {
   fetchSummaryCached,
   fetchTopRowsCached,
+  fetchWeeklyTrendCached,
   listSitemapsCached,
   getSiteUrl,
   type GscRow,
+  type WeeklyRow,
 } from "@/lib/seo/gsc";
 import { PageHeader } from "../_components/Field";
 
@@ -32,20 +34,32 @@ type LoadResult =
       topPages: GscRow[];
       topCountries: GscRow[];
       sitemaps: Awaited<ReturnType<typeof listSitemapsCached>>;
+      weeklyTrend: WeeklyRow[];
     }
   | { ok: false; error: string };
 
 async function load(): Promise<LoadResult> {
   try {
-    const [summary28, summary7, topQueries, topPages, topCountries, sitemaps] = await Promise.all([
-      fetchSummaryCached(28),
-      fetchSummaryCached(7),
-      fetchTopRowsCached(28, "query", 30),
-      fetchTopRowsCached(28, "page", 20),
-      fetchTopRowsCached(28, "country", 10),
-      listSitemapsCached(),
-    ]);
-    return { ok: true, summary28, summary7, topQueries, topPages, topCountries, sitemaps };
+    const [summary28, summary7, topQueries, topPages, topCountries, sitemaps, weeklyTrend] =
+      await Promise.all([
+        fetchSummaryCached(28),
+        fetchSummaryCached(7),
+        fetchTopRowsCached(28, "query", 30),
+        fetchTopRowsCached(28, "page", 20),
+        fetchTopRowsCached(28, "country", 10),
+        listSitemapsCached(),
+        fetchWeeklyTrendCached(12),
+      ]);
+    return {
+      ok: true,
+      summary28,
+      summary7,
+      topQueries,
+      topPages,
+      topCountries,
+      sitemaps,
+      weeklyTrend,
+    };
   } catch (e) {
     return { ok: false, error: e instanceof Error ? e.message : "Error desconocido" };
   }
@@ -91,6 +105,9 @@ export default async function AdminSeoPage() {
               caption="Tendencia reciente"
             />
           </section>
+
+          {/* Tendencia 12 semanas */}
+          <TrendCard rows={data.weeklyTrend} />
 
           {/* Top queries + Top pages */}
           <section className="grid gap-4 lg:grid-cols-2">
@@ -285,6 +302,146 @@ function SitemapsCard({ sitemaps }: { sitemaps: Awaited<ReturnType<typeof listSi
           })}
         </ul>
       )}
+    </div>
+  );
+}
+
+function TrendCard({ rows }: { rows: WeeklyRow[] }) {
+  if (rows.length === 0) {
+    return (
+      <div className="rounded-2xl border border-[var(--color-line)] bg-[var(--color-paper)] p-6">
+        <h2 className="font-display text-lg">Tendencia 12 semanas</h2>
+        <p className="mt-3 text-sm text-[var(--color-mute)]">
+          Aún no hay datos suficientes para mostrar la tendencia.
+        </p>
+      </div>
+    );
+  }
+
+  const clicks = rows.map((r) => r.clicks);
+  const impressions = rows.map((r) => r.impressions);
+  const ctr = rows.map((r) => r.ctr * 100);
+  const position = rows.map((r) => r.position);
+  const labels = rows.map((r) => r.weekStart);
+
+  return (
+    <div className="rounded-2xl border border-[var(--color-line)] bg-[var(--color-paper)] p-6">
+      <div className="flex items-baseline justify-between">
+        <h2 className="font-display text-lg">Tendencia 12 semanas</h2>
+        <span className="text-xs text-[var(--color-mute)]">
+          {rows.length} semana{rows.length === 1 ? "" : "s"} · {labels[0]} → {labels[labels.length - 1]}
+        </span>
+      </div>
+      <div className="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        <Sparkline title="Clicks" series={clicks} format={fmtInt} />
+        <Sparkline title="Impresiones" series={impressions} format={fmtInt} />
+        <Sparkline title="CTR" series={ctr} format={(v) => `${v.toFixed(1)}%`} />
+        <Sparkline title="Posición" series={position} format={fmtPos} betterWhen="down" />
+      </div>
+    </div>
+  );
+}
+
+function Sparkline({
+  title,
+  series,
+  format,
+  betterWhen = "up",
+}: {
+  title: string;
+  series: number[];
+  format: (v: number) => string;
+  betterWhen?: "up" | "down";
+}) {
+  const w = 200;
+  const h = 56;
+  const padding = 2;
+  const last = series[series.length - 1] ?? 0;
+  const first = series[0] ?? 0;
+  const valid = series.filter((v) => v > 0);
+  const min = valid.length ? Math.min(...valid) : 0;
+  const max = valid.length ? Math.max(...valid) : 1;
+  const range = max - min || 1;
+
+  const points = series
+    .map((v, i) => {
+      const x = padding + (i / Math.max(series.length - 1, 1)) * (w - padding * 2);
+      const y = padding + (h - padding * 2) * (1 - (v - min) / range);
+      return `${x.toFixed(1)},${y.toFixed(1)}`;
+    })
+    .join(" ");
+
+  // Delta: comparar últimas 4 semanas vs 4 anteriores (más estable que primera vs última)
+  const recent = series.slice(-4);
+  const prior = series.slice(-8, -4);
+  const recentAvg = recent.length ? recent.reduce((a, b) => a + b, 0) / recent.length : 0;
+  const priorAvg = prior.length ? prior.reduce((a, b) => a + b, 0) / prior.length : 0;
+  const delta = priorAvg > 0 ? ((recentAvg - priorAvg) / priorAvg) * 100 : 0;
+  const isPositive = betterWhen === "up" ? delta > 0 : delta < 0;
+  const noChange = Math.abs(delta) < 0.5 || (priorAvg === 0 && recentAvg === 0);
+
+  const stroke = noChange
+    ? "#94a3b8" // slate-400
+    : isPositive
+    ? "#047857" // emerald-700
+    : "#b91c1c"; // red-700
+  const deltaColor = noChange
+    ? "text-slate-500"
+    : isPositive
+    ? "text-emerald-700"
+    : "text-red-700";
+
+  // Solo dibujar puntos visibles cuando hay <= 12 semanas (siempre cumple en este caso)
+  const lastPoint = series.length > 0
+    ? {
+        x: padding + ((series.length - 1) / Math.max(series.length - 1, 1)) * (w - padding * 2),
+        y: padding + (h - padding * 2) * (1 - (last - min) / range),
+      }
+    : null;
+
+  return (
+    <div>
+      <div className="text-xs uppercase tracking-[0.16em] text-[var(--color-mute)]">{title}</div>
+      <div className="mt-1 flex items-baseline justify-between gap-2">
+        <span className="font-display text-2xl tracking-tight">{format(last)}</span>
+        {!noChange && prior.length > 0 && (
+          <span className={`text-xs font-medium ${deltaColor}`} title={`vs 4 sem. previas: ${format(priorAvg)}`}>
+            {delta > 0 ? "+" : ""}{delta.toFixed(0)}%
+          </span>
+        )}
+      </div>
+      <svg
+        viewBox={`0 0 ${w} ${h}`}
+        className="mt-2 h-14 w-full"
+        role="img"
+        aria-label={`Tendencia de ${title}: ${series.map(format).join(", ")}`}
+      >
+        {valid.length > 0 ? (
+          <>
+            <polyline
+              points={points}
+              fill="none"
+              stroke={stroke}
+              strokeWidth="1.5"
+              strokeLinejoin="round"
+              strokeLinecap="round"
+            />
+            {lastPoint && (
+              <circle cx={lastPoint.x} cy={lastPoint.y} r="2.5" fill={stroke} />
+            )}
+          </>
+        ) : (
+          <text
+            x={w / 2}
+            y={h / 2}
+            textAnchor="middle"
+            fontSize="10"
+            fill="var(--color-mute, #6b7280)"
+          >
+            sin datos
+          </text>
+        )}
+      </svg>
     </div>
   );
 }
