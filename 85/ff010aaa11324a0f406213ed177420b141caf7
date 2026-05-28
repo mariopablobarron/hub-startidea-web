@@ -1,0 +1,25 @@
+app/globals.css
+  s_a44e906d905f48::t_7899c8cb0de133 43-45
+app/salas/page.tsx
+  s_a44e906d905f48::t_c413e5df2946d7 78
+components/RoomsGrid.tsx
+  s_a44e906d905f48::t_b65902102bb7ec 59
+components/Floorplan.tsx
+  s_a44e906d905f48::t_93a66f25d51486 229
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "85ff010aaa11324a0f406213ed177420b141caf7",
+  "prompts": {},
+  "sessions": {
+    "s_a44e906d905f48": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "81ebd0fe-fabf-4fa7-bbd2-edb830fa5e8e",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}
