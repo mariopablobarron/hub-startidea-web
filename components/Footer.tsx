@@ -66,7 +66,7 @@ export function Footer() {
         </div>
 
         <div>
-          <div className="text-xs uppercase tracking-[0.18em] text-[var(--color-paper)]/50">Visítanos</div>
+          <div className="text-xs uppercase tracking-[0.18em] text-[var(--color-paper)]/65">Visítanos</div>
           <ul className="mt-4 space-y-3 text-sm">
             <li className="flex gap-3">
               <MapPin size={16} className="mt-0.5 shrink-0 text-[var(--color-coral-500)]" />
@@ -92,7 +92,7 @@ export function Footer() {
         </div>
 
         <div>
-          <div className="text-xs uppercase tracking-[0.18em] text-[var(--color-paper)]/50">Enlaces</div>
+          <div className="text-xs uppercase tracking-[0.18em] text-[var(--color-paper)]/65">Enlaces</div>
           <ul className="mt-4 space-y-3 text-sm">
             <li><Link href="/ecosistema" className="hover:text-[var(--color-coral-500)]">Ecosistema</Link></li>
             <li><Link href="/salas" className="hover:text-[var(--color-coral-500)]">Salas</Link></li>
@@ -112,7 +112,7 @@ export function Footer() {
       </div>
 
       <div className="border-t border-white/10">
-        <div className="container-page flex flex-col items-start justify-between gap-4 py-6 text-xs text-[var(--color-paper)]/50 md:flex-row md:items-center">
+        <div className="container-page flex flex-col items-start justify-between gap-4 py-6 text-xs text-[var(--color-paper)]/65 md:flex-row md:items-center">
           <div>© {new Date().getFullYear()} {site.parent.name}. Todos los derechos reservados.</div>
           <div className="flex gap-6">
             <Link href="/aviso-legal" className="hover:text-[var(--color-paper)]">Aviso legal</Link>

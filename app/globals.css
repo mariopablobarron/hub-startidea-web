@@ -27,7 +27,10 @@
   --color-paper: #f4efe6;   /* Crema · fondo por defecto */
   --color-paper-2: #eae3d3; /* Hueso · bandas y cards */
 
-  --color-mute: #6b6b6b;
+  /* Gris medio — texto secundario. Oscurecido a #595959 (desde #6b6b6b)
+     para pasar WCAG AA (ratio 4.5+) sobre paper #f4efe6 y paper-2 #eae3d3.
+     Lighthouse 2026-05-28: con #6b6b6b daba 4.16 sobre paper-2. */
+  --color-mute: #595959;
   --color-line: #ddd5c4;
   --color-line-dark: #2a2a2a;
 
