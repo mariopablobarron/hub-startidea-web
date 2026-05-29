@@ -1,0 +1,35 @@
+app/api/webhooks/stripe/route.ts
+  s_a44e906d905f48::t_f62449f127c09b 119,121-136
+  s_a44e906d905f48::t_1a25d97375b107 5-6
+  s_a44e906d905f48::t_9b7e576d7f384b 76,84
+app/reservar/gracias/page.tsx
+  s_a44e906d905f48::t_4e4acb68de2c85 1-132
+tests/e2e/public.spec.ts
+  s_a44e906d905f48::t_8c9f2733e70ace 227-228,230-255
+app/reservar/page.tsx
+  s_a44e906d905f48::t_f3f72b3f430d11 203-251,256,260-262
+  s_a44e906d905f48::t_4aefaf094f240f 73-91,93-107
+  s_a44e906d905f48::t_a8a854f754007d 3-4,7
+  s_a44e906d905f48::t_bd8eec1f8ba30e 272
+  s_a44e906d905f48::t_e6d9810ba03e2f 297
+  s_a44e906d905f48::t_ab8a5c7c47b891 33,35-36,52-53,55-57,60
+  s_a44e906d905f48::t_446b879e5a6673 135
+lib/bookings/guest.ts
+  s_a44e906d905f48::t_7288460956ff65 1-344
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "a3fdb95f0501b9510b1439c30179fd901548b84d",
+  "prompts": {},
+  "sessions": {
+    "s_a44e906d905f48": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "81ebd0fe-fabf-4fa7-bbd2-edb830fa5e8e",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}
