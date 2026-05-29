@@ -68,11 +68,13 @@ Secrets relevantes (no valores, solo nombres):
 | `RESEND_API_KEY` | Email transaccional |
 | `OPENROUTER_API_KEY` | Chat texto (claude haiku 4.5) |
 | `CRON_SECRET` | Bearer para `/api/cron/*` |
-| `STRIPE_SECRET_KEY` | Reservas con pago (test mode hoy) |
-| `STRIPE_WEBHOOK_SECRET` | **PENDIENTE** — crear endpoint en Stripe Dashboard |
+| `STRIPE_SECRET_KEY` | Reservas con pago (**test mode**, `sk_test_*`) |
+| `STRIPE_WEBHOOK_SECRET` | ✅ Configurado 2026-05-28 (test mode). Webhook `we_1TcBX1AIr4Y8vEdqxMXVHFai` con eventos `checkout.session.completed` + `expired`. Para live mode: crear nuevo webhook con `sk_live_*` y rotar este secret. |
 | `GITHUB_TOKEN` | Listar conversaciones del chat (Octokit) |
 | `TELEGRAM_BOT_TOKEN` + `TELEGRAM_CHAT_ID` | Notif admin de bookings/contact |
 | `GSC_OAUTH_*` | SEO admin (Search Console) |
+| `NEXT_PUBLIC_SENTRY_DSN` | ⏳ Pendiente. SDK ya integrado (`@sentry/nextjs` 10.55), no inicializa sin DSN. |
+| `SENTRY_AUTH_TOKEN` | ⏳ Pendiente. Solo build-time, para subir source maps. Sin él el SDK funciona pero stack traces quedan minificados. |
 | `ADMIN_EMAIL` / `ADMIN_PASSWORD` | Solo seed inicial |
 
 ## Diagnóstico común
@@ -179,12 +181,22 @@ gunzip -c /data/cal-com-hub-backups/cal_YYYYMMDD_HHMMSS.sql.gz | \
 |---|---|---|
 | 1 | Setup admin Cal.com en `/auth/setup` | Mario |
 | 2 | Cambiar password Coolify temporal | Mario |
-| 3 | STRIPE_WEBHOOK_SECRET (activar pagos reales) | Mario crea webhook en Stripe Dashboard |
-| 4 | Fotos reales 8 salas + mapa oficina | Mario sube |
-| 5 | Cal.com Fase 1: POC sala Sócrates como event-type | Después de #1 |
-| 6 | Modo kiosco tablet (PIN auth, UI touch) | Cuando llegue hardware |
-| 7 | KB completo a panel ElevenLabs (opcional, mejora respuestas) | Mario |
-| 8 | Cal.com Fase 2-6: 5 salas con 3 roles + redirect `/reservar` → cal | Tras Fase 1 |
+| 3 | Stripe **live mode** + nuevo webhook con `sk_live_*` (cuando vayas a cobrar real) | Mario crea, yo inyecto |
+| 4 | Crear proyecto Sentry `hub-startidea-web` en `de.sentry.io` + DSN | Mario crea, yo inyecto cifrado en Coolify |
+| 5 | Mapa oficina en `/public/floorplan/` | Mario sube archivo |
+| 6 | Cal.com Fase 1: POC sala Sócrates como event-type | Después de #1 |
+| 7 | Modo kiosco tablet (PIN auth, UI touch) | Cuando llegue hardware |
+| 8 | KB completo a panel ElevenLabs (opcional, mejora respuestas) | Mario |
+| 9 | Cal.com Fase 2-6: 5 salas con 3 roles + redirect `/reservar` → cal | Tras Fase 1 |
+
+## Cambios significativos 2026-05-28
+
+- ✅ **Stripe webhook** `we_1TcBX1AIr4Y8vEdqxMXVHFai` creado vía API Stripe + `STRIPE_WEBHOOK_SECRET` inyectado cifrado en Coolify BD (técnica documentada en memoria `reference_coolify_aes_secret_inject.md`). Webhook valida signatures HMAC.
+- ✅ **Umami analytics** — fix backend: insertado website `2c83c9c1-7b4d-4206-8f7e-551874203ef6` en `umami-db` (no existía → 400 silencioso, web no trackeaba nada). Receta y patrón en memoria `reference_umami_uuid_must_exist.md`.
+- ✅ **Sentry SDK** integrado (`@sentry/nextjs` 10.55): `instrumentation.ts`, `instrumentation-client.ts`, `app/global-error.tsx`, `withSentryConfig` en `next.config.ts`, ARGs en Dockerfile. Sin DSN no inicializa, así que producción no afectada hasta que se configure.
+- ✅ **Accessibility WCAG AA** — Lighthouse mobile 100 en home, `/salas`, `/salas/cc33`. Cambios: `--color-mute` → `#595959`, footer opacity `/50→/65`, `coral-500→coral-700` en badges magenta sobre imagen, `coral-600` → `#a9234e` global.
+- ✅ **Gráfica tendencia 12 semanas** en `/admin/seo` (sparklines SVG, 0 deps nuevas) + **alerta 🚨** en cron weekly cuando clicks caen >50% (script versionado en `scripts/seo-weekly-report.sh` + desplegado en VPS).
+- ✅ **Tests E2E** nuevos: VoiceWidget, desglose IVA, slots libres agenda admin.
 
 ## Repos relacionados
 
