@@ -1,0 +1,22 @@
+app/admin/salas/[slug]/RoomImageUploader.tsx
+  s_a44e906d905f48::t_d6dffeffc31e8c 1-239
+app/admin/salas/[slug]/page.tsx
+  s_a44e906d905f48::t_62dca5cd735fa0 36-45
+  s_a44e906d905f48::t_d539a37aa39a44 5
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "4b5e8501d3518e3ff159e20f30084bf3af31f194",
+  "prompts": {},
+  "sessions": {
+    "s_a44e906d905f48": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "81ebd0fe-fabf-4fa7-bbd2-edb830fa5e8e",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}
