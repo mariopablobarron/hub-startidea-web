@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import type Stripe from "stripe";
 import { prisma } from "@/lib/db/prisma";
 import { getStripe } from "@/lib/stripe/client";
+import { sendGuestPostPaymentEmail } from "@/lib/bookings/guest";
+import { content } from "@/lib/content";
 
 /**
  * Webhook de Stripe — endpoint que recibe eventos de pago.
@@ -71,6 +73,7 @@ export async function POST(req: Request) {
 async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
   const paymentId = session.metadata?.paymentId;
   const kind = session.metadata?.kind;
+  const guestFlow = session.metadata?.guestFlow === "1";
   if (!paymentId) {
     console.warn("[stripe-webhook] checkout.session.completed sin paymentId en metadata");
     return;
@@ -78,7 +81,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
 
   const payment = await prisma.payment.findUnique({
     where: { id: paymentId },
-    include: { bookings: true, bondPurchase: true },
+    include: { bookings: true, bondPurchase: true, user: true },
   });
   if (!payment) {
     console.warn("[stripe-webhook] payment no encontrado:", paymentId);
@@ -113,8 +116,24 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     }
     await notifyAdminTelegram(
       "💶 Reserva pagada",
-      `Payment ${paymentId} → CONFIRMED · ${payment.amountCents / 100}€`,
+      `Payment ${paymentId} → CONFIRMED · ${payment.amountCents / 100}€${guestFlow ? " (guest)" : ""}`,
     );
+
+    // Si es guest flow, enviar email con magic-link para acceder a /me/reservas
+    if (guestFlow && payment.user && payment.bookings[0]) {
+      const booking = payment.bookings[0];
+      const room = content.rooms.find((r) => r.slug === booking.roomSlug);
+      await sendGuestPostPaymentEmail({
+        email: payment.user.email,
+        name: payment.user.name || payment.user.email.split("@")[0],
+        bookingId: booking.id,
+        roomName: room?.name || booking.roomSlug,
+        startsAt: booking.startsAt,
+        totalCents: payment.amountCents,
+      }).catch((err) => {
+        console.error("[stripe-webhook] guest post-payment email failed:", err);
+      });
+    }
   }
 
   // Activar PrepaidBond

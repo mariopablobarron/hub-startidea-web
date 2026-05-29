@@ -224,15 +224,34 @@ test.describe("VoiceWidget (ElevenLabs)", () => {
   });
 });
 
-test.describe("Reservar — desglose IVA", () => {
-  test("/reservar (anónimo) muestra tarifa base + IVA + descuentos por rol", async ({ page }) => {
+test.describe("Reservar — guest checkout", () => {
+  test("/reservar (anónimo) muestra form completo con campos guest", async ({ page }) => {
     await page.goto("/reservar");
-    // AnonymousLanding muestra tarifa base "20€/h base + IVA" y PVP final
-    // por rol: visitante 24,20€/h, coworker 16,94€/h, colaborador 19,36€/h.
-    // Si cualquiera de estos cambia por error, queremos enterarnos.
-    await expect(page.getByText(/20€\/h base \+ IVA/i)).toBeVisible();
-    await expect(page.getByText(/24,20€\/h/)).toBeVisible(); // PVP visitante con IVA
-    await expect(page.getByText(/16,94€\/h/)).toBeVisible(); // coworker -30%
-    await expect(page.getByText(/19,36€\/h/)).toBeVisible(); // colaborador -20%
+    // Visitor ve form unificado (no AnonymousLanding). Debe haber:
+    // 1) Header con CTA a login
+    await expect(page.getByRole("link", { name: /Inicia sesi[oó]n/i })).toBeVisible();
+    // 2) SlotPicker / form fields del booking estándar
+    await expect(page.getByText(/Qu[eé] vas a hacer\?/i)).toBeVisible();
+    // 3) Campos guest específicos (nombre, email, teléfono)
+    await expect(page.getByLabel(/Nombre completo/i)).toBeVisible();
+    await expect(page.getByLabel(/^Email$/i)).toBeVisible();
+    await expect(page.getByLabel(/Tel[eé]fono.*opcional/i)).toBeVisible();
+    // 4) Botón submit "Reservar y pagar"
+    await expect(page.getByRole("button", { name: /Reservar y pagar/i })).toBeVisible();
+    // 5) Texto explicativo de protección anti-spam (slot se libera en 30 min)
+    await expect(page.getByText(/30 min/i)).toBeVisible();
+  });
+
+  test("/reservar (anónimo) muestra tarifa visitor con IVA", async ({ page }) => {
+    await page.goto("/reservar");
+    // Visitor ve PVP por hora 24,20€ (20€ base + 21% IVA) y el desglose
+    await expect(page.getByText(/24,20\s*€/).first()).toBeVisible();
+    await expect(page.getByText(/IVA.*21\s*%/i).first()).toBeVisible();
+  });
+
+  test("/reservar (anónimo) header indica acceso a Stripe", async ({ page }) => {
+    await page.goto("/reservar");
+    // El texto del header explica el flow: Stripe Checkout → confirmación instantánea
+    await expect(page.getByText(/Stripe/i).first()).toBeVisible();
   });
 });
