@@ -500,5 +500,12 @@
     "eyebrow": "Tour del local",
     "title": "Pasa por cada sala sin moverte de la silla.",
     "description": "Toca cualquier zona del plano para ver su tamaño, capacidad y equipamiento. ¿Prefieres venir? Acércate a saludar y te lo enseñamos en directo."
+  },
+  "bankTransfer": {
+    "enabled": true,
+    "holder": "",
+    "iban": "",
+    "bankName": "",
+    "instructions": ""
   }
 }

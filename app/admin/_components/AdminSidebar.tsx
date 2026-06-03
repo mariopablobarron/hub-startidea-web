@@ -21,6 +21,8 @@ import {
   CalendarDays,
   MessageSquareText,
   Euro,
+  Ticket,
+  Banknote,
 } from "lucide-react";
 import { cn } from "@/lib/cn";
 
@@ -30,6 +32,8 @@ const NAV = [
   { href: "/admin/users", label: "Usuarios", icon: Users },
   { href: "/admin/reservas", label: "Reservas", icon: CalendarCheck },
   { href: "/admin/tarifas", label: "Tarifas", icon: Euro },
+  { href: "/admin/cupones", label: "Cupones", icon: Ticket },
+  { href: "/admin/pagos", label: "Pagos · Transferencia", icon: Banknote },
   { href: "/admin/eventos", label: "Eventos", icon: CalendarDays },
   { href: "/admin/foro", label: "Foro", icon: MessageSquareText },
   // Contenido (git-based)

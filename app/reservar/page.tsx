@@ -7,6 +7,7 @@ import { createBooking } from "@/lib/bookings/actions";
 import { createGuestBookingAndCheckout } from "@/lib/bookings/guest";
 import { quotePrice, formatEuros } from "@/lib/bookings/pricing";
 import { bookingsInRange } from "@/lib/bookings/availability";
+import { prisma } from "@/lib/db/prisma";
 import { SlotPicker } from "@/components/SlotPicker";
 import { DateNavigator } from "@/components/DateNavigator";
 
@@ -49,13 +50,29 @@ export default async function ReservarPage({ searchParams }: Props) {
     to,
   });
 
-  // Quotes con role efectivo: VISITOR (sin descuento) para guests, role real para users
+  // Quotes con role efectivo: VISITOR (sin descuento) para guests, role real para users.
   const effectiveRole = user?.role ?? "VISITOR";
+
+  // Descuento personal del usuario — para que vea su precio rebajado ya en el preview.
+  const personal = user
+    ? await prisma.user.findUnique({
+        where: { id: user.id },
+        select: { discountKind: true, discountValue: true },
+      })
+    : null;
+  const personalDiscount =
+    personal?.discountKind && personal.discountValue != null
+      ? { kind: personal.discountKind, value: personal.discountValue }
+      : null;
+
   const [quote1h, quote2h, quote4h] = await Promise.all([
-    quotePrice({ roomSlug: room.slug, durationHours: 1, role: effectiveRole }),
-    quotePrice({ roomSlug: room.slug, durationHours: 2, role: effectiveRole }),
-    quotePrice({ roomSlug: room.slug, durationHours: 4, role: effectiveRole }),
+    quotePrice({ roomSlug: room.slug, durationHours: 1, role: effectiveRole, personalDiscount }),
+    quotePrice({ roomSlug: room.slug, durationHours: 2, role: effectiveRole, personalDiscount }),
+    quotePrice({ roomSlug: room.slug, durationHours: 4, role: effectiveRole, personalDiscount }),
   ]);
+
+  // ¿Hay que cobrar? VISITOR/CLIENT/COLLABORATOR pagan; MEMBER/ADMIN no.
+  const payable = quote1h.quoted && effectiveRole !== "MEMBER" && effectiveRole !== "ADMIN";
 
   const formAction = isGuest ? createGuestBookingAndCheckout : createBooking;
 
@@ -78,7 +95,7 @@ export default async function ReservarPage({ searchParams }: Props) {
             </p>
           ) : (
             <p className="mt-2 text-[var(--color-mute)]">
-              Rellena el formulario, paga online en Stripe y la sala queda confirmada al instante.
+              Rellena el formulario y elige cómo pagar — tarjeta o transferencia.
               {" "}
               <Link
                 href={`/login?callbackUrl=${encodeURIComponent(`/reservar?sala=${room.slug}`)}`}
@@ -249,19 +266,51 @@ export default async function ReservarPage({ searchParams }: Props) {
             </div>
           )}
 
+          {payable && (
+            <div className="mt-6 space-y-4 rounded-xl border border-[var(--color-line)] bg-[var(--color-paper-2)] p-4">
+              <div>
+                <span className="text-sm font-medium">¿Cómo quieres pagar?</span>
+                <div className="mt-2 grid gap-2 sm:grid-cols-2">
+                  <label className="flex cursor-pointer items-start gap-2 rounded-xl border border-[var(--color-line)] bg-white p-3 text-sm has-[:checked]:border-[var(--color-ink)] has-[:checked]:ring-1 has-[:checked]:ring-[var(--color-ink)]">
+                    <input type="radio" name="paymentMethod" value="stripe" defaultChecked className="mt-0.5" />
+                    <span>
+                      <span className="block font-medium">Tarjeta</span>
+                      <span className="block text-xs text-[var(--color-mute)]">Pago online (Stripe). Confirmación inmediata.</span>
+                    </span>
+                  </label>
+                  <label className="flex cursor-pointer items-start gap-2 rounded-xl border border-[var(--color-line)] bg-white p-3 text-sm has-[:checked]:border-[var(--color-ink)] has-[:checked]:ring-1 has-[:checked]:ring-[var(--color-ink)]">
+                    <input type="radio" name="paymentMethod" value="transfer" className="mt-0.5" />
+                    <span>
+                      <span className="block font-medium">Transferencia</span>
+                      <span className="block text-xs text-[var(--color-mute)]">Te enviamos los datos por email. Se confirma al recibir el ingreso.</span>
+                    </span>
+                  </label>
+                </div>
+              </div>
+              <label className="block text-sm">
+                <span className="font-medium">Código de descuento (opcional)</span>
+                <input
+                  type="text"
+                  name="couponCode"
+                  maxLength={40}
+                  placeholder="Ej. AMIGO20"
+                  className="mt-1 block w-full rounded-xl border border-[var(--color-line)] bg-white px-3 py-2 uppercase outline-none focus:border-[var(--color-ink)]"
+                />
+              </label>
+            </div>
+          )}
+
           <button
             type="submit"
             className="mt-6 inline-flex items-center gap-2 rounded-full bg-[var(--color-ink)] px-6 py-3 text-sm font-medium text-[var(--color-paper)] hover:bg-[var(--color-coral-500)]"
           >
-            {isGuest ? "Reservar y pagar" : "Enviar reserva"} <ArrowRight size={14} />
+            {isGuest ? "Reservar" : "Enviar reserva"} <ArrowRight size={14} />
           </button>
 
           <p className="mt-3 text-xs text-[var(--color-mute)]">
-            {isGuest
-              ? "Te llevamos a Stripe Checkout. Reserva confirmada al pagar; si no completas el pago en 30 min, el slot vuelve a estar libre automáticamente."
-              : user!.role === "MEMBER" || user!.role === "ADMIN"
+            {user && (user.role === "MEMBER" || user.role === "ADMIN")
               ? "Tu reserva queda confirmada al instante."
-              : "Tu reserva quedará pendiente hasta que admin la apruebe."}
+              : "Con tarjeta, la reserva se confirma al pagar. Con transferencia, queda reservada y pendiente hasta que confirmemos el ingreso (te enviamos los datos por email)."}
           </p>
         </form>
 
@@ -292,9 +341,15 @@ export default async function ReservarPage({ searchParams }: Props) {
                       {formatEuros(quote1h.totalCents)}
                     </span>
                   </div>
-                  {quote1h.discountPct > 0 && (
+                  {quote1h.discountLabel && (
                     <p className="mt-1 text-xs text-[var(--color-coral-600)]">
-                      Incluye {quote1h.discountPct}% descuento {ROLE_LABEL[effectiveRole].toLowerCase()}.
+                      Incluye {quote1h.discountLabel}
+                      {quote1h.discountSource === "role"
+                        ? ` (${ROLE_LABEL[effectiveRole].toLowerCase()})`
+                        : quote1h.discountSource === "personal"
+                        ? " (descuento personal)"
+                        : ""}
+                      .
                     </p>
                   )}
                 </div>
@@ -310,7 +365,7 @@ export default async function ReservarPage({ searchParams }: Props) {
                   </div>
                 </div>
                 <p className="mt-2 text-[10px] text-[var(--color-mute)]">
-                  Todos los precios incluyen IVA. Stripe cobra el importe total final.
+                  Todos los precios incluyen IVA. Puedes pagar con tarjeta o por transferencia.
                 </p>
               </>
             )}

@@ -8,7 +8,9 @@ import { prisma } from "@/lib/db/prisma";
 import { requireAuth, requireAdmin } from "@/lib/auth/roles";
 import { isSlotAvailable, isWithinOpeningHours } from "./availability";
 import { quotePrice, formatEuros } from "./pricing";
-import { content } from "@/lib/content";
+import { validateCoupon, redeemCoupon } from "./coupons";
+import { sendTransferInstructionsEmail } from "@/lib/mail/transfer";
+import { content, bookingRef } from "@/lib/content";
 import type { BookingStatus } from "@prisma/client";
 
 /**
@@ -55,6 +57,8 @@ const createSchema = z.object({
   attendees: z.coerce.number().int().min(1).max(200).optional(),
   purpose: z.string().min(1).max(500),
   notes: z.string().max(2000).optional(),
+  paymentMethod: z.enum(["stripe", "transfer"]).default("stripe"),
+  couponCode: z.string().max(40).optional(),
 });
 
 export async function createBooking(formData: FormData) {
@@ -69,6 +73,8 @@ export async function createBooking(formData: FormData) {
       attendees: formData.get("attendees") || undefined,
       purpose: formData.get("purpose"),
       notes: formData.get("notes") || undefined,
+      paymentMethod: (formData.get("paymentMethod") as string) || "stripe",
+      couponCode: formData.get("couponCode") || undefined,
     });
 
     // Verificar que la sala existe Y es reservable. Las salas marcadas
@@ -102,11 +108,27 @@ export async function createBooking(formData: FormData) {
       throw new Error("Ese horario ya está reservado en esta sala. Prueba otro.");
     }
 
+    // Descuento personal del usuario (independiente del rol) — vive en BD,
+    // no en la sesión, así que lo cargamos aquí.
+    const dbUser = await prisma.user.findUnique({
+      where: { id: user.id },
+      select: { discountKind: true, discountValue: true },
+    });
+    const personalDiscount =
+      dbUser?.discountKind && dbUser.discountValue != null
+        ? { kind: dbUser.discountKind, value: dbUser.discountValue }
+        : null;
+
+    // Cupón (si el cliente metió código) — validado contra BD.
+    const coupon = await validateCoupon(data.couponCode, data.roomSlug);
+
     const durationHours = (endsAt.getTime() - startsAt.getTime()) / 3_600_000;
     const quote = await quotePrice({
       roomSlug: data.roomSlug,
       durationHours,
       role: user.role,
+      personalDiscount,
+      coupon,
     });
 
     // Status inicial según rol
@@ -124,8 +146,35 @@ export async function createBooking(formData: FormData) {
         notes: data.notes,
         totalCents: quote.totalCents,
         status,
+        couponCode: quote.couponCode,
       },
     });
+
+    // Consumir cupón si fue el descuento aplicado
+    if (quote.couponCode) await redeemCoupon(quote.couponCode);
+
+    // ¿Pago por transferencia? Solo si hay importe y la reserva no se
+    // autoconfirma por rol. Creamos el Payment BANK_TRANSFER en PENDING;
+    // el admin lo marca como recibido desde /admin/reservas.
+    const isTransfer =
+      status === "PENDING" && quote.totalCents > 0 && data.paymentMethod === "transfer";
+
+    if (isTransfer) {
+      const payment = await prisma.payment.create({
+        data: {
+          userId: user.id,
+          amountCents: quote.totalCents,
+          currency: "EUR",
+          status: "PENDING",
+          method: "BANK_TRANSFER",
+          description: `Reserva ${room.name} — ${bookingRef(booking.id)}`,
+        },
+      });
+      await prisma.booking.update({
+        where: { id: booking.id },
+        data: { paymentId: payment.id },
+      });
+    }
 
     // Notificaciones
     await Promise.all([
@@ -137,16 +186,27 @@ export async function createBooking(formData: FormData) {
         userEmail: user.email,
         durationHours,
         totalCents: quote.totalCents,
+        paymentMethod: isTransfer ? "transfer" : "stripe",
       }),
-      notifyUserEmail({
-        booking,
-        roomName: room.name,
-        userName: user.name || user.email.split("@")[0],
-        userEmail: user.email,
-        durationHours,
-        totalCents: quote.totalCents,
-        status,
-      }),
+      isTransfer
+        ? sendTransferInstructionsEmail({
+            to: user.email,
+            name: user.name || user.email.split("@")[0],
+            roomName: room.name,
+            startsAt,
+            durationHours,
+            totalCents: quote.totalCents,
+            reference: bookingRef(booking.id),
+          })
+        : notifyUserEmail({
+            booking,
+            roomName: room.name,
+            userName: user.name || user.email.split("@")[0],
+            userEmail: user.email,
+            durationHours,
+            totalCents: quote.totalCents,
+            status,
+          }),
     ]);
 
     revalidatePath("/admin/reservas");
@@ -221,6 +281,77 @@ export async function changeBookingStatus(formData: FormData) {
 }
 
 // ============================================================
+// Marcar pago recibido manualmente (admin) — transferencias / efectivo
+// ============================================================
+
+const markPaidSchema = z.object({ bookingId: z.string().min(1) });
+
+export async function markBookingPaidManually(formData: FormData) {
+  return withFeedback("/admin/reservas", async () => {
+    const admin = await requireAdmin();
+    const { bookingId } = markPaidSchema.parse({ bookingId: formData.get("bookingId") });
+
+    const booking = await prisma.booking.findUnique({
+      where: { id: bookingId },
+      include: {
+        user: { select: { email: true, name: true } },
+        payment: { select: { id: true } },
+      },
+    });
+    if (!booking) throw new Error("Reserva no encontrada.");
+
+    await prisma.$transaction(async (tx) => {
+      let paymentId = booking.payment?.id ?? null;
+      if (paymentId) {
+        await tx.payment.update({ where: { id: paymentId }, data: { status: "PAID" } });
+      } else {
+        // Reserva sin Payment (p. ej. pago en efectivo): creamos uno PAID.
+        const p = await tx.payment.create({
+          data: {
+            userId: booking.userId,
+            amountCents: booking.totalCents,
+            currency: "EUR",
+            status: "PAID",
+            method: "BANK_TRANSFER",
+            description: `Reserva ${booking.roomSlug} — ${bookingRef(booking.id)}`,
+          },
+        });
+        paymentId = p.id;
+      }
+      await tx.booking.update({
+        where: { id: booking.id },
+        data: { status: "CONFIRMED", paymentId },
+      });
+    });
+
+    await prisma.auditLog.create({
+      data: {
+        actorId: admin.id,
+        actorEmail: admin.email,
+        action: "booking.payment_received",
+        target: booking.id,
+        metadata: { amountCents: booking.totalCents, via: "manual" } as never,
+      },
+    });
+
+    // Confirmación al cliente
+    const room = content.rooms.find((r) => r.slug === booking.roomSlug);
+    await notifyUserEmail({
+      booking: { ...booking, status: "CONFIRMED" },
+      roomName: room?.name || booking.roomSlug,
+      userName: booking.user.name || booking.user.email.split("@")[0],
+      userEmail: booking.user.email,
+      durationHours: (booking.endsAt.getTime() - booking.startsAt.getTime()) / 3_600_000,
+      totalCents: booking.totalCents,
+      status: "CONFIRMED",
+    }).catch(() => {});
+
+    revalidatePath("/admin/reservas");
+    revalidatePath("/me");
+  });
+}
+
+// ============================================================
 // Cancelar (usuario)
 // ============================================================
 
@@ -272,6 +403,7 @@ async function notifyAdminTelegram(opts: {
   userEmail: string;
   durationHours: number;
   totalCents: number;
+  paymentMethod?: "stripe" | "transfer";
 }) {
   const bot = process.env.TELEGRAM_BOT_TOKEN;
   const chat = process.env.TELEGRAM_CHAT_ID;
@@ -293,6 +425,7 @@ async function notifyAdminTelegram(opts: {
     `🗓️ ${fmtDate} (${opts.durationHours.toFixed(1)}h)`,
     `👤 ${opts.userName} — ${opts.userEmail}`,
     `💶 ${formatEuros(opts.totalCents)}`,
+    ...(opts.paymentMethod === "transfer" ? [`💳 Transferencia (pendiente de ingreso)`] : []),
     ``,
     opts.type === "new-pending"
       ? `[Ver en admin →](https://hubstartidea.es/admin/reservas)`

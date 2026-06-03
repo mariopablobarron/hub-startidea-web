@@ -1,22 +1,21 @@
 import { faq } from "@/lib/chat/faqShape";
-import type { PricingUnit, Role } from "@prisma/client";
+import type { PricingUnit, Role, DiscountKind } from "@prisma/client";
+import { chooseBestDiscount, type DiscountCandidate, type AppliedDiscount } from "./discount";
 
 /**
- * Cálculo de precio para una reserva — fuente única: faq.json.
+ * Cálculo de precio para una reserva — fuente única de tarifas: faq.json.
  *
  * Histórico (2026-05-18 — Mario confirma tarifas reales):
- *   - 20€/hora base imponible (sin IVA) para las 5 salas reservables
- *     (CC33, Serendipia, Sócrates, Estudio Podcast, Office Privado).
+ *   - 20€/hora base imponible (sin IVA) para las salas reservables.
  *   - IVA: 21% (servicios España).
- *   - Descuentos: MEMBER -30%, COLLABORATOR -20%, sobre la base ANTES del IVA.
+ *   - Descuentos por rol: MEMBER -30%, COLLABORATOR -20%.
  *
- * Antes: tarifas vivían en el modelo Prisma `Pricing` con seed placeholder.
- * Ahora: leemos directamente de `faq.tariffs.rooms[slug]` para que el
- * chatbot y el booking system muestren la misma cifra siempre.
- *
- * El modelo Prisma `Pricing` queda como legacy (no se borra para no
- * romper schema mientras dura el sistema custom; muere en Cal.com Fase 6).
- * `/admin/tarifas` se marca como deprecated y apunta a `/admin/faq`.
+ * Ampliación (2026-06-03):
+ *   - Descuento personal por usuario (campos User.discountKind/discountValue).
+ *   - Cupones / códigos promocionales (modelo Coupon).
+ *   - Ambos pueden ser % o importe fijo (€). No se acumulan: se aplica el
+ *     MÁS VENTAJOSO entre rol, personal y cupón. La matemática vive en
+ *     ./discount.ts (pura y testeada); aquí solo se cablea con faq.json.
  *
  * Las cantidades en BD siguen siendo céntimos enteros — sin decimales.
  */
@@ -26,16 +25,26 @@ const VAT_RATE_PCT = (faq.tariffs as { vatRate?: number }).vatRate ?? 21;
 export type PriceQuote = {
   unit: PricingUnit;
   durationHours: number;
-  /** Tarifa por hora SIN IVA (en céntimos). */
+  /** Tarifa por hora SIN IVA tras descuento (en céntimos). */
   baseHourCents: number;
-  /** Base imponible total (= baseHourCents × hours) en céntimos. */
+  /** Base imponible total SIN descuento — para mostrar precio tachado. */
+  baseCentsFull: number;
+  /** Base imponible total tras descuento. */
   baseCents: number;
-  /** IVA total en céntimos (21% sobre baseCents). */
+  /** IVA total en céntimos sobre baseCents. */
   vatCents: number;
-  /** Total a cobrar (base + IVA) — esto es lo que Stripe carga. */
+  /** Total a cobrar (base + IVA) — esto es lo que se cobra. */
   totalCents: number;
-  /** Descuento aplicado por rol, en %. 0 si no hay. */
+  /** % efectivo de descuento sobre la base (0 si no hay). Compat UI. */
   discountPct: number;
+  /** Importe de descuento aplicado, en céntimos. */
+  discountCents: number;
+  /** Origen del descuento aplicado, o null. */
+  discountSource: AppliedDiscount["source"] | null;
+  /** Texto corto del descuento para UI ("−30%", "−10,00 €"). */
+  discountLabel: string | null;
+  /** Código de cupón aplicado, si lo hubo. */
+  couponCode: string | null;
   vatRatePct: number;
   quoted: boolean;
   reason?: string;
@@ -43,12 +52,8 @@ export type PriceQuote = {
 
 /**
  * Elige la unidad más eficiente para una duración dada.
- * - <= 5 horas → PER_HOUR
- * - 5-7 horas → HALF_DAY (cuando haya tarifa)
- * - > 7 horas → FULL_DAY (cuando haya tarifa)
- *
- * Hoy solo tenemos PER_HOUR activa. Si Mario añade HALF_DAY/FULL_DAY a
- * faq.json en el futuro, el cálculo se adapta sin tocar este archivo.
+ * Hoy solo PER_HOUR está activa; si Mario añade HALF_DAY/FULL_DAY a
+ * faq.json, el cálculo se adapta sin tocar este archivo.
  */
 export function chooseUnit(durationHours: number, override?: PricingUnit): PricingUnit {
   if (override) return override;
@@ -76,7 +81,7 @@ function getBaseTariffEurosFromFaq(roomSlug: string, unit: PricingUnit): number 
     case "PER_SESSION":
       return typeof room.session2h === "number" ? room.session2h : null;
     case "PER_DAY":
-      // No tenemos por_día por sala en faq.json (es por coworking abierto/office)
+      // No tenemos por_día por sala en faq.json (es por coworking/office)
       return null;
   }
   return null;
@@ -93,16 +98,25 @@ export async function quotePrice(opts: {
   durationHours: number;
   role: Role;
   unit?: PricingUnit;
+  /** Descuento personal del usuario (User.discountKind/discountValue). */
+  personalDiscount?: { kind: DiscountKind; value: number } | null;
+  /** Cupón ya validado (código + tipo + valor). */
+  coupon?: { kind: DiscountKind; value: number; code?: string } | null;
 }): Promise<PriceQuote> {
   const unit = chooseUnit(opts.durationHours, opts.unit);
   const zero = (reason: string): PriceQuote => ({
     unit,
     durationHours: opts.durationHours,
     baseHourCents: 0,
+    baseCentsFull: 0,
     baseCents: 0,
     vatCents: 0,
     totalCents: 0,
     discountPct: 0,
+    discountCents: 0,
+    discountSource: null,
+    discountLabel: null,
+    couponCode: null,
     vatRatePct: VAT_RATE_PCT,
     quoted: reason === "admin",
     reason,
@@ -115,27 +129,45 @@ export async function quotePrice(opts: {
   const baseEurosPerUnit = getBaseTariffEurosFromFaq(opts.roomSlug, unit);
   if (baseEurosPerUnit == null) return zero("no-pricing");
 
-  const discountPct = discountPctForRole(opts.role);
   const baseHourCentsFull = Math.round(baseEurosPerUnit * 100);
-  const baseHourCentsAfterDiscount = Math.round(baseHourCentsFull * (1 - discountPct / 100));
+  const baseCentsFull =
+    unit === "PER_HOUR" ? Math.round(baseHourCentsFull * opts.durationHours) : baseHourCentsFull;
 
-  // PER_HOUR multiplica por horas. Resto = unidad cerrada (un cargo).
-  const baseCents =
-    unit === "PER_HOUR"
-      ? Math.round(baseHourCentsAfterDiscount * opts.durationHours)
-      : baseHourCentsAfterDiscount;
+  // Candidatos de descuento (orden = prioridad en empate): cupón > personal > rol
+  const rolePct = discountPctForRole(opts.role);
+  const candidates: Array<DiscountCandidate | null> = [
+    opts.coupon
+      ? { source: "coupon", kind: opts.coupon.kind, value: opts.coupon.value, code: opts.coupon.code }
+      : null,
+    opts.personalDiscount
+      ? { source: "personal", kind: opts.personalDiscount.kind, value: opts.personalDiscount.value }
+      : null,
+    rolePct > 0 ? { source: "role", kind: "PERCENT", value: rolePct } : null,
+  ];
+  const best = chooseBestDiscount(candidates, baseCentsFull);
 
+  const discountCents = best?.cents ?? 0;
+  const baseCents = Math.max(0, baseCentsFull - discountCents);
   const vatCents = Math.round((baseCents * VAT_RATE_PCT) / 100);
   const totalCents = baseCents + vatCents;
+  const baseHourCents =
+    unit === "PER_HOUR" && opts.durationHours > 0
+      ? Math.round(baseCents / opts.durationHours)
+      : baseCents;
 
   return {
     unit,
     durationHours: opts.durationHours,
-    baseHourCents: baseHourCentsAfterDiscount,
+    baseHourCents,
+    baseCentsFull,
     baseCents,
     vatCents,
     totalCents,
-    discountPct,
+    discountPct: best?.pct ?? 0,
+    discountCents,
+    discountSource: best?.source ?? null,
+    discountLabel: best?.label ?? null,
+    couponCode: best?.source === "coupon" ? opts.coupon?.code ?? null : null,
     vatRatePct: VAT_RATE_PCT,
     quoted: true,
   };

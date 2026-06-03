@@ -6,7 +6,9 @@ import { Resend } from "resend";
 import { prisma } from "@/lib/db/prisma";
 import { isSlotAvailable, isWithinOpeningHours } from "./availability";
 import { quotePrice } from "./pricing";
-import { content } from "@/lib/content";
+import { validateCoupon, redeemCoupon } from "./coupons";
+import { sendTransferInstructionsEmail } from "@/lib/mail/transfer";
+import { content, bookingRef } from "@/lib/content";
 import { getStripe, isStripeConfigured } from "@/lib/stripe/client";
 
 /**
@@ -37,6 +39,8 @@ const guestSchema = z.object({
   attendees: z.coerce.number().int().min(1).max(200).optional(),
   purpose: z.string().min(1, "Cuéntanos qué vas a hacer").max(500),
   notes: z.string().max(2000).optional(),
+  paymentMethod: z.enum(["stripe", "transfer"]).default("stripe"),
+  couponCode: z.string().max(40).optional(),
 
   // Datos del visitor
   guestEmail: z.string().email("Email inválido"),
@@ -56,6 +60,8 @@ export async function createGuestBookingAndCheckout(formData: FormData) {
       attendees: formData.get("attendees") || undefined,
       purpose: formData.get("purpose"),
       notes: formData.get("notes") || undefined,
+      paymentMethod: (formData.get("paymentMethod") as string) || "stripe",
+      couponCode: formData.get("couponCode") || undefined,
       guestEmail: formData.get("guestEmail"),
       guestName: formData.get("guestName"),
       guestPhone: formData.get("guestPhone") || undefined,
@@ -97,19 +103,23 @@ export async function createGuestBookingAndCheckout(formData: FormData) {
     redirect(`/reservar?error=${encodeURIComponent("Ese horario ya está reservado. Prueba otro.")}`);
   }
 
-  // 4. Calcular precio con role VISITOR (sin descuento)
+  // 4. Calcular precio con role VISITOR (sin descuento de rol) + cupón si aplica
+  const coupon = await validateCoupon(data.couponCode, data.roomSlug);
   const durationHours = (endsAt.getTime() - startsAt.getTime()) / 3_600_000;
   const quote = await quotePrice({
     roomSlug: data.roomSlug,
     durationHours,
     role: "VISITOR",
+    coupon,
   });
   if (quote.totalCents <= 0) {
     redirect(`/reservar?error=${encodeURIComponent("Esta sala no tiene tarifa configurada — escríbenos para coordinar")}`);
   }
 
-  // 5. Stripe configurado?
-  if (!isStripeConfigured()) {
+  const isTransfer = data.paymentMethod === "transfer";
+
+  // 5. Stripe configurado? (solo necesario para pago con tarjeta)
+  if (!isTransfer && !isStripeConfigured()) {
     redirect(`/reservar?error=${encodeURIComponent("Pago no disponible ahora mismo — escríbenos a hola@hubstartidea.es")}`);
   }
 
@@ -146,6 +156,7 @@ export async function createGuestBookingAndCheckout(formData: FormData) {
         notes: data.notes,
         totalCents: quote.totalCents,
         status: "PENDING",
+        couponCode: quote.couponCode,
       },
     });
     const p = await tx.payment.create({
@@ -154,6 +165,7 @@ export async function createGuestBookingAndCheckout(formData: FormData) {
         amountCents: quote.totalCents,
         currency: "EUR",
         status: "PENDING",
+        method: isTransfer ? "BANK_TRANSFER" : "STRIPE",
         description: `Reserva ${room!.name} — ${startsAt.toISOString().slice(0, 16).replace("T", " ")}`,
       },
     });
@@ -163,6 +175,37 @@ export async function createGuestBookingAndCheckout(formData: FormData) {
     });
     return { booking: b, payment: p };
   });
+
+  // Consumir cupón si fue el descuento aplicado
+  if (quote.couponCode) await redeemCoupon(quote.couponCode);
+
+  // Rama TRANSFERENCIA: sin Stripe. Email con instrucciones + acceso a /me.
+  if (isTransfer) {
+    const manageUrl = `${SITE_URL}/login?email=${encodeURIComponent(data.guestEmail)}&callbackUrl=${encodeURIComponent("/me/reservas")}`;
+    await sendTransferInstructionsEmail({
+      to: data.guestEmail,
+      name: data.guestName,
+      roomName: room!.name,
+      startsAt,
+      durationHours,
+      totalCents: quote.totalCents,
+      reference: bookingRef(booking.id),
+      manageUrl,
+    });
+    await notifyAdminTelegramGuestBooking({
+      bookingId: booking.id,
+      roomName: room!.name,
+      guestName: data.guestName,
+      guestEmail: data.guestEmail,
+      guestPhone: data.guestPhone,
+      startsAt,
+      durationHours,
+      totalCents: quote.totalCents,
+      isNewUser: !existingUser,
+      isTransfer: true,
+    }).catch(() => {});
+    redirect(`/reservar/gracias?id=${booking.id}`);
+  }
 
   // 8. Crear Stripe Checkout Session
   const stripe = getStripe();
@@ -226,6 +269,7 @@ async function notifyAdminTelegramGuestBooking(opts: {
   durationHours: number;
   totalCents: number;
   isNewUser: boolean;
+  isTransfer?: boolean;
 }) {
   const bot = process.env.TELEGRAM_BOT_TOKEN;
   const chat = process.env.TELEGRAM_CHAT_ID;
@@ -240,7 +284,7 @@ async function notifyAdminTelegramGuestBooking(opts: {
   });
 
   const text = [
-    `🆕 *Reserva guest iniciada (esperando pago)*`,
+    `🆕 *Reserva guest ${opts.isTransfer ? "por transferencia (pendiente de ingreso)" : "iniciada (esperando pago)"}*`,
     ``,
     `🏢 Sala: ${opts.roomName}`,
     `🗓️ ${fmtDate} (${opts.durationHours.toFixed(1)}h)`,
@@ -249,7 +293,9 @@ async function notifyAdminTelegramGuestBooking(opts: {
     opts.guestPhone ? `📱 ${opts.guestPhone}` : "",
     `💶 ${(opts.totalCents / 100).toFixed(2)}€`,
     ``,
-    `_Estado: PENDING — se confirmará al pagar en Stripe (30 min)_`,
+    opts.isTransfer
+      ? `_Estado: PENDING — marca "pago recibido" al ver la transferencia_\n[Ver en admin →](https://hubstartidea.es/admin/reservas)`
+      : `_Estado: PENDING — se confirmará al pagar en Stripe (30 min)_`,
   ]
     .filter(Boolean)
     .join("\n");

@@ -22,6 +22,8 @@ import {
   CalendarDays,
   MessageSquareText,
   Euro,
+  Ticket,
+  Banknote,
 } from "lucide-react";
 
 type Card = {
@@ -60,6 +62,20 @@ const CARDS: Card[] = [
     title: "Tarifas",
     desc: "Precios por sala/unidad/rol. Descuentos coworker y colaborador.",
     icon: Euro,
+    group: "plataforma",
+  },
+  {
+    href: "/admin/cupones",
+    title: "Cupones",
+    desc: "Códigos de descuento (% o €) que el cliente usa al reservar.",
+    icon: Ticket,
+    group: "plataforma",
+  },
+  {
+    href: "/admin/pagos",
+    title: "Pagos · Transferencia",
+    desc: "Datos bancarios (IBAN) para reservas pagadas por transferencia.",
+    icon: Banknote,
     group: "plataforma",
   },
   {

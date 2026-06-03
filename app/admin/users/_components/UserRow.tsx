@@ -100,6 +100,39 @@ export function UserRow({ user }: { user: User }) {
               />
             </label>
 
+            <label>
+              <span className="block font-medium text-[var(--color-ink)]">Descuento personal</span>
+              <div className="mt-1 flex gap-2">
+                <select
+                  name="discountKind"
+                  defaultValue={user.discountKind || ""}
+                  className="block w-1/2 rounded-lg border border-[var(--color-line)] bg-white px-2 py-1.5"
+                >
+                  <option value="">— Ninguno —</option>
+                  <option value="PERCENT">% porcentaje</option>
+                  <option value="FIXED">€ importe</option>
+                </select>
+                <input
+                  type="number"
+                  name="discountValue"
+                  min="0"
+                  step="0.01"
+                  placeholder="0"
+                  defaultValue={
+                    user.discountValue == null
+                      ? ""
+                      : user.discountKind === "FIXED"
+                        ? (user.discountValue / 100).toString()
+                        : user.discountValue.toString()
+                  }
+                  className="block w-1/2 rounded-lg border border-[var(--color-line)] bg-white px-2 py-1.5"
+                />
+              </div>
+              <span className="mt-1 block text-[10px] leading-snug text-[var(--color-mute)]">
+                % sobre la tarifa o € fijos. Se aplica el más ventajoso; no se acumula con el descuento de rol.
+              </span>
+            </label>
+
             <button
               type="submit"
               className="mt-1 rounded-lg bg-[var(--color-ink)] px-3 py-1.5 text-xs font-medium text-[var(--color-paper)] hover:bg-[var(--color-coral-500)]"

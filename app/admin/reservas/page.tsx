@@ -2,9 +2,9 @@ import Link from "next/link";
 import { Calendar, AlertCircle, CheckCircle2, XCircle, UserX, ChevronDown, MapPin, Users as UsersIcon } from "lucide-react";
 import { prisma } from "@/lib/db/prisma";
 import { requireAdmin } from "@/lib/auth/roles";
-import { content, bookableRooms } from "@/lib/content";
+import { content, bookableRooms, bookingRef } from "@/lib/content";
 import { PageHeader, FlashBanner } from "../_components/Field";
-import { changeBookingStatus } from "@/lib/bookings/actions";
+import { changeBookingStatus, markBookingPaidManually } from "@/lib/bookings/actions";
 import { formatEuros } from "@/lib/bookings/pricing";
 import type { BookingStatus } from "@prisma/client";
 
@@ -87,7 +87,7 @@ export default async function AdminReservasPage({ searchParams }: Props) {
     take: 100,
     include: {
       user: { select: { name: true, email: true, role: true, phone: true } },
-      payment: { select: { status: true, stripeSessionId: true } },
+      payment: { select: { status: true, method: true, stripeSessionId: true } },
       bond: { select: { type: true } },
     },
   });
@@ -221,6 +221,9 @@ export default async function AdminReservasPage({ searchParams }: Props) {
                     {b.payment?.status === "PENDING" && (
                       <span className="rounded-full bg-amber-50 px-2 py-0.5 text-xs text-amber-700">Pago pendiente</span>
                     )}
+                    {b.payment?.method === "BANK_TRANSFER" && (
+                      <span className="rounded-full bg-orange-50 px-2 py-0.5 text-xs text-orange-700">Transferencia</span>
+                    )}
                     {b.bondId && (
                       <span className="rounded-full bg-blue-50 px-2 py-0.5 text-xs text-blue-700">Con bono</span>
                     )}
@@ -238,6 +241,13 @@ export default async function AdminReservasPage({ searchParams }: Props) {
                     {b.attendees && <Info label="Asistentes esperados" value={`${b.attendees} personas`} icon={<UsersIcon size={12} />} />}
                     <Info label="Cliente" value={`${b.user.name || "—"} · ${b.user.email}${b.user.phone ? " · " + b.user.phone : ""}`} />
                     <Info label="Rol del cliente" value={b.user.role} />
+                    <Info label="Referencia / concepto" value={bookingRef(b.id)} />
+                    {b.payment?.method === "BANK_TRANSFER" && (
+                      <Info
+                        label="Método de pago"
+                        value={`Transferencia · ${b.payment.status === "PAID" ? "cobrada" : "pendiente de ingreso"}`}
+                      />
+                    )}
                   </div>
                   <div className="space-y-3">
                     {b.purpose && (
@@ -284,6 +294,18 @@ export default async function AdminReservasPage({ searchParams }: Props) {
                         <AdminAction bookingId={b.id} newStatus="CANCELLED" label="Cancelar" variant="ghost" />
                         <AdminAction bookingId={b.id} newStatus="NO_SHOW" label="No-show" variant="danger" />
                       </>
+                    )}
+                    {((b.payment?.status === "PENDING" && b.payment?.method === "BANK_TRANSFER") ||
+                      (b.status === "PENDING" && b.totalCents > 0 && !b.payment)) && (
+                      <form action={markBookingPaidManually} className="inline">
+                        <input type="hidden" name="bookingId" value={b.id} />
+                        <button
+                          type="submit"
+                          className="rounded-full bg-emerald-600 px-4 py-1 text-xs font-medium text-white hover:bg-emerald-700"
+                        >
+                          ✓ Pago recibido
+                        </button>
+                      </form>
                     )}
                     {b.payment?.stripeSessionId && (
                       <Link

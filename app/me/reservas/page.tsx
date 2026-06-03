@@ -6,7 +6,7 @@ import { requireAuth } from "@/lib/auth/roles";
 import { cancelOwnBooking } from "@/lib/bookings/actions";
 import { createCheckoutForBooking } from "@/lib/stripe/actions";
 import { formatEuros } from "@/lib/bookings/pricing";
-import { content } from "@/lib/content";
+import { content, bankTransfer, bankTransferReady, bookingRef } from "@/lib/content";
 import type { BookingStatus } from "@prisma/client";
 
 export const metadata: Metadata = {
@@ -32,11 +32,13 @@ export default async function MisReservasPage({ searchParams }: Props) {
     prisma.booking.findMany({
       where: { userId: user.id, startsAt: { gte: new Date() } },
       orderBy: { startsAt: "asc" },
+      include: { payment: { select: { status: true, method: true } } },
     }),
     prisma.booking.findMany({
       where: { userId: user.id, startsAt: { lt: new Date() } },
       orderBy: { startsAt: "desc" },
       take: 20,
+      include: { payment: { select: { status: true, method: true } } },
     }),
   ]);
 
@@ -122,6 +124,7 @@ function BookingCard({
     status: BookingStatus;
     totalCents: number;
     purpose: string | null;
+    payment?: { status: string; method: string } | null;
   };
   canCancel?: boolean;
   compact?: boolean;
@@ -173,9 +176,30 @@ function BookingCard({
         </div>
       </div>
       {canCancel && (booking.status === "PENDING" || booking.status === "CONFIRMED") && (
-        <div className="mt-3 flex flex-wrap items-center gap-3">
-          {/* Pagar si está PENDING con importe > 0 */}
-          {booking.status === "PENDING" && booking.totalCents > 0 && (
+        <div className="mt-3 space-y-3">
+          {/* Reserva pendiente de transferencia: mostramos datos de pago */}
+          {booking.status === "PENDING" && booking.payment?.method === "BANK_TRANSFER" ? (
+            <div className="rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs text-amber-900">
+              <div className="font-medium">Pendiente de pago por transferencia</div>
+              {bankTransferReady() ? (
+                <div className="mt-1 space-y-0.5">
+                  {bankTransfer?.holder && <div>Titular: {bankTransfer.holder}</div>}
+                  <div>
+                    IBAN: <span className="font-mono">{bankTransfer?.iban}</span>
+                  </div>
+                  <div>Importe: {formatEuros(booking.totalCents)}</div>
+                  <div>Concepto: <span className="font-mono">{bookingRef(booking.id)}</span></div>
+                </div>
+              ) : (
+                <div className="mt-1">
+                  Te hemos enviado los datos de pago por email. Concepto:{" "}
+                  <span className="font-mono">{bookingRef(booking.id)}</span>.
+                </div>
+              )}
+              <div className="mt-1.5 opacity-80">La reserva se confirma al recibir el ingreso.</div>
+            </div>
+          ) : booking.status === "PENDING" && booking.totalCents > 0 ? (
+            /* Pago con tarjeta pendiente (flujo Stripe) */
             <form action={createCheckoutForBooking}>
               <input type="hidden" name="bookingId" value={booking.id} />
               <button
@@ -185,7 +209,7 @@ function BookingCard({
                 <CreditCard size={12} /> Pagar ahora · {formatEuros(booking.totalCents)}
               </button>
             </form>
-          )}
+          ) : null}
           <form action={cancelOwnBooking}>
             <input type="hidden" name="bookingId" value={booking.id} />
             <button

@@ -46,6 +46,11 @@ model User {
   role            Role            @default(VISITOR)
   membershipType  MembershipType?
   membershipUntil DateTime?
+  // Descuento personalizado asignable por admin, independiente del rol.
+  // Se aplica el MÁS ventajoso entre rol y este; no se acumulan
+  // (ver lib/bookings/pricing.ts). NULL = sin descuento personal.
+  discountKind    DiscountKind?
+  discountValue   Int?            // PERCENT: 0-100 · FIXED: céntimos
   bio             String?         @db.Text
   // Visibilidad pública del usuario en /comunidad
   publicProfile   Boolean         @default(false)
@@ -138,6 +143,9 @@ model Booking {
   bond        PrepaidBond?  @relation(fields: [bondId], references: [id])
   notes       String?       @db.Text     // notas del cliente
   adminNotes  String?       @db.Text     // notas del admin (internas)
+  // Snapshot del código de cupón aplicado (se guarda aunque el cupón
+  // se borre/edite después — auditoría del descuento concedido).
+  couponCode  String?
 
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
@@ -156,6 +164,17 @@ enum PaymentStatus {
   REFUNDED
 }
 
+enum PaymentMethod {
+  STRIPE          // Stripe Checkout (tarjeta) — confirma webhook
+  BANK_TRANSFER   // Transferencia bancaria — admin confirma manualmente
+}
+
+// Tipo de descuento, compartido por User (descuento personal) y Coupon.
+enum DiscountKind {
+  PERCENT   // value = 0-100 (porcentaje sobre base imponible)
+  FIXED     // value = céntimos a descontar de la base imponible
+}
+
 model Payment {
   id                    String        @id @default(cuid())
   userId                String
@@ -163,6 +182,7 @@ model Payment {
   amountCents           Int
   currency              String        @default("EUR")
   status                PaymentStatus @default(PENDING)
+  method                PaymentMethod @default(STRIPE)
   description           String?
   stripeSessionId       String?       @unique
   stripePaymentIntentId String?       @unique
@@ -229,6 +249,28 @@ model Pricing {
 
   @@unique([roomSlug, unit])
   @@index([roomSlug, active])
+}
+
+// Cupones / códigos promocionales — gestionables desde /admin/cupones.
+// El cliente teclea el código al reservar; se valida en server action.
+// El descuento puede ser % (0-100) o importe fijo en céntimos.
+model Coupon {
+  id             String       @id @default(cuid())
+  code           String       @unique          // normalizado a MAYÚSCULAS
+  kind           DiscountKind
+  value          Int                            // PERCENT: 0-100 · FIXED: céntimos
+  active         Boolean      @default(true)
+  expiresAt      DateTime?                       // null = sin caducidad
+  maxRedemptions Int?                            // null = ilimitado
+  redemptions    Int          @default(0)
+  // Restricción opcional a una sala concreta (null = aplica a todas)
+  roomSlug       String?
+  notes          String?      @db.Text
+
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@index([active])
 }
 
 // ============================================================

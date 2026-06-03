@@ -54,3 +54,35 @@ export const totalArea = Math.round(rooms.reduce((s, r) => s + r.area, 0));
 export function formatArea(area: number): string {
   return String(Math.round(area));
 }
+
+// ============================================================
+// Pago por transferencia
+// ============================================================
+
+export type BankTransfer = {
+  enabled: boolean;
+  holder: string;
+  iban: string;
+  bankName: string;
+  instructions: string;
+};
+
+/** Datos bancarios para pago por transferencia (editables desde /admin). */
+export const bankTransfer = (content as Content & { bankTransfer?: BankTransfer })
+  .bankTransfer;
+
+/**
+ * ¿Hay datos bancarios listos para mostrar al cliente? Si no, el email
+ * de transferencia avisa de que se enviarán los datos en breve.
+ */
+export function bankTransferReady(): boolean {
+  return !!bankTransfer?.enabled && !!bankTransfer?.iban?.trim();
+}
+
+/**
+ * Referencia corta y legible de una reserva, para usar como concepto de
+ * la transferencia y para que el admin la cuadre con el ingreso recibido.
+ */
+export function bookingRef(id: string): string {
+  return "HUB-" + id.slice(-6).toUpperCase();
+}

@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import sharp from "sharp";
+import { z } from "zod";
 import { auth } from "@/auth";
 import { commitFile, triggerRedeploy } from "./persist";
 import contentJson from "@/data/content.json";
@@ -325,5 +326,33 @@ export async function updateEcosystem(formData: FormData) {
     });
     const next = { ...contentJson, ecosystem: data } as ContentJson;
     await saveContent(next, "feat(admin): actualizar Ecosistema Startidea");
+  });
+}
+
+// ============================================================
+// Datos bancarios para pago por transferencia
+// ============================================================
+
+const bankTransferSchema = z.object({
+  enabled: z.boolean(),
+  holder: z.string().max(140),
+  iban: z.string().max(60),
+  bankName: z.string().max(140),
+  instructions: z.string().max(1000),
+});
+
+export async function updateBankTransfer(formData: FormData) {
+  return withFeedback("/admin/pagos", async () => {
+    await requireAdmin();
+    const data = bankTransferSchema.parse({
+      enabled: formData.get("enabled") === "on" || formData.get("enabled") === "true",
+      holder: (formData.get("holder") as string) || "",
+      // Normaliza el IBAN: sin espacios y en mayúsculas.
+      iban: ((formData.get("iban") as string) || "").replace(/\s+/g, "").toUpperCase(),
+      bankName: (formData.get("bankName") as string) || "",
+      instructions: (formData.get("instructions") as string) || "",
+    });
+    const next = { ...contentJson, bankTransfer: data } as ContentJson;
+    await saveContent(next, "chore(admin): actualizar datos de transferencia");
   });
 }

@@ -62,6 +62,9 @@ const updateRoleSchema = z.object({
   role: z.enum(["VISITOR", "CLIENT", "MEMBER", "COLLABORATOR", "ADMIN"]),
   membershipType: z.enum(["COWORKER_FIXED", "COWORKER_FLEX", "OFFICE_PRIVATE"]).optional().nullable(),
   membershipUntilISO: z.string().optional().nullable(),
+  // Descuento personal: tipo (% o €) y valor introducido por el admin.
+  discountKind: z.enum(["PERCENT", "FIXED"]).optional().nullable(),
+  discountValueRaw: z.coerce.number().min(0).optional().nullable(),
 });
 
 export async function updateUserRole(formData: FormData) {
@@ -73,6 +76,8 @@ export async function updateUserRole(formData: FormData) {
       role: formData.get("role"),
       membershipType: formData.get("membershipType") || null,
       membershipUntilISO: formData.get("membershipUntilISO") || null,
+      discountKind: formData.get("discountKind") || null,
+      discountValueRaw: formData.get("discountValue") || null,
     });
 
     // No permitir que el admin se quite a sí mismo el rol ADMIN — habría
@@ -89,12 +94,26 @@ export async function updateUserRole(formData: FormData) {
 
     const membershipUntil = data.membershipUntilISO ? new Date(data.membershipUntilISO) : null;
 
+    // Descuento personal: % se guarda tal cual (0-100); € se pasa a céntimos.
+    // Si no hay tipo o el valor es 0, se limpia el descuento.
+    let discountKind: "PERCENT" | "FIXED" | null = null;
+    let discountValue: number | null = null;
+    if (data.discountKind && data.discountValueRaw != null && data.discountValueRaw > 0) {
+      discountKind = data.discountKind;
+      discountValue =
+        data.discountKind === "PERCENT"
+          ? Math.min(100, Math.round(data.discountValueRaw))
+          : Math.round(data.discountValueRaw * 100);
+    }
+
     await prisma.user.update({
       where: { id: data.userId },
       data: {
         role: data.role as Role,
         membershipType: (data.membershipType as MembershipType) || null,
         membershipUntil,
+        discountKind,
+        discountValue,
       },
     });
 
