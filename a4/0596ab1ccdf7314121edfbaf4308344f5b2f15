@@ -1,0 +1,95 @@
+app/admin/users/_components/UserRow.tsx
+  s_e7b8a76efc490f::t_7b16e73015b468 103-135
+lib/content.ts
+  s_e7b8a76efc490f::t_430d104a783ef3 57-88
+lib/mail/transfer.ts
+  s_e7b8a76efc490f::t_4e0f9a769258a8 1-110
+app/admin/reservas/page.tsx
+  s_e7b8a76efc490f::t_67e50a3125ac14 244-250
+  s_e7b8a76efc490f::t_d56cea8d4356bf 224-226
+  s_e7b8a76efc490f::t_03d57f4d95ebfa 90
+  s_e7b8a76efc490f::t_869fda23dbdb3a 5,7
+  s_e7b8a76efc490f::t_717da71a481931 298-309
+app/admin/_components/AdminSidebar.tsx
+  s_e7b8a76efc490f::t_e496709a9d59f9 24-25
+  s_e7b8a76efc490f::t_e5166298736cec 35-36
+app/admin/page.tsx
+  s_e7b8a76efc490f::t_5c021d96c5bf3b 25-26
+  s_e7b8a76efc490f::t_f4c14e7db29a16 68-80
+app/reservar/gracias/page.tsx
+  s_e7b8a76efc490f::t_daa9864feb3362 49-50,55-104
+  s_e7b8a76efc490f::t_e43e1569d36c91 6
+  s_e7b8a76efc490f::t_ee54605cfccadb 150-152
+  s_e7b8a76efc490f::t_839e163562031c 30
+app/me/reservas/page.tsx
+  s_e7b8a76efc490f::t_71840833a207fd 127
+  s_e7b8a76efc490f::t_aacc289c154992 179-202,212
+  s_e7b8a76efc490f::t_05355cecfe1486 35,41
+  s_e7b8a76efc490f::t_6e63903900e76c 9
+lib/bookings/pricing.ts
+  s_e7b8a76efc490f::t_b92e7d7642de8a 2-3,6,9,11,13-18,28,30-32,34,36,38,40-47,55-56,84,101-104,111,116-119,133-134,136-147,149-150,153-156,161-162,166-170
+app/admin/cupones/page.tsx
+  s_e7b8a76efc490f::t_a01b094460f4da 1-173
+prisma/schema.prisma
+  s_e7b8a76efc490f::t_816d3d32b27fbc 254-275
+  s_e7b8a76efc490f::t_11d62b94e0466c 146-148
+  s_e7b8a76efc490f::t_c8377bd89c12cf 49-53
+  s_e7b8a76efc490f::t_03db714b565eb1 167-177
+  s_e7b8a76efc490f::t_8e6a26ef21e826 185
+lib/bookings/discount.ts
+  s_e7b8a76efc490f::t_09ec8161a4b3d5 1-87
+lib/users/actions.ts
+  s_e7b8a76efc490f::t_c2f92f258e619a 79-80
+  s_e7b8a76efc490f::t_259492f1480854 97-108,115-116
+  s_e7b8a76efc490f::t_397ad3b1a64360 65-67
+scripts/check-discount.ts
+  s_e7b8a76efc490f::t_0cb19993e45f92 1-84
+lib/bookings/coupons.ts
+  s_e7b8a76efc490f::t_327dccff5c6c1a 1-46
+lib/bookings/actions.ts
+  s_e7b8a76efc490f::t_c3cbbf79a824b0 406
+  s_e7b8a76efc490f::t_19f0cb665eea23 428
+  s_e7b8a76efc490f::t_c304f7ccb4d2dd 76-77
+  s_e7b8a76efc490f::t_3fd8139f81212b 60-61
+  s_e7b8a76efc490f::t_912d2b3f0c7c25 111-124,130-131,149,153-178,189,191-209
+  s_e7b8a76efc490f::t_9e99025b2f4bd5 11-13
+  s_e7b8a76efc490f::t_a0c7725868adae 284-353
+app/reservar/page.tsx
+  s_e7b8a76efc490f::t_98a891ee00621e 269-302,307,311,313
+  s_e7b8a76efc490f::t_45489d446421f5 10
+  s_e7b8a76efc490f::t_874e98a691147e 344,346-352
+  s_e7b8a76efc490f::t_4cebdd80fc9f86 368
+  s_e7b8a76efc490f::t_6d4e36ab2f061a 53,55-67,69-71,74-75
+  s_e7b8a76efc490f::t_197adae80f0bc6 98
+lib/bookings/guest.ts
+  s_e7b8a76efc490f::t_05fa4f1dc1fe7c 9-11
+  s_e7b8a76efc490f::t_2c5341801f3dd1 287,296-298
+  s_e7b8a76efc490f::t_db0f7dda702afc 272
+  s_e7b8a76efc490f::t_5dcfb5edd73bb6 63-64
+  s_e7b8a76efc490f::t_ce8725084ac76b 159,168,179-208
+  s_e7b8a76efc490f::t_4092dfd2a69055 106-107,113,119-122
+  s_e7b8a76efc490f::t_5115be71e9bf3d 42-43
+lib/admin/actions.ts
+  s_e7b8a76efc490f::t_d5b0872e542c3c 6
+  s_e7b8a76efc490f::t_cd278ce656315f 331-358
+app/admin/pagos/page.tsx
+  s_e7b8a76efc490f::t_474ff35e299888 1-44
+lib/admin/couponActions.ts
+  s_e7b8a76efc490f::t_d061517b1db50b 1-93
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "a40596ab1ccdf7314121edfbaf4308344f5b2f15",
+  "prompts": {},
+  "sessions": {
+    "s_e7b8a76efc490f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "4ae5ca91-4324-44cd-a433-62fa77884468",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}
