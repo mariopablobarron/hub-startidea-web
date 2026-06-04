@@ -1,0 +1,22 @@
+auth.config.ts
+  s_e7b8a76efc490f::t_85daf8628b32ad 57-66,68-72,74-75
+  s_e7b8a76efc490f::t_a30acd155ffc5c 67
+  s_e7b8a76efc490f::t_ebaa7ab86341ad 73
+  s_e7b8a76efc490f::t_6f4773501db177 2-3
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.3",
+  "base_commit_sha": "5687836b0cbfec891fb539341c9ac4316236a923",
+  "prompts": {},
+  "sessions": {
+    "s_e7b8a76efc490f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "4ae5ca91-4324-44cd-a433-62fa77884468",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}
