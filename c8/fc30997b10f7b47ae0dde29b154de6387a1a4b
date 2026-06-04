@@ -1,0 +1,24 @@
+lib/chat/systemPrompt.ts
+  s_a44e906d905f48::t_3d31bcc36fe51e 94-106,110-111,113
+lib/chat/tools.ts
+  s_a44e906d905f48::t_bc0a20ad34f587 1-210
+app/api/chat/route.ts
+  s_a44e906d905f48::t_52ec651010b1c8 68-72
+  s_a44e906d905f48::t_25149dff5b70b8 2,6
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.3",
+  "base_commit_sha": "c8fc30997b10f7b47ae0dde29b154de6387a1a4b",
+  "prompts": {},
+  "sessions": {
+    "s_a44e906d905f48": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "81ebd0fe-fabf-4fa7-bbd2-edb830fa5e8e",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}
