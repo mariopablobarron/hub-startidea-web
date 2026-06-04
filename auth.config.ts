@@ -1,4 +1,6 @@
 import type { NextAuthConfig } from "next-auth";
+// `import type` se borra en compilación — no arrastra código Prisma al edge.
+import type { Role } from "@prisma/client";
 
 /**
  * Configuración base de NextAuth — separada de auth.ts para que
@@ -51,6 +53,25 @@ export const authConfig = {
 
       // Resto pública
       return true;
+    },
+
+    // Los callbacks jwt y session se definen aquí (sin Prisma/bcrypt) para
+    // que el middleware en edge runtime pueda leer session.user.role.
+    // auth.ts los sobrescribe con versiones más ricas (trigger=update, etc.):
+    // al hacer `...authConfig.callbacks` los callbacks de auth.ts ganan.
+    jwt({ token, user }) {
+      if (user) {
+        token.id = user.id;
+        // user.role viene del Credentials authorize() o del magic-link adapter.
+        // Usamos casting a string para no importar @prisma/client en edge.
+        token.role = ((user as { role?: Role }).role) ?? ("VISITOR" as Role);
+      }
+      return token;
+    },
+    session({ session, token }) {
+      if (token?.id) session.user.id = token.id as string;
+      if (token?.role) session.user.role = token.role as Role;
+      return session;
     },
   },
   providers: [],
