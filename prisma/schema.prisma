@@ -22,17 +22,17 @@ datasource db {
 // ============================================================
 
 enum Role {
-  VISITOR       // sin login o cuenta básica
-  CLIENT        // cliente puntual: reserva con pago, sin descuento
-  MEMBER        // coworker activo, plaza fija o flex
-  COLLABORATOR  // red Startidea: -20% en reservas
-  ADMIN         // Mario y equipo
+  VISITOR // sin login o cuenta básica
+  CLIENT // cliente puntual: reserva con pago, sin descuento
+  MEMBER // coworker activo, plaza fija o flex
+  COLLABORATOR // red Startidea: -20% en reservas
+  ADMIN // Mario y equipo
 }
 
 enum MembershipType {
-  COWORKER_FIXED    // plaza fija mensual
-  COWORKER_FLEX     // pase flex (X días/mes)
-  OFFICE_PRIVATE    // office privado
+  COWORKER_FIXED // plaza fija mensual
+  COWORKER_FLEX // pase flex (X días/mes)
+  OFFICE_PRIVATE // office privado
 }
 
 model User {
@@ -42,7 +42,7 @@ model User {
   name            String?
   image           String?
   phone           String?
-  passwordHash    String?         // null si solo usa magic-link
+  passwordHash    String? // null si solo usa magic-link
   role            Role            @default(VISITOR)
   membershipType  MembershipType?
   membershipUntil DateTime?
@@ -50,26 +50,26 @@ model User {
   // Se aplica el MÁS ventajoso entre rol y este; no se acumulan
   // (ver lib/bookings/pricing.ts). NULL = sin descuento personal.
   discountKind    DiscountKind?
-  discountValue   Int?            // PERCENT: 0-100 · FIXED: céntimos
+  discountValue   Int? // PERCENT: 0-100 · FIXED: céntimos
   bio             String?         @db.Text
   // Visibilidad pública del usuario en /comunidad
   publicProfile   Boolean         @default(false)
 
-  bookings        Booking[]
-  payments        Payment[]
-  bonds           PrepaidBond[]
-  eventsOrganized Event[]         @relation("EventOrganizer")
+  bookings           Booking[]
+  payments           Payment[]
+  bonds              PrepaidBond[]
+  eventsOrganized    Event[]             @relation("EventOrganizer")
   eventRegistrations EventRegistration[]
-  topics          Topic[]
-  posts           Post[]
-  reactions       Reaction[]
-  sessions        Session[]
-  accounts        Account[]
+  topics             Topic[]
+  posts              Post[]
+  reactions          Reaction[]
+  sessions           Session[]
+  accounts           Account[]
   verificationTokens VerificationToken[]
 
-  createdAt       DateTime        @default(now())
-  updatedAt       DateTime        @updatedAt
-  lastLoginAt     DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  lastLoginAt DateTime?
 
   @@index([role])
 }
@@ -117,44 +117,71 @@ model VerificationToken {
 // ============================================================
 
 enum BookingStatus {
-  PENDING       // creada, espera aprobación o pago
-  CONFIRMED     // confirmada
-  CANCELLED     // cancelada por usuario o admin
-  COMPLETED     // pasó OK
-  NO_SHOW       // no apareció
+  PENDING // creada, espera aprobación o pago
+  CONFIRMED // confirmada
+  CANCELLED // cancelada por usuario o admin
+  COMPLETED // pasó OK
+  NO_SHOW // no apareció
 }
 
 model Booking {
-  id          String        @id @default(cuid())
-  userId      String
-  user        User          @relation(fields: [userId], references: [id])
+  id         String        @id @default(cuid())
+  userId     String
+  user       User          @relation(fields: [userId], references: [id])
   // referencia a content.json (cc33, serendipia, socrates, etc.) — no FK porque
   // el catálogo de salas vive en git, no en BD (es estable y bajo cambio)
-  roomSlug    String
-  startsAt    DateTime
-  endsAt      DateTime
-  attendees   Int?
-  purpose     String?       @db.Text     // "Formación equipo X", evento, etc.
-  status      BookingStatus @default(PENDING)
-  totalCents  Int           @default(0)
-  paymentId   String?
-  payment     Payment?      @relation(fields: [paymentId], references: [id])
-  bondId      String?
-  bond        PrepaidBond?  @relation(fields: [bondId], references: [id])
-  notes       String?       @db.Text     // notas del cliente
-  adminNotes  String?       @db.Text     // notas del admin (internas)
+  roomSlug   String
+  startsAt   DateTime
+  endsAt     DateTime
+  attendees  Int?
+  purpose    String?       @db.Text // "Formación equipo X", evento, etc.
+  status     BookingStatus @default(PENDING)
+  totalCents Int           @default(0)
+  paymentId  String?
+  payment    Payment?      @relation(fields: [paymentId], references: [id])
+  bondId     String?
+  bond       PrepaidBond?  @relation(fields: [bondId], references: [id])
+  notes      String?       @db.Text // notas del cliente
+  adminNotes String?       @db.Text // notas del admin (internas)
   // Snapshot del código de cupón aplicado (se guarda aunque el cupón
   // se borre/edite después — auditoría del descuento concedido).
-  couponCode  String?
+  couponCode String?
 
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
+  // Feedback post-COMPLETED (opcional). Solo se crea cuando el cron
+  // detecta la reserva como COMPLETED + envía email pidiendo feedback.
+  feedback Feedback?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   // Validación de overlaps se hace en server action (no en exclusion constraint
   // de Postgres — más simple y portable). Índices para query eficiente.
   @@index([roomSlug, startsAt, endsAt])
   @@index([userId, startsAt])
   @@index([status, startsAt])
+}
+
+// Feedback humano post-reserva. Filosofía Startidea: NO escala 1-10,
+// solo una pregunta abierta — "¿Cómo te sentiste trabajando aquí?".
+// El email lleva un link /feedback/[token] (sin login) para responder.
+// Marca relacional Honestidad: queremos texto humano, no métrica fría.
+model Feedback {
+  id          String    @id @default(cuid())
+  bookingId   String    @unique
+  booking     Booking   @relation(fields: [bookingId], references: [id])
+  // Token público para acceder al form sin login. Se incluye en el
+  // email enviado al user — solo quien recibe el email puede responder.
+  token       String    @unique @default(cuid())
+  // Respuesta libre del user. Null hasta que responda.
+  text        String?   @db.Text
+  // Cuándo se envió el email pidiendo feedback (un solo intento).
+  sentAt      DateTime  @default(now())
+  // Cuándo respondió (null si no ha respondido todavía).
+  respondedAt DateTime?
+  createdAt   DateTime  @default(now())
+
+  // Para query de "respondidos recientemente" en /admin/feedback
+  @@index([respondedAt])
 }
 
 enum PaymentStatus {
@@ -165,14 +192,14 @@ enum PaymentStatus {
 }
 
 enum PaymentMethod {
-  STRIPE          // Stripe Checkout (tarjeta) — confirma webhook
-  BANK_TRANSFER   // Transferencia bancaria — admin confirma manualmente
+  STRIPE // Stripe Checkout (tarjeta) — confirma webhook
+  BANK_TRANSFER // Transferencia bancaria — admin confirma manualmente
 }
 
 // Tipo de descuento, compartido por User (descuento personal) y Coupon.
 enum DiscountKind {
-  PERCENT   // value = 0-100 (porcentaje sobre base imponible)
-  FIXED     // value = céntimos a descontar de la base imponible
+  PERCENT // value = 0-100 (porcentaje sobre base imponible)
+  FIXED // value = céntimos a descontar de la base imponible
 }
 
 model Payment {
@@ -189,8 +216,8 @@ model Payment {
   bookings              Booking[]
   bondPurchase          PrepaidBond?
 
-  createdAt             DateTime      @default(now())
-  updatedAt             DateTime      @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([userId, createdAt])
 }
@@ -203,19 +230,19 @@ enum BondType {
 }
 
 model PrepaidBond {
-  id          String    @id @default(cuid())
-  userId      String
-  user        User      @relation(fields: [userId], references: [id])
-  type        BondType
-  hoursTotal  Int
-  hoursUsed   Int       @default(0)
-  expiresAt   DateTime?
-  paymentId   String?   @unique
-  payment     Payment?  @relation(fields: [paymentId], references: [id])
-  bookings    Booking[]
+  id         String    @id @default(cuid())
+  userId     String
+  user       User      @relation(fields: [userId], references: [id])
+  type       BondType
+  hoursTotal Int
+  hoursUsed  Int       @default(0)
+  expiresAt  DateTime?
+  paymentId  String?   @unique
+  payment    Payment?  @relation(fields: [paymentId], references: [id])
+  bookings   Booking[]
 
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([userId])
 }
@@ -228,24 +255,24 @@ enum PricingUnit {
   HALF_DAY
   FULL_DAY
   EVENT
-  PER_SESSION   // podcast por sesión
-  PER_DAY       // coworking por día
+  PER_SESSION // podcast por sesión
+  PER_DAY // coworking por día
 }
 
 model Pricing {
-  id          String       @id @default(cuid())
-  roomSlug    String       // referencia content.json
-  unit        PricingUnit
+  id                String      @id @default(cuid())
+  roomSlug          String // referencia content.json
+  unit              PricingUnit
   // Precios en céntimos por rol. NULL = no aplica para ese rol.
   clientCents       Int?
   memberCents       Int?
   collaboratorCents Int?
   // Notas internas opcionales (ej. "incluye proyector + agua")
-  notes       String?      @db.Text
-  active      Boolean      @default(true)
+  notes             String?     @db.Text
+  active            Boolean     @default(true)
 
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@unique([roomSlug, unit])
   @@index([roomSlug, active])
@@ -256,19 +283,19 @@ model Pricing {
 // El descuento puede ser % (0-100) o importe fijo en céntimos.
 model Coupon {
   id             String       @id @default(cuid())
-  code           String       @unique          // normalizado a MAYÚSCULAS
+  code           String       @unique // normalizado a MAYÚSCULAS
   kind           DiscountKind
-  value          Int                            // PERCENT: 0-100 · FIXED: céntimos
+  value          Int // PERCENT: 0-100 · FIXED: céntimos
   active         Boolean      @default(true)
-  expiresAt      DateTime?                       // null = sin caducidad
-  maxRedemptions Int?                            // null = ilimitado
+  expiresAt      DateTime? // null = sin caducidad
+  maxRedemptions Int? // null = ilimitado
   redemptions    Int          @default(0)
   // Restricción opcional a una sala concreta (null = aplica a todas)
   roomSlug       String?
   notes          String?      @db.Text
 
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([active])
 }
@@ -278,26 +305,26 @@ model Coupon {
 // ============================================================
 
 model Event {
-  id            String              @id @default(cuid())
-  slug          String              @unique
-  title         String
-  description   String              @db.Text
-  startsAt      DateTime
-  endsAt        DateTime
+  id               String              @id @default(cuid())
+  slug             String              @unique
+  title            String
+  description      String              @db.Text
+  startsAt         DateTime
+  endsAt           DateTime
   // Ubicación: sala del HUB o texto libre (eventos externos del ecosistema)
-  roomSlug      String?
-  externalLocation String?          // para eventos fuera del HUB
-  cover         String?             // path a /public/images/events/...
-  isPublic      Boolean             @default(true)
+  roomSlug         String?
+  externalLocation String? // para eventos fuera del HUB
+  cover            String? // path a /public/images/events/...
+  isPublic         Boolean             @default(true)
   // Si es false, no aparece en /eventos hasta que se publica
-  published     Boolean             @default(false)
-  capacity      Int?
-  organizerId   String
-  organizer     User                @relation("EventOrganizer", fields: [organizerId], references: [id])
-  registrations EventRegistration[]
+  published        Boolean             @default(false)
+  capacity         Int?
+  organizerId      String
+  organizer        User                @relation("EventOrganizer", fields: [organizerId], references: [id])
+  registrations    EventRegistration[]
 
-  createdAt     DateTime            @default(now())
-  updatedAt     DateTime            @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([startsAt, published])
   @@index([slug])
@@ -311,20 +338,20 @@ enum RegistrationStatus {
 }
 
 model EventRegistration {
-  id        String              @id @default(cuid())
-  eventId   String
-  event     Event               @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  id      String             @id @default(cuid())
+  eventId String
+  event   Event              @relation(fields: [eventId], references: [id], onDelete: Cascade)
   // userId opcional: permitimos invitados externos sin cuenta (registro guest)
-  userId    String?
-  user      User?               @relation(fields: [userId], references: [id])
-  email     String
-  name      String?
-  phone     String?
-  status    RegistrationStatus  @default(REGISTERED)
-  notes     String?             @db.Text
+  userId  String?
+  user    User?              @relation(fields: [userId], references: [id])
+  email   String
+  name    String?
+  phone   String?
+  status  RegistrationStatus @default(REGISTERED)
+  notes   String?            @db.Text
 
-  createdAt DateTime            @default(now())
-  updatedAt DateTime            @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   // Una persona (por email) solo se registra una vez al mismo evento
   @@unique([eventId, email])
@@ -345,24 +372,24 @@ enum TopicCategory {
 }
 
 model Topic {
-  id          String        @id @default(cuid())
-  slug        String        @unique
-  title       String
-  body        String        @db.Text
-  authorId    String
-  author      User          @relation(fields: [authorId], references: [id])
-  category    TopicCategory @default(GENERAL)
-  pinned      Boolean       @default(false)
-  locked      Boolean       @default(false)
-  views       Int           @default(0)
+  id             String        @id @default(cuid())
+  slug           String        @unique
+  title          String
+  body           String        @db.Text
+  authorId       String
+  author         User          @relation(fields: [authorId], references: [id])
+  category       TopicCategory @default(GENERAL)
+  pinned         Boolean       @default(false)
+  locked         Boolean       @default(false)
+  views          Int           @default(0)
   // Última actividad del hilo: max(createdAt, último post) — denormalizado
   // para sort eficiente sin agregar la tabla Post en cada query.
-  lastActivityAt DateTime   @default(now())
-  posts       Post[]
-  reactions   Reaction[]
+  lastActivityAt DateTime      @default(now())
+  posts          Post[]
+  reactions      Reaction[]
 
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([category, lastActivityAt])
   @@index([pinned, lastActivityAt])
@@ -379,8 +406,8 @@ model Post {
   // Marcado como respuesta aceptada (útil en categoría AYUDA)
   isAnswer  Boolean    @default(false)
 
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([topicId, createdAt])
 }
@@ -393,16 +420,16 @@ enum ReactionType {
 }
 
 model Reaction {
-  id        String       @id @default(cuid())
-  userId    String
-  user      User         @relation(fields: [userId], references: [id])
-  topicId   String?
-  topic     Topic?       @relation(fields: [topicId], references: [id], onDelete: Cascade)
-  postId    String?
-  post      Post?        @relation(fields: [postId], references: [id], onDelete: Cascade)
-  type      ReactionType
+  id      String       @id @default(cuid())
+  userId  String
+  user    User         @relation(fields: [userId], references: [id])
+  topicId String?
+  topic   Topic?       @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  postId  String?
+  post    Post?        @relation(fields: [postId], references: [id], onDelete: Cascade)
+  type    ReactionType
 
-  createdAt DateTime     @default(now())
+  createdAt DateTime @default(now())
 
   // Un usuario solo puede reaccionar una vez al mismo item con el mismo type
   @@unique([userId, topicId, postId, type])
@@ -413,12 +440,12 @@ model Reaction {
 // ============================================================
 
 model AuditLog {
-  id        String   @id @default(cuid())
-  actorId   String?  // userId del que hizo la acción
+  id         String  @id @default(cuid())
+  actorId    String? // userId del que hizo la acción
   actorEmail String? // copia denormalizada por si se borra el user
-  action    String   // "booking.approved", "user.role_changed", etc.
-  target    String?  // id del recurso afectado
-  metadata  Json?    // datos adicionales
+  action     String // "booking.approved", "user.role_changed", etc.
+  target     String? // id del recurso afectado
+  metadata   Json? // datos adicionales
 
   createdAt DateTime @default(now())
 

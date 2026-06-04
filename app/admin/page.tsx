@@ -92,6 +92,13 @@ const CARDS: Card[] = [
     icon: MessageSquareText,
     group: "plataforma",
   },
+  {
+    href: "/admin/feedback",
+    title: "Feedback",
+    desc: "Respuestas humanas tras reservas COMPLETED. Una pregunta abierta, sin escalas.",
+    icon: MessageSquareQuote,
+    group: "plataforma",
+  },
   // Narrativa principal
   {
     href: "/admin/hero",
