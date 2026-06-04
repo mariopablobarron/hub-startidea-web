@@ -1,8 +1,9 @@
 import { createOpenRouter } from "@openrouter/ai-sdk-provider";
-import { convertToModelMessages, streamText, type UIMessage } from "ai";
+import { convertToModelMessages, streamText, stepCountIs, type UIMessage } from "ai";
 import { buildSystemPrompt } from "@/lib/chat/systemPrompt";
 import { checkRateLimit, fingerprintFrom } from "@/lib/chat/rateLimit";
 import { saveConversationTurn } from "@/lib/chat/persist";
+import { chatTools } from "@/lib/chat/tools";
 
 export const runtime = "nodejs";
 export const maxDuration = 30;
@@ -64,6 +65,11 @@ export async function POST(req: Request) {
     system: buildSystemPrompt(),
     messages: await convertToModelMessages(messages),
     temperature: 0.4,
+    tools: chatTools,
+    // Permite que el modelo encadene varias tools en un mismo turno
+    // (e.g. listRooms → checkAvailability → quotePrice → startBookingFlow)
+    // sin tener que pedirle al usuario que confirme paso a paso.
+    stopWhen: stepCountIs(5),
     onFinish: async ({ text, usage }) => {
       const lastUser = [...messages].reverse().find((m) => m.role === "user");
       void saveConversationTurn({
