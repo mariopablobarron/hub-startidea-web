@@ -3,9 +3,10 @@ import Link from "next/link";
 import { ArrowLeft, Info } from "lucide-react";
 import { getTransparencyMetrics } from "@/lib/transparencia/metrics";
 
-// Revalidamos cada 5 minutos — los datos son reales pero no necesitamos
-// hit a BD por cada visita. Cambio: bajar a 0 si quieres tiempo real literal.
-export const revalidate = 300;
+// force-dynamic para que Next NO intente prerender en build (Prisma sin
+// BD accesible en CI build). En runtime, la cache HTTP del CDN cachea
+// las primeras visitas y mitiga la carga.
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Transparencia — datos reales del HUB",
