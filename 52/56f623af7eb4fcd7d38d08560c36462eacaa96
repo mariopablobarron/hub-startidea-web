@@ -1,0 +1,22 @@
+lib/transparencia/metrics.ts
+  s_a44e906d905f48::t_f0c1945bff6e4a 1-85,87-173
+  s_a44e906d905f48::t_eee1604f8462c8 86
+app/transparencia/page.tsx
+  s_a44e906d905f48::t_eda4e7812f496e 1-197
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "5256f623af7eb4fcd7d38d08560c36462eacaa96",
+  "prompts": {},
+  "sessions": {
+    "s_a44e906d905f48": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "81ebd0fe-fabf-4fa7-bbd2-edb830fa5e8e",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}
