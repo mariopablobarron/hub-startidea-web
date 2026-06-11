@@ -22,7 +22,14 @@ export type Room = {
   equipment: string[];
   highlight?: string;
   planLabel: string;
+  /** Foto principal (compatibilidad — equivalente a images[0] cuando hay galería). */
   image: string;
+  /**
+   * Galería de fotos. Opcional. Si está, images[0] coincide con image
+   * (consistencia). Si no, usamos solo image en componentes legacy.
+   * El admin las edita con upload multi (orden = array order).
+   */
+  images?: string[];
 };
 
 export type Content = typeof contentJson;
@@ -30,6 +37,16 @@ export type Content = typeof contentJson;
 export const content = contentJson as Content;
 
 export const rooms = content.rooms as Room[];
+
+/**
+ * Galería efectiva de una sala. Si `images` está poblado, devuelve esa
+ * lista (orden tal cual). Si no, devuelve `[image]` para que cualquier
+ * componente que itere reciba siempre un array (no-op para legacy).
+ */
+export function roomGallery(room: Room): string[] {
+  if (room.images && room.images.length > 0) return room.images;
+  return [room.image];
+}
 
 /** Solo las salas reservables por horas (excluye coworking, aulas inactivas). */
 export const bookableRooms = rooms.filter((r) => r.bookable !== false);

@@ -3,12 +3,20 @@
 import { useCallback, useRef, useState } from "react";
 import Image from "next/image";
 import { useFormStatus } from "react-dom";
-import { UploadCloud, X, ImageIcon } from "lucide-react";
+import { UploadCloud, X, ImageIcon, Plus, Trash2 } from "lucide-react";
 
 type Props = {
+  /** Foto principal — slot 0, también usada como OG image y card listado. */
   currentImage: string;
+  /** Galería completa incluyendo la principal (índice 0). */
+  gallery: string[];
   roomName: string;
+  /** Sustituye la foto principal (slot 0). */
   action: (formData: FormData) => Promise<void>;
+  /** Añade una foto adicional al final de la galería. */
+  addAction: (formData: FormData) => Promise<void>;
+  /** Elimina una foto por URL (no la principal). */
+  removeAction: (formData: FormData) => Promise<void>;
 };
 
 const MAX_BYTES = 15 * 1024 * 1024;
@@ -25,7 +33,7 @@ const ALLOWED = ["image/jpeg", "image/jpg", "image/png", "image/webp", "image/he
  * Sigue posteando al form action `uploadRoomImage` original — no
  * cambia la lógica de servidor.
  */
-export function RoomImageUploader({ currentImage, roomName, action }: Props) {
+export function RoomImageUploader({ currentImage, gallery, roomName, action, addAction, removeAction }: Props) {
   const [preview, setPreview] = useState<string | null>(null);
   const [file, setFile] = useState<File | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -221,6 +229,16 @@ export function RoomImageUploader({ currentImage, roomName, action }: Props) {
           <SubmitButton disabled={!file || !!error} />
         </div>
       </div>
+
+      {/* Galería: fotos adicionales (slot 2+). La principal (gallery[0])
+          se ve arriba y se reemplaza con el form de arriba. Las demás se
+          pueden añadir aquí y quitar individualmente. */}
+      <Gallery
+        gallery={gallery}
+        currentImage={currentImage}
+        addAction={addAction}
+        removeAction={removeAction}
+      />
     </form>
   );
 }
@@ -236,4 +254,108 @@ function SubmitButton({ disabled }: { disabled: boolean }) {
       {pending ? "Subiendo y optimizando…" : "Subir y aplicar"}
     </button>
   );
+}
+
+function Gallery({
+  gallery,
+  currentImage,
+  addAction,
+  removeAction,
+}: {
+  gallery: string[];
+  currentImage: string;
+  addAction: (formData: FormData) => Promise<void>;
+  removeAction: (formData: FormData) => Promise<void>;
+}) {
+  const addInputRef = useRef<HTMLInputElement>(null);
+  // La principal va aparte (arriba). Aquí solo mostramos las adicionales.
+  // currentImage puede tener ?v=cachebust — comparamos solo el path base.
+  const principalBase = currentImage.split("?")[0];
+  const additionalImages = gallery.filter((u) => u.split("?")[0] !== principalBase);
+  const max = 8;
+  const canAdd = gallery.length < max;
+
+  return (
+    <div className="border-t border-[var(--color-line)] pt-6">
+      <div className="flex items-baseline justify-between">
+        <h3 className="font-display text-base">Galería ({gallery.length}/{max})</h3>
+        <span className="text-xs text-[var(--color-mute)]">
+          Fotos adicionales que el visitante ve en la página de la sala.
+        </span>
+      </div>
+
+      {additionalImages.length === 0 ? (
+        <p className="mt-3 text-sm text-[var(--color-mute)]">
+          Aún no hay fotos adicionales. Añade hasta {max - 1} más para mostrar diferentes
+          ángulos / configuraciones.
+        </p>
+      ) : (
+        <ul className="mt-4 grid gap-3 sm:grid-cols-2 md:grid-cols-3">
+          {additionalImages.map((url) => {
+            const baseUrl = url.split("?")[0];
+            return (
+              <li key={baseUrl} className="group relative aspect-[16/10] overflow-hidden rounded-xl bg-[var(--color-paper-2)]">
+                <Image src={url} alt="Foto adicional" fill sizes="320px" className="object-cover" />
+                <form action={removeAction} className="absolute right-2 top-2">
+                  <input type="hidden" name="url" value={baseUrl} />
+                  <RemoveButton />
+                </form>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+
+      {canAdd && (
+        <form
+          action={addAction}
+          encType="multipart/form-data"
+          className="mt-4 flex flex-wrap items-center gap-3"
+        >
+          <input
+            ref={addInputRef}
+            type="file"
+            name="file"
+            accept="image/jpeg,image/png,image/webp,image/heic,image/heif"
+            required
+            onChange={(e) => {
+              if (e.target.files?.[0]) {
+                (e.target.form as HTMLFormElement).requestSubmit();
+              }
+            }}
+            className="hidden"
+          />
+          <button
+            type="button"
+            onClick={() => addInputRef.current?.click()}
+            className="inline-flex items-center gap-2 rounded-full border border-dashed border-[var(--color-line)] px-4 py-2 text-sm text-[var(--color-mute)] hover:border-[var(--color-ink)] hover:text-[var(--color-ink)]"
+          >
+            <Plus size={14} /> Añadir foto adicional
+          </button>
+          <AddSubmitFeedback />
+        </form>
+      )}
+    </div>
+  );
+}
+
+function RemoveButton() {
+  const { pending } = useFormStatus();
+  return (
+    <button
+      type="submit"
+      disabled={pending}
+      className="grid h-8 w-8 place-items-center rounded-full bg-white/90 text-red-700 opacity-0 shadow-sm transition group-hover:opacity-100 hover:bg-red-50 disabled:opacity-50"
+      aria-label="Quitar foto"
+      title="Quitar foto"
+    >
+      {pending ? <span className="text-xs">…</span> : <Trash2 size={14} />}
+    </button>
+  );
+}
+
+function AddSubmitFeedback() {
+  const { pending } = useFormStatus();
+  if (!pending) return null;
+  return <span className="text-xs text-[var(--color-mute)]">Subiendo y optimizando…</span>;
 }

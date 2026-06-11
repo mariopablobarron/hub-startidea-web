@@ -7,6 +7,7 @@ import { z } from "zod";
 import { auth } from "@/auth";
 import { commitFile, triggerRedeploy } from "./persist";
 import contentJson from "@/data/content.json";
+import type { Room } from "@/lib/content";
 import {
   heroSchema,
   roomSchema,
@@ -184,50 +185,133 @@ export async function updateRoom(slug: string, formData: FormData) {
   });
 }
 
+/**
+ * Optimiza un File subido → JPG 1600px max + quality 82 (sharp + mozjpeg).
+ * Respeta orientación EXIF (móviles giran al colgar).
+ */
+async function optimizeRoomImage(file: File): Promise<Buffer> {
+  if (file.size > 15 * 1024 * 1024) throw new Error("Imagen demasiado grande (máx 15 MB)");
+  const inputExt = (file.type.split("/")[1] || "").replace("jpeg", "jpg");
+  const allowedInput = ["jpg", "png", "webp", "heic", "heif"];
+  if (!allowedInput.includes(inputExt)) {
+    throw new Error(`Formato no permitido (${inputExt}). Usa jpg, png, webp o heic.`);
+  }
+  const inputBuf = Buffer.from(await file.arrayBuffer());
+  return sharp(inputBuf)
+    .rotate()
+    .resize({ width: 1600, withoutEnlargement: true, fit: "inside" })
+    .jpeg({ quality: 82, mozjpeg: true })
+    .toBuffer();
+}
+
+/**
+ * Sube foto principal (slot 0). Mantiene compat con sistema legacy:
+ * archivo en `{slug}.jpg`, actualiza `room.image` y `room.images[0]`.
+ */
 export async function uploadRoomImage(slug: string, formData: FormData): Promise<never> {
   return withFeedback(`/admin/salas/${slug}`, async () => {
     await requireAdmin();
     const file = formData.get("file") as File | null;
     if (!file) throw new Error("No se ha enviado archivo");
-    // Aceptamos hasta 15 MB en entrada (móviles modernos sacan fotos de 8-12 MB);
-    // sharp reduce el peso final >90% antes del commit.
-    if (file.size > 15 * 1024 * 1024) throw new Error("Imagen demasiado grande (máx 15 MB)");
-    const inputExt = (file.type.split("/")[1] || "").replace("jpeg", "jpg");
-    const allowedInput = ["jpg", "png", "webp", "heic", "heif"];
-    if (!allowedInput.includes(inputExt)) {
-      throw new Error(`Formato no permitido (${inputExt}). Usa jpg, png, webp o heic.`);
-    }
 
-    // Optimización: redimensionar a max 1600px de ancho y comprimir a JPG quality 82.
-    // Mantener .jpg como extensión final asegura consistencia con el resto del sitio
-    // (OG images, Image src, etc.) y next/image servirá WebP/AVIF al navegador.
-    const inputBuf = Buffer.from(await file.arrayBuffer());
-    const optimized = await sharp(inputBuf)
-      .rotate() // respeta EXIF orientation (móviles giran las fotos al colgarlas)
-      .resize({ width: 1600, withoutEnlargement: true, fit: "inside" })
-      .jpeg({ quality: 82, mozjpeg: true })
-      .toBuffer();
-
+    const optimized = await optimizeRoomImage(file);
     const path = `public/images/rooms/${slug}.jpg`;
     const publicPath = `/images/rooms/${slug}.jpg`;
+    await commitFile({ path, content: optimized, message: `feat(admin): subir foto principal de ${slug}` });
 
-    await commitFile({ path, content: optimized, message: `feat(admin): subir foto de ${slug}` });
+    // Sincronizar tanto image (compat) como images[0] (galería).
+    const room = contentJson.rooms.find((r) => r.slug === slug);
+    const currentImages = (room as Room | undefined)?.images;
+    const needsUpdate =
+      room?.image !== publicPath ||
+      !currentImages ||
+      currentImages[0] !== publicPath;
 
-    // Si el path no cambia (siempre .jpg) no hace falta tocar content.json salvo
-    // que la sala apuntara antes a otra extensión. Lo dejamos coherente por si acaso.
-    if (contentJson.rooms.find((r) => r.slug === slug)?.image !== publicPath) {
+    if (needsUpdate) {
+      const newImages = currentImages && currentImages.length > 0
+        ? [publicPath, ...currentImages.filter((u) => u !== publicPath)]
+        : [publicPath];
       const next: ContentJson = {
         ...contentJson,
         rooms: contentJson.rooms.map((r) =>
-          r.slug === slug ? { ...r, image: publicPath } : r,
+          r.slug === slug ? { ...r, image: publicPath, images: newImages } : r,
         ),
       } as ContentJson;
-      await saveContent(next, `feat(admin): apuntar imagen de ${slug} a ${publicPath}`);
+      await saveContent(next, `feat(admin): foto principal de ${slug}`);
     } else {
-      // Solo necesitamos invalidar la cache y forzar redeploy para servir la nueva imagen.
       revalidatePath("/", "layout");
       await triggerRedeploy();
     }
+  });
+}
+
+/**
+ * Añade foto adicional a la galería (slot >0). Se guarda como
+ * `{slug}-{N}.jpg` donde N es el primer slot libre (≥2). El admin no
+ * elige el número — siempre añade al final.
+ */
+export async function addRoomImage(slug: string, formData: FormData): Promise<never> {
+  return withFeedback(`/admin/salas/${slug}`, async () => {
+    await requireAdmin();
+    const file = formData.get("file") as File | null;
+    if (!file) throw new Error("No se ha enviado archivo");
+
+    const room = contentJson.rooms.find((r) => r.slug === slug) as Room | undefined;
+    if (!room) throw new Error("Sala no encontrada");
+
+    const current = room.images && room.images.length > 0 ? room.images : [room.image];
+    if (current.length >= 8) {
+      throw new Error("Máximo 8 fotos por sala. Borra alguna antes de añadir más.");
+    }
+
+    // Slot: el primer N≥2 que no esté en uso (mira los paths existentes).
+    // Numeramos a partir de 2 porque {slug}.jpg es el principal (slot 1 conceptual).
+    let slot = 2;
+    while (current.some((u) => u.endsWith(`-${slot}.jpg`))) slot++;
+    const path = `public/images/rooms/${slug}-${slot}.jpg`;
+    const publicPath = `/images/rooms/${slug}-${slot}.jpg`;
+
+    const optimized = await optimizeRoomImage(file);
+    await commitFile({ path, content: optimized, message: `feat(admin): añadir foto ${slot} a ${slug}` });
+
+    const next: ContentJson = {
+      ...contentJson,
+      rooms: contentJson.rooms.map((r) =>
+        r.slug === slug ? { ...r, images: [...current, publicPath] } : r,
+      ),
+    } as ContentJson;
+    await saveContent(next, `feat(admin): foto adicional ${slot} de ${slug}`);
+  });
+}
+
+/**
+ * Elimina una foto de la galería. La principal (slot 0) NO se borra
+ * por aquí — se reemplaza con uploadRoomImage. Solo limpia entradas
+ * de images[] (no borra el archivo físico, queda huérfano en /public
+ * — costo despreciable y reversible si Mario lo quiere reactivar).
+ */
+export async function removeRoomImage(slug: string, formData: FormData): Promise<never> {
+  return withFeedback(`/admin/salas/${slug}`, async () => {
+    await requireAdmin();
+    const url = String(formData.get("url") || "");
+    if (!url) throw new Error("Falta URL de la foto a eliminar");
+
+    const room = contentJson.rooms.find((r) => r.slug === slug) as Room | undefined;
+    if (!room) throw new Error("Sala no encontrada");
+    if (url === room.image) {
+      throw new Error("No se puede borrar la foto principal — reemplázala subiendo otra.");
+    }
+    const current = room.images && room.images.length > 0 ? room.images : [];
+    if (!current.includes(url)) throw new Error("La foto no está en la galería");
+
+    const filtered = current.filter((u) => u !== url);
+    const next: ContentJson = {
+      ...contentJson,
+      rooms: contentJson.rooms.map((r) =>
+        r.slug === slug ? { ...r, images: filtered } : r,
+      ),
+    } as ContentJson;
+    await saveContent(next, `feat(admin): quitar foto de ${slug}`);
   });
 }
 

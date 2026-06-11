@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
-import { content } from "@/lib/content";
-import { updateRoom, uploadRoomImage } from "@/lib/admin/actions";
+import { content, roomGallery, type Room } from "@/lib/content";
+import { updateRoom, uploadRoomImage, addRoomImage, removeRoomImage } from "@/lib/admin/actions";
 import { Field, Input, Textarea, SaveBar, PageHeader, FlashBanner } from "../../_components/Field";
 import { RoomImageUploader } from "./RoomImageUploader";
 
@@ -25,6 +25,21 @@ export default async function RoomEditPage({ params, searchParams }: Props) {
     await uploadRoomImage(slug, formData);
   }
 
+  async function addImage(formData: FormData) {
+    "use server";
+    await addRoomImage(slug, formData);
+  }
+
+  async function removeImage(formData: FormData) {
+    "use server";
+    await removeRoomImage(slug, formData);
+  }
+
+  // Cache-bust en todas las URLs si acabamos de guardar — evita ver foto vieja
+  // por cache del navegador/CDN durante varios minutos.
+  const cacheBust = sp.saved === "1" ? `?v=${Date.now()}` : "";
+  const gallery = roomGallery(room as Room).map((u) => `${u}${cacheBust}`);
+
   return (
     <div className="space-y-6">
       <PageHeader
@@ -33,15 +48,13 @@ export default async function RoomEditPage({ params, searchParams }: Props) {
       />
       <FlashBanner saved={sp.saved === "1"} error={sp.error} />
 
-      {/* Cache-bust: si acabamos de guardar, añadimos ?v=<now> al src para
-          que el navegador no muestre la foto vieja desde su caché o el CDN.
-          Sin esto, el admin sube foto y ve la anterior durante minutos. */}
       <RoomImageUploader
-        currentImage={
-          sp.saved === "1" ? `${room.image}?v=${Date.now()}` : room.image
-        }
+        currentImage={`${room.image}${cacheBust}`}
+        gallery={gallery}
         roomName={room.name}
         action={upload}
+        addAction={addImage}
+        removeAction={removeImage}
       />
 
       {/* Datos de la sala */}
