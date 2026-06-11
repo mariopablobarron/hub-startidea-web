@@ -261,3 +261,83 @@ test.describe("Reservar — guest checkout", () => {
     await expect(page.getByText(/Stripe/i).first()).toBeVisible();
   });
 });
+
+test.describe("Precios — página pública", () => {
+  test("/precios indexable con tabla por rol", async ({ page }) => {
+    await page.goto("/precios");
+    // Título principal con tono Startidea (no SaaS genérico)
+    await expect(page.getByRole("heading", { name: /sin sorpresas/i, level: 1 })).toBeVisible();
+    // Tabla con 3 columnas de rol
+    await expect(page.getByRole("columnheader", { name: /Visitante/i })).toBeVisible();
+    await expect(page.getByRole("columnheader", { name: /Colaborador/i })).toBeVisible();
+    await expect(page.getByRole("columnheader", { name: /Coworker/i })).toBeVisible();
+    // Al menos una fila de sala con CTA Reservar
+    const reservarLinks = page.getByRole("link", { name: /^Reservar$/i });
+    expect(await reservarLinks.count()).toBeGreaterThan(0);
+    // Letra pequeña visible (IVA, pago, cancelación)
+    await expect(page.getByText(/IVA incluido/i)).toBeVisible();
+  });
+
+  test("/precios tiene canonical y robots indexable", async ({ page }) => {
+    const res = await page.goto("/precios");
+    expect(res?.status()).toBe(200);
+    // Canonical
+    const canonical = await page
+      .locator("link[rel=canonical]")
+      .getAttribute("href");
+    expect(canonical).toBe("https://hubstartidea.es/precios");
+    // No tiene noindex (debe estar en buscadores)
+    const robots = await page.locator('meta[name="robots"]').count();
+    if (robots > 0) {
+      const content = await page.locator('meta[name="robots"]').getAttribute("content");
+      expect(content).not.toMatch(/noindex/i);
+    }
+  });
+});
+
+test.describe("Transparencia — datos reales", () => {
+  test("/transparencia con ocupación, reservas y feedback", async ({ page }) => {
+    await page.goto("/transparencia");
+    // H1 real: "Los datos que casi nadie enseña."
+    await expect(page.getByRole("heading", { name: /casi nadie enseña/i, level: 1 })).toBeVisible();
+    // Sección ocupación por sala (h2)
+    await expect(page.getByRole("heading", { name: /Ocupación real/i, level: 2 })).toBeVisible();
+    // Stats principales
+    await expect(page.getByText(/Reservas este mes/i).first()).toBeVisible();
+    await expect(page.getByText(/Coworkers activos/i).first()).toBeVisible();
+    // Sección feedback humano
+    await expect(page.getByRole("heading", { name: /quien ha estado/i, level: 2 })).toBeVisible();
+    // Bloque honestidad (lo que NO enseñamos todavía)
+    await expect(page.getByText(/no enseña.*todavía/i).first()).toBeVisible();
+  });
+});
+
+test.describe("Feedback — token inválido", () => {
+  test("/feedback/<token-inválido> devuelve 404", async ({ page }) => {
+    const res = await page.goto("/feedback/this-token-does-not-exist-12345");
+    expect(res?.status()).toBe(404);
+  });
+});
+
+test.describe("Middleware anti-spam", () => {
+  test("URL de casino devuelve 410 Gone", async ({ request }) => {
+    const res = await request.get("/mejores-casinos-argentina", { failOnStatusCode: false });
+    expect(res.status()).toBe(410);
+    // X-Robots-Tag bloquea indexación incluso del 410
+    expect(res.headers()["x-robots-tag"]).toContain("noindex");
+  });
+
+  test("URL de juega-gratis devuelve 410", async ({ request }) => {
+    const res = await request.get("/juega-gratis-a-wild-chapo", { failOnStatusCode: false });
+    expect(res.status()).toBe(410);
+  });
+
+  test("URL legítima NO se bloquea por error (regresión)", async ({ request }) => {
+    // Salas tienen "casino" como falso positivo posible si el regex
+    // estuviera mal. Verificamos rutas reales no se bloquean.
+    for (const path of ["/", "/salas", "/salas/cc33", "/reservar", "/precios", "/comunidad"]) {
+      const res = await request.get(path);
+      expect(res.status(), `${path} debe responder 200`).toBe(200);
+    }
+  });
+});
