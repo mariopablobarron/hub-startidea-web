@@ -1,0 +1,24 @@
+app/sitemap.ts
+  s_a44e906d905f48::t_584ed4df97bbc0 65-75
+app/salas/[slug]/RoomGalleryHero.tsx
+  s_a44e906d905f48::t_725876fd1446e8 1-88
+app/salas/[slug]/page.tsx
+  s_a44e906d905f48::t_71cb96c7b22df0 115-119
+  s_a44e906d905f48::t_cb8e996b931fcc 6,9
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "5f6ab7a1cffe7ac217c590b39df05ecd4edfbc3a",
+  "prompts": {},
+  "sessions": {
+    "s_a44e906d905f48": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "81ebd0fe-fabf-4fa7-bbd2-edb830fa5e8e",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}
