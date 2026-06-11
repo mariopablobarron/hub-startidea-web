@@ -1,0 +1,23 @@
+lib/seo/structuredData.ts
+  s_a44e906d905f48::t_af9e374c1327b1 105
+  s_a44e906d905f48::t_3cd6ab5367ca2d 87-97,99-104,106-119,122,128,131,133-160
+components/RoomsGrid.tsx
+  s_a44e906d905f48::t_e526de1c7ad380 6,8-19
+  s_a44e906d905f48::t_32591baea91b4e 96,105-114
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "9412d82a652a9552622f75a88ae327c101d06508",
+  "prompts": {},
+  "sessions": {
+    "s_a44e906d905f48": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "81ebd0fe-fabf-4fa7-bbd2-edb830fa5e8e",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}
