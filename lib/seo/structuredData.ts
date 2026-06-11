@@ -84,18 +84,80 @@ export function websiteSchema() {
 }
 
 /** Servicio (sala individual) — schema Product / Service. */
+/**
+ * Service schema enriquecido por sala. Incluye:
+ *  - Offer con precio (si bookable + tarifa configurada) → Google Rich
+ *    Results "From X EUR" en SERP.
+ *  - additionalProperty con m² y capacidades por configuración →
+ *    Google entiende que es un espacio físico con dimensiones.
+ *  - image: usa la foto principal de la sala (room.image).
+ *
+ * Si la sala no tiene tarifa en faq.tariffs.rooms[slug], se omite el
+ * Offer (no inventar precio en SEO).
+ */
 export function roomServiceSchema(room: Room) {
-  return {
+  // Lazy import del faq para no romper si la estructura cambia
+  // (faqShape ya está tipado, así que esto compila tranquilo).
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { faq } = require("@/lib/chat/faqShape") as typeof import("@/lib/chat/faqShape");
+  const tariff = faq.tariffs.rooms[room.slug];
+  const baseHour = tariff && "perHour" in tariff && tariff.perHour ? tariff.perHour : null;
+  const vat = (faq.tariffs as { vatRate?: number }).vatRate ?? 21;
+  const totalHour = baseHour ? Math.round(baseHour * (1 + vat / 100) * 100) / 100 : null;
+
+  // additionalProperty estándar Schema.org para metadata estructurada
+  const additionalProperty: Array<Record<string, unknown>> = [
+    { "@type": "PropertyValue", name: "Superficie", value: room.area, unitCode: "MTK" /* m² */ },
+  ];
+  if (room.capacity.school > 0)
+    additionalProperty.push({ "@type": "PropertyValue", name: "Capacidad escolar", value: room.capacity.school });
+  if (room.capacity.theater > 0)
+    additionalProperty.push({ "@type": "PropertyValue", name: "Capacidad auditorio", value: room.capacity.theater });
+  if (room.capacity.boardroom)
+    additionalProperty.push({ "@type": "PropertyValue", name: "Capacidad boardroom", value: room.capacity.boardroom });
+
+  const schema: Record<string, unknown> = {
     "@context": "https://schema.org",
     "@type": "Service",
+    "@id": `${site.url}/salas/${room.slug}#service`,
     name: `${room.name} · ${site.name}`,
     description: room.description,
     image: `${site.url}${room.image}`,
     provider: { "@id": `${site.url}/#localbusiness` },
     serviceType: room.subtitle,
+    category: "Coworking · Sala de reuniones · Espacio para eventos",
     areaServed: { "@type": "City", name: "Granada" },
     url: `${site.url}/salas/${room.slug}`,
+    additionalProperty,
   };
+
+  // Offer solo si la sala es reservable Y tiene tarifa configurada
+  if (room.bookable !== false && totalHour !== null) {
+    schema.offers = {
+      "@type": "Offer",
+      url: `${site.url}/reservar?sala=${room.slug}`,
+      priceCurrency: "EUR",
+      price: totalHour,
+      availability: "https://schema.org/InStock",
+      validFrom: new Date(new Date().getFullYear(), 0, 1).toISOString().slice(0, 10),
+      priceSpecification: {
+        "@type": "UnitPriceSpecification",
+        price: totalHour,
+        priceCurrency: "EUR",
+        unitCode: "HUR",
+        unitText: "hora",
+        valueAddedTaxIncluded: true,
+      },
+      eligibleQuantity: {
+        "@type": "QuantitativeValue",
+        unitCode: "HUR",
+        minValue: 1,
+        maxValue: 8,
+      },
+    };
+  }
+
+  return schema;
 }
 
 /** Breadcrumbs reutilizable. */

@@ -3,8 +3,20 @@
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { ArrowUpRight, Maximize2, Users, CalendarCheck } from "lucide-react";
+import { ArrowUpRight, Maximize2, Users, CalendarCheck, Euro } from "lucide-react";
 import { rooms, formatArea } from "@/lib/content";
+import { faq } from "@/lib/chat/faqShape";
+
+/**
+ * Tarifa visitante por hora (con IVA) si la sala tiene perHour configurado.
+ * Devuelve null si no hay tarifa o no es bookable — la card no muestra precio.
+ */
+function priceFromForRoom(slug: string): number | null {
+  const t = faq.tariffs.rooms[slug];
+  if (!t || !("perHour" in t) || !t.perHour) return null;
+  const vat = (faq.tariffs as { vatRate?: number }).vatRate ?? 21;
+  return Math.round(t.perHour * (1 + vat / 100) * 100) / 100;
+}
 
 export function RoomsGrid() {
   const featured = rooms.filter((r) => r.category !== "comun").slice(0, 6);
@@ -81,7 +93,7 @@ export function RoomsGrid() {
                     {room.short}
                   </p>
 
-                  <div className="mt-6 flex items-center gap-5 text-sm text-[var(--color-ink)]/80">
+                  <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-[var(--color-ink)]/80">
                     <span className="inline-flex items-center gap-1.5">
                       <Maximize2 size={14} className="text-[var(--color-coral-500)]" />
                       {formatArea(room.area)} m²
@@ -90,6 +102,16 @@ export function RoomsGrid() {
                       <Users size={14} className="text-[var(--color-coral-500)]" />
                       hasta {Math.max(room.capacity.school, room.capacity.theater, room.capacity.coctel ?? 0, room.capacity.boardroom ?? 0)}
                     </span>
+                    {(() => {
+                      const price = priceFromForRoom(room.slug);
+                      if (!price || room.bookable === false) return null;
+                      return (
+                        <span className="inline-flex items-center gap-1.5 font-medium text-[var(--color-coral-700)]">
+                          <Euro size={14} className="text-[var(--color-coral-500)]" />
+                          desde {price.toFixed(2).replace(".", ",")}€/h
+                        </span>
+                      );
+                    })()}
                   </div>
 
                   <div className="mt-auto flex flex-wrap items-center gap-2 pt-6">
