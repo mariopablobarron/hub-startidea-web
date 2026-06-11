@@ -236,10 +236,16 @@ test.describe("Reservar — guest checkout", () => {
     await expect(page.getByLabel(/Nombre completo/i)).toBeVisible();
     await expect(page.getByLabel(/^Email$/i)).toBeVisible();
     await expect(page.getByLabel(/Tel[eé]fono.*opcional/i)).toBeVisible();
-    // 4) Botón submit "Reservar y pagar"
-    await expect(page.getByRole("button", { name: /Reservar y pagar/i })).toBeVisible();
-    // 5) Texto explicativo de protección anti-spam (slot se libera en 30 min)
-    await expect(page.getByText(/30 min/i)).toBeVisible();
+    // 4) Botón submit del form (texto cambió a solo "Reservar" cuando
+    //    se añadió elección stripe/transferencia — buscamos submit en el
+    //    bloque del form, no en el header)
+    await expect(
+      page.locator("form").getByRole("button", { name: /^Reservar/i }),
+    ).toBeVisible();
+    // 5) Texto explicativo del flow (tarjeta o transferencia). El copy
+    //    cambió al introducir la elección de método pago — ahora menciona
+    //    "tarjeta o transferencia" en vez del antiguo "30 min".
+    await expect(page.getByText(/tarjeta o transferencia/i).first()).toBeVisible();
   });
 
   test("/reservar (anónimo) muestra tarifa visitor con IVA", async ({ page }) => {
