@@ -1,0 +1,33 @@
+lib/content.ts
+  s_a44e906d905f48::t_200ed7975acec5 25,27-32,41-49
+lib/admin/actions.ts
+  s_a44e906d905f48::t_1975f6fd12ba83 188-210,217,220,222-228,230-233,237,240,248-314
+  s_a44e906d905f48::t_d85a4b45b139c8 10
+app/precios/page.tsx
+  s_a44e906d905f48::t_383157de31951a 1-221
+app/admin/salas/[slug]/page.tsx
+  s_a44e906d905f48::t_e3c4a7f1aeb7aa 28-40,42,52-53,56-57
+  s_a44e906d905f48::t_db7e50aae25e7a 2
+  s_a44e906d905f48::t_31448dac94edf0 3
+  s_a44e906d905f48::t_97bff525c80444 41
+app/admin/salas/[slug]/RoomImageUploader.tsx
+  s_a44e906d905f48::t_a71cc84837a349 36
+  s_a44e906d905f48::t_0e96d1fb3439d3 232-241,258-360
+  s_a44e906d905f48::t_787455d5c1ac7e 6,9,11-12,14,16-19
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "ba8fa35221cbf9950a41558eb188308892c59344",
+  "prompts": {},
+  "sessions": {
+    "s_a44e906d905f48": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "81ebd0fe-fabf-4fa7-bbd2-edb830fa5e8e",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}
