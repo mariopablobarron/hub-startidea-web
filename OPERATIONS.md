@@ -198,6 +198,80 @@ gunzip -c /data/cal-com-hub-backups/cal_YYYYMMDD_HHMMSS.sql.gz | \
 - ✅ **Gráfica tendencia 12 semanas** en `/admin/seo` (sparklines SVG, 0 deps nuevas) + **alerta 🚨** en cron weekly cuando clicks caen >50% (script versionado en `scripts/seo-weekly-report.sh` + desplegado en VPS).
 - ✅ **Tests E2E** nuevos: VoiceWidget, desglose IVA, slots libres agenda admin.
 
+## Cambios significativos 2026-06-11
+
+### Nuevas páginas públicas (SEO indexables)
+
+- ✅ **`/reservar`** — Guest checkout: cualquier persona reserva sin cuenta (form completo + Stripe Checkout o transferencia bancaria). Si email existe como User registrado, se reutiliza. Webhook `checkout.session.expired` libera slot si no paga en 30 min.
+- ✅ **`/precios`** (`app/precios/page.tsx`) — tabla por sala × rol (visitante / colaborador / coworker) con precios reales calculados vía `quotePrice()`. Indexable, canonical, OG. `revalidate=3600`.
+- ✅ **`/transparencia`** (`app/transparencia/page.tsx`) — ocupación real por sala últimos 30d, reservas mes, eventos próximos, coworkers anonimizados, feedbacks íntegros. `force-dynamic` (lee BD). Filosofía: si una sala está al 8%, lo decimos.
+- ✅ **`/feedback/[token]`** (`app/feedback/[token]/page.tsx`) — página pública sin login que el user abre desde email NPS. Un textarea, sin escalas, una pregunta abierta. `robots: noindex`.
+- ✅ **`/reservar/gracias`** — post-pago. Soporta `BANK_TRANSFER` con IBAN + concepto + acceso magic-link.
+
+### Sistema NPS humano post-COMPLETED
+
+- ✅ Modelo `Feedback` en Prisma con relación 1-1 a Booking + token público.
+- ✅ Cron diario `/api/cron/feedback-request` (10:00 UTC) detecta COMPLETED 24h+ sin Feedback → envía email Resend con CTA "Responder (1 min)".
+- ✅ Server action `submitFeedback` → guarda text + notifica Telegram con respuesta íntegra (sin emoji-overload).
+- ✅ Dashboard admin `/admin/feedback` con filtros (respondidos/pendientes/todos) y chips por sala.
+
+### Chat con tools de reserva (`lib/chat/tools.ts`)
+
+- ✅ `listRooms()` — catálogo de salas reservables
+- ✅ `checkAvailability(slug, date)` — slots libres/ocupados 08-20h
+- ✅ `quotePrice(slug, hours)` — precio total con IVA
+- ✅ `startBookingFlow(slug, date?, hour?)` — genera link a `/reservar` prellenado
+- `stopWhen: stepCountIs(5)` permite encadenar tools sin pedir permiso
+
+### SEO enriquecido por sala (`lib/seo/structuredData.ts`)
+
+- `roomServiceSchema` ahora emite Schema.org Service con:
+  - **Offer + UnitPriceSpecification** (precio con IVA, EUR, EligibleQuantity 1-8h) → Rich Results "From X EUR" en SERP
+  - **additionalProperty**: superficie (MTK = m²) + capacidades (escolar/auditorio/boardroom)
+  - **eligibleQuantity** 1-8h
+- Sitemap incluye `/precios`, `/transparencia` + todas las `/salas/[slug]`.
+
+### Galería múltiple por sala (`lib/content.ts` + admin)
+
+- `Room.images?: string[]` opcional con retrocompat (`roomGallery()` helper).
+- Admin `/admin/salas/[slug]`: bloque "Galería (N/8)" para añadir/quitar fotos adicionales. Foto principal sigue separada (slot 1). Numeración: `{slug}.jpg`, `{slug}-2.jpg`, `{slug}-3.jpg`...
+- `/salas/[slug]` usa `RoomGalleryHero` (cliente): 1 foto → render simple legacy, 2+ → tira de thumbnails clicables (aria tabs).
+
+### Anti-spam bots casino
+
+- ✅ `middleware.ts` filtro 12 regex (casino/juega/megaways/tragaperras/crupier/blackjack/slot/bet365) → **410 Gone** + `X-Robots-Tag: noindex,nofollow,noarchive` + cache 24h. ~1ms edge, no toca render ni Umami.
+- ✅ `app/robots.ts` Disallow explícito para crawlers educados.
+- ✅ Limpieza histórica: 45 events spam eliminados de Umami.
+- ✅ Tráfico real ahora visible: 119 / · 43 /reservar · 12 /salas · 8 /comunidad...
+
+### Hub.startidea.tech (otro proyecto): workspace `startidea` deprecado
+
+- POST `/api/rooms/[id]/book` → **410** + redirect a `hubstartidea.es/reservar` solo para `workspace.slug === "startidea"`. Otros workspaces (granadasocial, etc.) siguen activos.
+- `/[workspace=startidea]/salas/*` → 307 a `hubstartidea.es/salas/...`
+- `/[workspace=startidea]/admin/reservas` → banner deprecation con link al panel actual.
+- Spam Telegram smoke-test silenciado: filtro local en `/api/rooms/[id]/book` + DELETE booking + **filtro global** en `lib/notify/telegram.ts` con `SILENT_PATTERNS` regex.
+
+### Datos reales en producción (a fecha 2026-06-11)
+
+- 2 users registrados, 2 bookings (ambos CANCELLED), 0 payments PAID, 0 feedbacks.
+- Tráfico Umami 7d: ~65 visitas humanas (resto ya bloqueado por middleware).
+- 23/23 tests E2E pasan contra producción.
+
+## Pendientes activos (actualizado 2026-06-11)
+
+| # | Pendiente | Responsable |
+|---|---|---|
+| 1 | DSN Sentry — `de.sentry.io` nuevo proyecto `hub-startidea-web` | Mario crea, yo inyecto cifrado en Coolify |
+| 2 | Stripe **live mode** + nuevo webhook con `sk_live_*` (cuando vayas a cobrar real) | Mario activa live, yo creo webhook |
+| 3 | Cambiar password Coolify temporal | Mario |
+| 4 | Setup admin Cal.com en `/auth/setup` | Mario (si retoma Cal.com) |
+| 5 | Mapping fotos dossier → slugs + m² reales por sala | Equipo Mario (diseño + ops) |
+| 6 | Subir fotos definitivas vía `/admin/salas/[slug]` (preview + galería múltiple ya lista) | Equipo diseño |
+| 7 | Copy editorial por sala (50-80 palabras tono Startidea) | Equipo comunicación |
+| 8 | Datos transferencia bancaria (IBAN, titular, banco) → `data/content.json` clave `bankTransfer` | Mario (admin) |
+| 9 | Mapa oficina SVG en `/public/floorplan/` | Equipo diseño |
+| 10 | KB ElevenLabs (opcional, mejora respuestas chat voz) | Mario |
+
 ## Repos relacionados
 
 - `mariopablobarron/hub-startidea-web` (este) — web + booking system
