@@ -14,7 +14,10 @@ const nav = [
   { href: "/eventos", label: "Eventos" },
   { href: "/metodo", label: "Método" },
   { href: "/#podcast", label: "Podcast" },
-  { href: "/comunidad", label: "Comunidad" },
+  // Consolidado al Telar (comunidad.hubstartidea.es): la "Comunidad" pública del
+  // HUB es la plataforma online; el foro interno /comunidad sigue existiendo pero
+  // ya no se enlaza desde la navegación pública.
+  { href: "https://comunidad.hubstartidea.es", label: "Comunidad" },
 ];
 
 export function Header() {

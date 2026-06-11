@@ -98,7 +98,7 @@ export function Footer() {
             <li><Link href="/salas" className="hover:text-[var(--color-coral-500)]">Salas</Link></li>
             <li><Link href="/reservar" className="hover:text-[var(--color-coral-500)]">Reservar sala</Link></li>
             <li><Link href="/eventos" className="hover:text-[var(--color-coral-500)]">Eventos</Link></li>
-            <li><Link href="/comunidad" className="hover:text-[var(--color-coral-500)]">Comunidad</Link></li>
+            <li><a href="https://comunidad.hubstartidea.es" target="_blank" rel="noreferrer noopener" className="hover:text-[var(--color-coral-500)]">Comunidad ↗</a></li>
             <li><Link href="/metodo" className="hover:text-[var(--color-coral-500)]">Método Raíz y Acción</Link></li>
             <li><Link href="/#tour" className="hover:text-[var(--color-coral-500)]">Tour del local</Link></li>
             <li><Link href="/#podcast" className="hover:text-[var(--color-coral-500)]">Estudio podcast</Link></li>

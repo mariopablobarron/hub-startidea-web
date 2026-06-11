@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { content } from "@/lib/content";
 import { getIcon } from "@/lib/icons";
@@ -32,14 +31,16 @@ export function Community() {
           })}
         </div>
 
-        {/* CTA al foro de la comunidad */}
+        {/* CTA a la comunidad online (consolidada en el Telar) */}
         <div className="mt-10">
-          <Link
-            href="/comunidad"
+          <a
+            href="https://comunidad.hubstartidea.es"
+            target="_blank"
+            rel="noreferrer noopener"
             className="inline-flex items-center gap-2 rounded-full bg-[var(--color-ink)] px-6 py-3 text-sm font-medium text-[var(--color-paper)] transition hover:bg-[var(--color-coral-500)]"
           >
-            Entrar al foro de la comunidad <ArrowRight size={14} />
-          </Link>
+            Entrar a la comunidad <ArrowRight size={14} />
+          </a>
         </div>
       </div>
     </section>
