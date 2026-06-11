@@ -1,0 +1,21 @@
+tests/e2e/public.spec.ts
+  s_a44e906d905f48::t_4ab7f5a8da75a2 301-302
+  s_a44e906d905f48::t_ec674de68bf553 303-304,306-309,311
+  s_a44e906d905f48::t_fce1a922776838 264-300,305,310,312-343
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "783cb0d756d1a369bf2365d42c717291182c12e3",
+  "prompts": {},
+  "sessions": {
+    "s_a44e906d905f48": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "81ebd0fe-fabf-4fa7-bbd2-edb830fa5e8e",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}
