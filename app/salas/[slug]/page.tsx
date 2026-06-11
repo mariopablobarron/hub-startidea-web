@@ -3,9 +3,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, Maximize2, Users, MapPin } from "lucide-react";
-import { rooms, getRoom, content, formatArea } from "@/lib/content";
+import { rooms, getRoom, content, formatArea, roomGallery, type Room } from "@/lib/content";
 import { JsonLd } from "@/components/JsonLd";
 import { roomServiceSchema, breadcrumbSchema } from "@/lib/seo/structuredData";
+import { RoomGalleryHero } from "./RoomGalleryHero";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -111,16 +112,11 @@ export default async function SalaPage({ params }: Props) {
           )}
         </header>
 
-        <div className="mt-12 relative aspect-[21/9] overflow-hidden rounded-3xl bg-[var(--color-paper-2)]">
-          <Image
-            src={room.image}
-            alt={`${room.name} — ${room.subtitle}`}
-            fill
-            sizes="(min-width: 1280px) 1280px, 100vw"
-            priority
-            className="object-cover"
-          />
-        </div>
+        <RoomGalleryHero
+          images={roomGallery(room as Room)}
+          roomName={room.name}
+          subtitle={room.subtitle}
+        />
 
         <div className="mt-16 grid gap-px overflow-hidden rounded-3xl border border-[var(--color-line)] bg-[var(--color-line)] sm:grid-cols-2 lg:grid-cols-4">
           <Spec icon={<Maximize2 size={16} />} label="Superficie" value={`${formatArea(room.area)} m²`} />
