@@ -49,6 +49,8 @@ Todos en VPS root (`crontab -e`).
 | `0 4 * * *` | `/root/scripts/hub-db-backup.sh` | Backup hub-db diario |
 | `0 22 * * *` | `curl /api/cron/complete-past-bookings` | Bookings pasadas → COMPLETED, PENDING expira → CANCELLED |
 | `0 * * * *` | `curl /api/cron/event-reminders` | Email 24h antes de eventos (cuando se activen) |
+| `0 10 * * *` | `curl /api/cron/feedback-request` | NPS: email a reservas COMPLETED +24h sin feedback (añadido 2026-06-11) |
+| `0 9 * * 0` | `curl /api/cron/weekly-kpis` | KPIs semanales por Telegram a Mario (domingo, añadido 2026-06-13) |
 
 Auth de los crons HTTP: `Authorization: Bearer $CRON_SECRET` (env del container).
 
