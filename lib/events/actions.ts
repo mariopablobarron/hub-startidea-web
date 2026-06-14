@@ -9,6 +9,7 @@ import { prisma } from "@/lib/db/prisma";
 import { requireAdmin, getCurrentUser } from "@/lib/auth/roles";
 import { commitFile } from "@/lib/admin/persist";
 import { content } from "@/lib/content";
+import { ingestContactToCrm } from "@/lib/crm/ingest";
 
 /**
  * Server actions de eventos.
@@ -291,6 +292,17 @@ export async function registerForEvent(formData: FormData) {
       }
       throw e;
     }
+
+    // Inscrito a evento → CRM central. await porque withFeedback redirige
+    // después; el helper nunca lanza (no rompe la inscripción).
+    await ingestContactToCrm({
+      email: data.email,
+      name: data.name,
+      phone: data.phone || null,
+      source: "hub-coworking:evento",
+      tags: ["evento", `evento:${slug}`],
+      kind: "newsletter",
+    });
 
     // Email de confirmación
     if (process.env.RESEND_API_KEY) {

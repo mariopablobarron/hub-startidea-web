@@ -6,6 +6,7 @@ import { rateLimit, maybeSweep } from "./rate-limit";
 import { adminEmail, userEmail } from "./emails";
 import { sendEmail, isResendConfigured } from "@/lib/mail/resend";
 import { sendContactToTelegram, isTelegramConfigured } from "./telegram";
+import { ingestContactToCrm } from "@/lib/crm/ingest";
 
 export type ContactState =
   | { status: "idle" }
@@ -120,6 +121,18 @@ export async function submitContact(
       }),
     );
   }
+
+  // Lead del formulario de contacto → CRM central. No suma a `errors`
+  // (el helper nunca lanza); es captación secundaria al aviso a Mario.
+  tasks.push(
+    ingestContactToCrm({
+      email: data.email,
+      name: data.name,
+      source: "hub-coworking:contacto",
+      tags: ["contacto-web"],
+      kind: "newsletter",
+    }).then(() => {}),
+  );
 
   try {
     await Promise.all(tasks);

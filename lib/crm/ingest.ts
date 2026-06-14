@@ -57,7 +57,7 @@ export async function ingestContactToCrm(contact: IngestContact): Promise<boolea
         tags: contact.tags,
         kind: contact.kind || "newsletter",
       }),
-      signal: AbortSignal.timeout(8_000),
+      signal: AbortSignal.timeout(4_000),
     });
     if (!res.ok) {
       console.warn(`[crm-ingest] ${res.status} para ${contact.email}`);

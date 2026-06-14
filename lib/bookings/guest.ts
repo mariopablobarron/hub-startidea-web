@@ -145,8 +145,11 @@ export async function createGuestBookingAndCheckout(formData: FormData) {
   }
 
   // Alimentar el CRM central de TodoMerchandising con el contacto.
-  // Fire-and-forget: no bloquea la reserva si el CRM no responde.
-  void ingestContactToCrm({
+  // await (no void): esta server action redirige a Stripe justo después,
+  // y un fire-and-forget podría cortarse antes de completar el fetch.
+  // El helper ya captura sus propios errores (timeout 4s) y nunca lanza,
+  // así que await aquí NO puede romper la reserva — solo garantiza envío.
+  await ingestContactToCrm({
     email: data.guestEmail,
     name: data.guestName,
     phone: data.guestPhone,
