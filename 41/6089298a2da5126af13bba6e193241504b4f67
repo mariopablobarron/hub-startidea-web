@@ -1,0 +1,51 @@
+prisma/schema.prisma
+  s_a44e906d905f48::t_baf1a047560101 514-540
+app/admin/capsula/grabaciones/RecordingsManager.tsx
+  s_a44e906d905f48::t_38ca2731aa6192 1-115
+.gitignore
+  s_a44e906d905f48::t_f750821e32a8a3 41-43
+prisma/migrations/20260614180000_add_recording/migration.sql
+  s_a44e906d905f48::t_6419b81f5b832d 1-20
+app/capsula/CapsulaAudio.tsx
+  s_a44e906d905f48::t_ca4444f78fc0ac 46-48
+  s_a44e906d905f48::t_6dbda8a2e8372f 446
+  s_a44e906d905f48::t_c9802e5350eb6e 98-106
+  s_a44e906d905f48::t_6307a15099240d 169
+  s_a44e906d905f48::t_48147d20c4bee4 494-509
+  s_a44e906d905f48::t_ed0de2e693a3ba 255-273
+  s_a44e906d905f48::t_d7dc2a628e1e0c 291-298,300
+  s_a44e906d905f48::t_57cab207feed9e 135-152
+  s_a44e906d905f48::t_39cf61fd9e87fa 341
+  s_a44e906d905f48::t_98724b60ce83e2 323,325
+  s_a44e906d905f48::t_363f475178a685 240-253
+  s_a44e906d905f48::t_8bef7a904a058b 309-314
+  s_a44e906d905f48::t_85da29d693c4e9 172-239
+  s_a44e906d905f48::t_879a15dbf28b39 54-64
+app/api/capsula/recordings/route.ts
+  s_a44e906d905f48::t_bbcef5ab310ddc 74
+  s_a44e906d905f48::t_92f226d75d2e2b 1-73,75-101
+app/api/capsula/recordings/[id]/route.ts
+  s_a44e906d905f48::t_ed21389b467fcd 1-100
+app/capsula/soundscape.ts
+  s_a44e906d905f48::t_6d62096970e2c5 48,54
+app/admin/capsula/grabaciones/page.tsx
+  s_a44e906d905f48::t_784b2f7d82474f 1-45
+lib/capsula/recordings.ts
+  s_a44e906d905f48::t_2768670b3820b8 1-31
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "416089298a2da5126af13bba6e193241504b4f67",
+  "prompts": {},
+  "sessions": {
+    "s_a44e906d905f48": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "81ebd0fe-fabf-4fa7-bbd2-edb830fa5e8e",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}
