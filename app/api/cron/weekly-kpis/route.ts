@@ -47,6 +47,8 @@ export async function GET(req: Request) {
     feedbacksThisWeek,
     upcomingBookings,
     pendingBookings,
+    activeKeyHolders,
+    keyHoldersGrantedThisWeek,
   ] = await Promise.all([
     // Reservas creadas esta semana (cualquier estado)
     prisma.booking.count({ where: { createdAt: { gte: weekAgo } } }),
@@ -78,6 +80,10 @@ export async function GET(req: Request) {
     }),
     // Pendientes (esperando aprobación/pago) — accionable
     prisma.booking.count({ where: { status: "PENDING" } }),
+    // Control de acceso: cuánta gente tiene llave/código activo al espacio
+    prisma.keyHolder.count({ where: { status: "ACTIVE" } }),
+    // Altas de acceso esta semana (para señalar cambios en el padrón)
+    prisma.keyHolder.count({ where: { status: "ACTIVE", grantedAt: { gte: weekAgo } } }),
   ]);
 
   const incomeThisWeek = paidPayments._sum.amountCents ?? 0;
@@ -127,6 +133,7 @@ export async function GET(req: Request) {
       ``,
       `📅 *Próximos 7 días:* ${upcomingBookings} reservas confirmadas`,
       pendingBookings > 0 ? `⚠️ *${pendingBookings} pendientes* esperando acción → /admin/reservas` : ``,
+      `🔑 *Acceso al espacio:* ${activeKeyHolders} con llave/código${keyHoldersGrantedThisWeek > 0 ? ` (+${keyHoldersGrantedThisWeek} esta semana)` : ""}`,
       ``,
       `_Detalle completo: hubstartidea.es/admin_`,
     ]
@@ -157,6 +164,8 @@ export async function GET(req: Request) {
       feedbacksThisWeek,
       upcomingBookings,
       pendingBookings,
+      activeKeyHolders,
+      keyHoldersGrantedThisWeek,
     },
   });
 }
