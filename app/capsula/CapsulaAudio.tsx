@@ -3,6 +3,15 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import Script from "next/script";
 import { Mic, MicOff, PhoneCall, Loader2, Volume2 } from "lucide-react";
+import { MODOS } from "./modos";
+
+// Labels de ambiente (espejo de DESTINOS en CapsulaScene) solo para mostrar
+// la sugerencia "ambiente: X" junto al modo; el cambio real de escena se
+// hace arriba en el selector de destino.
+const AMBIENTE_LABEL: Record<string, string> = {
+  granada: "Granada", infancia: "Infancia", verano: "Verano",
+  general: "Recuerdo", abrazo: "Abrazo", simbolos: "Símbolos",
+};
 
 /**
  * Audio en tiempo real + TTS para Cápsula del Tiempo, sobre WebRTC P2P
@@ -47,6 +56,8 @@ export function CapsulaAudio({ sala = "estudio", isHost }: { sala?: string; isHo
   const [voiceId, setVoiceId] = useState("");
   const [ttsText, setTtsText] = useState("");
   const [speaking, setSpeaking] = useState(false);
+  const [modoId, setModoId] = useState(MODOS[0].id);
+  const modo = MODOS.find((m) => m.id === modoId) || MODOS[0];
 
   const peerRef = useRef<PeerInstance | null>(null);
   const localStreamRef = useRef<MediaStream | null>(null);
@@ -167,17 +178,24 @@ export function CapsulaAudio({ sala = "estudio", isHost }: { sala?: string; isHo
     setMuted(next);
   }
 
-  async function sendTts() {
-    if (!ttsText.trim() || !voiceId) return;
+  // Envía un texto al invitado (canal de datos) y lo reproduce también aquí.
+  // Lo usan tanto los guiones del modo como el campo de texto libre.
+  async function speak(text: string) {
+    const t = text.trim();
+    if (!t || !voiceId || speaking) return;
     setSpeaking(true);
-    // Enviar la orden al invitado (si está conectado)
     if (dataConnRef.current?.open !== false) {
-      try { dataConnRef.current?.send({ type: "tts", text: ttsText.trim(), voiceId } as TtsMsg); } catch {}
+      try { dataConnRef.current?.send({ type: "tts", text: t, voiceId } as TtsMsg); } catch {}
     }
-    // Reproducir también en el host (Mario oye lo mismo que el invitado)
-    await playTts(ttsText.trim(), voiceId);
+    await playTts(t, voiceId);
     setSpeaking(false);
+  }
+
+  async function sendFromInput() {
+    if (!ttsText.trim()) return;
+    const t = ttsText;
     setTtsText("");
+    await speak(t);
   }
 
   useEffect(() => {
@@ -222,16 +240,51 @@ export function CapsulaAudio({ sala = "estudio", isHost }: { sala?: string; isHo
         )}
       </div>
 
-      {/* Panel de voz/TTS — para el entrevistador desde que conecta.
-          Aparece aunque el invitado no tenga micro: el TTS viaja por el
-          canal de datos y, si no hay invitado aún, suena al menos aquí. */}
+      {/* Panel del entrevistador — desde que conecta. Aparece aunque el
+          invitado no tenga micro: el TTS viaja por el canal de datos y, si
+          no hay invitado aún, suena al menos aquí. */}
       {isHost && (status === "connecting" || status === "live") && (
-        <div className="fixed bottom-4 left-1/2 z-50 w-[min(92vw,560px)] -translate-x-1/2 rounded-2xl bg-black/80 p-3 backdrop-blur">
+        <div className="fixed bottom-4 left-1/2 z-50 w-[min(94vw,640px)] -translate-x-1/2 rounded-2xl bg-black/80 p-3 backdrop-blur">
+          {/* Modo + público + ambiente sugerido */}
+          <div className="mb-2 flex flex-wrap items-center gap-2">
+            <select
+              value={modoId}
+              onChange={(e) => setModoId(e.target.value)}
+              className="rounded-lg border border-white/20 bg-white/10 px-2 py-1.5 text-xs font-semibold text-white outline-none"
+              title="Modo de la experiencia"
+            >
+              {MODOS.map((m) => (
+                <option key={m.id} value={m.id} className="text-black">{m.nombre}</option>
+              ))}
+            </select>
+            <span className="text-[11px] text-white/50">
+              {modo.publico} · ambiente sugerido: {AMBIENTE_LABEL[modo.ambiente] ?? modo.ambiente}
+            </span>
+          </div>
+
+          {/* Guiones del modo: un clic = suena en las gafas del invitado */}
+          <div className="mb-2 flex max-h-28 flex-wrap gap-1.5 overflow-y-auto">
+            {modo.guiones.map((g, i) => (
+              <button
+                key={i}
+                type="button"
+                onClick={() => speak(g)}
+                disabled={speaking || !voiceId}
+                className="rounded-full bg-white/10 px-2.5 py-1 text-left text-[11px] text-white transition hover:bg-white/25 disabled:opacity-40"
+                title="Decir esta frase"
+              >
+                {g}
+              </button>
+            ))}
+          </div>
+
+          {/* Voz + texto libre + decir + micro */}
           <div className="flex items-center gap-2">
             <select
               value={voiceId}
               onChange={(e) => setVoiceId(e.target.value)}
-              className="max-w-[40%] rounded-lg border border-white/20 bg-white/10 px-2 py-2 text-xs text-white outline-none"
+              className="max-w-[34%] rounded-lg border border-white/20 bg-white/10 px-2 py-2 text-xs text-white outline-none"
+              title="Voz"
             >
               {voices.length === 0 && <option value="">— sin voces —</option>}
               {voices.map((v) => (
@@ -242,14 +295,14 @@ export function CapsulaAudio({ sala = "estudio", isHost }: { sala?: string; isHo
               type="text"
               value={ttsText}
               onChange={(e) => setTtsText(e.target.value)}
-              onKeyDown={(e) => { if (e.key === "Enter") sendTts(); }}
-              placeholder="Escribe lo que la voz dirá al invitado…"
+              onKeyDown={(e) => { if (e.key === "Enter") sendFromInput(); }}
+              placeholder="…o escribe algo libre y pulsa Decir"
               maxLength={1000}
               className="flex-1 rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-sm text-white placeholder:text-white/40 outline-none"
             />
             <button
               type="button"
-              onClick={sendTts}
+              onClick={sendFromInput}
               disabled={speaking || !ttsText.trim() || !voiceId}
               className="inline-flex items-center gap-1.5 rounded-lg bg-[var(--color-coral-500,#e63e73)] px-3 py-2 text-sm font-semibold text-white disabled:opacity-50"
             >
@@ -266,7 +319,7 @@ export function CapsulaAudio({ sala = "estudio", isHost }: { sala?: string; isHo
             </button>
           </div>
           <p className="mt-1.5 text-[10px] text-white/50">
-            Escribe y pulsa Decir: sonará con la voz elegida en las gafas del invitado (y aquí). Tu micro sigue activo salvo que lo silencies.
+            Pulsa una frase del guion o escribe la tuya: sonará con la voz elegida en las gafas del invitado (y aquí). Tu micro sigue activo salvo que lo silencies.
           </p>
         </div>
       )}
