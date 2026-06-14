@@ -27,9 +27,11 @@ export function CookieBanner() {
   const persist = (value: Exclude<Consent, null>) => {
     try {
       localStorage.setItem(STORAGE_KEY, value);
+      // Avisa a <GoogleAnalytics> para cargar GA4 al instante al aceptar
+      // (sin recargar la página).
+      window.dispatchEvent(new Event("hub-consent-changed"));
     } catch {}
     setConsent(value);
-    // Hook futuro: si "accepted" cargar GA4 / Pixel aquí.
   };
 
   return (
