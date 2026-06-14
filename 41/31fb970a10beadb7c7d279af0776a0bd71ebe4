@@ -1,0 +1,20 @@
+app/admin/_components/AdminSidebar.tsx
+  s_a44e906d905f48::t_13979c988ccc48 53
+  s_a44e906d905f48::t_1d533c15c427cc 26
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "4131fb970a10beadb7c7d279af0776a0bd71ebe4",
+  "prompts": {},
+  "sessions": {
+    "s_a44e906d905f48": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "81ebd0fe-fabf-4fa7-bbd2-edb830fa5e8e",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}
