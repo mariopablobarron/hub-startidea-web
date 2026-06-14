@@ -1,0 +1,27 @@
+lib/contact/actions.ts
+  s_a44e906d905f48::t_5be5f425a02fea 9
+  s_a44e906d905f48::t_1d5c9cb164191a 125-136
+lib/events/actions.ts
+  s_a44e906d905f48::t_166dbf861add13 12
+  s_a44e906d905f48::t_c6c82c5d51cf92 296-306
+lib/crm/ingest.ts
+  s_a44e906d905f48::t_34e43af61760e2 60
+lib/bookings/guest.ts
+  s_a44e906d905f48::t_7309d45d9bf478 148-152
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "cb9346b4a10d9ee3728c791aeb622443d28f8b78",
+  "prompts": {},
+  "sessions": {
+    "s_a44e906d905f48": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "81ebd0fe-fabf-4fa7-bbd2-edb830fa5e8e",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}
