@@ -1,0 +1,28 @@
+app/admin/espacio/page.tsx
+  s_a44e906d905f48::t_272c0a4db815eb 1-104
+app/espacio/page.tsx
+  s_a44e906d905f48::t_9c422594c227d4 1-133
+lib/admin/actions.ts
+  s_a44e906d905f48::t_3096d869769c72 145-167
+lib/content.ts
+  s_a44e906d905f48::t_babe905573cb22 39-60
+app/admin/page.tsx
+  s_a44e906d905f48::t_21f5c3fa71f7da 28
+  s_a44e906d905f48::t_0f9c3767e9e80c 111-117
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "8a4f568aff446ce22f97c6e6853d7bbe3da1daab",
+  "prompts": {},
+  "sessions": {
+    "s_a44e906d905f48": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "81ebd0fe-fabf-4fa7-bbd2-edb830fa5e8e",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}
