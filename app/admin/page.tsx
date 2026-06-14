@@ -24,6 +24,7 @@ import {
   Euro,
   Ticket,
   Banknote,
+  KeyRound,
 } from "lucide-react";
 
 type Card = {
@@ -97,6 +98,13 @@ const CARDS: Card[] = [
     title: "Feedback",
     desc: "Respuestas humanas tras reservas COMPLETED. Una pregunta abierta, sin escalas.",
     icon: MessageSquareQuote,
+    group: "plataforma",
+  },
+  {
+    href: "/admin/llaves",
+    title: "Control de acceso",
+    desc: "Quién tiene llave, código o tarjeta del HUB. Altas y bajas con histórico auditado.",
+    icon: KeyRound,
     group: "plataforma",
   },
   // Narrativa principal

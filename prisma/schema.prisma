@@ -66,6 +66,7 @@ model User {
   sessions           Session[]
   accounts           Account[]
   verificationTokens VerificationToken[]
+  keyHolders         KeyHolder[]
 
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
@@ -451,4 +452,62 @@ model AuditLog {
 
   @@index([actorId, createdAt])
   @@index([action, createdAt])
+}
+
+// ============================================================
+// CONTROL DE ACCESO FÍSICO AL ESPACIO
+// ============================================================
+
+enum AccessType {
+  PHYSICAL_KEY // llave física del local
+  ALARM_CODE // código de la alarma
+  ACCESS_CARD // tarjeta/llavero de proximidad
+  GARAGE_REMOTE // mando del garaje/portal
+  BUILDING_KEY // llave del portal del edificio
+  OTHER // otro (detallar en notas)
+}
+
+enum KeyHolderStatus {
+  ACTIVE // tiene el acceso ahora mismo
+  REVOKED // se le retiró (devolvió llave, baja, etc.)
+}
+
+// Padrón de tenedores de llave / acceso al HUB (C/ Conde Cifuentes 33).
+// Registro administrativo para SABER QUIÉN PUEDE ENTRAR y con qué medio.
+// No es cerradura electrónica — es el control documental: quién, qué
+// tipo de acceso, desde cuándo, quién lo autorizó, y baja cuando devuelve.
+// Nunca se borra una fila: se marca REVOKED (auditoría e histórico).
+model KeyHolder {
+  id     String  @id @default(cuid())
+  // Datos de la persona. Puede ser un User del HUB (coworker/staff) o
+  // alguien externo sin cuenta (limpieza, mantenimiento, propietario).
+  name   String
+  email  String?
+  phone  String?
+  // Link opcional a User si es miembro del HUB (no obligatorio).
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id])
+
+  accessType AccessType @default(PHYSICAL_KEY)
+  // Identificador físico opcional: nº de copia grabado en la llave,
+  // últimos dígitos del código, nº de tarjeta. Para inventario.
+  identifier String?
+  // Rol / motivo del acceso: "Coworker fijo", "Limpieza", "Mantenimiento",
+  // "Propietario", "Staff Startidea"...
+  role       String?
+  notes      String?    @db.Text
+
+  status       KeyHolderStatus @default(ACTIVE)
+  grantedAt    DateTime        @default(now())
+  // Quién autorizó el alta (auditoría).
+  grantedBy    String? // email del admin
+  revokedAt    DateTime?
+  revokedBy    String? // email del admin que dio de baja
+  revokeReason String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+  @@index([accessType, status])
 }
