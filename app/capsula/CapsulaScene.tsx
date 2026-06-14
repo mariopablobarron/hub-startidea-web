@@ -2,38 +2,25 @@
 
 import { useEffect, useRef, useState } from "react";
 import Script from "next/script";
+import { DESTINOS, destinoById } from "./destinos";
 
 /**
- * Cada destino del viaje. `color` = atmósfera de fondo 360 (gradiente
- * sólido). `image` (opcional) = foto 360 equirectangular real; si está,
- * manda sobre el color. `word` = palabra que flota en el espacio.
+ * Escena WebXR de la Cápsula del Tiempo. Es un componente CONTROLADO: el
+ * ambiente activo (`activeId`) y su cambio (`onSelect`) viven en el padre
+ * (CapsulaExperience), para que el panel del entrevistador pueda cambiar el
+ * ambiente además del selector de arriba.
  */
-type Destino = {
-  id: string;
-  label: string;
-  word: string;
-  color: string;
-  accent: string;
-  image?: string; // /images/capsula/<id>.jpg cuando exista
-};
-
-// Biblioteca de destinos del programa (brief de Mario: Granada, infancia,
-// verano, generales, abrazo, símbolos — ambientes SIN personas para que
-// el invitado proyecte su propio recuerdo).
-const DESTINOS: Destino[] = [
-  { id: "granada", label: "Granada", word: "Granada", color: "#7c3a2d", accent: "#e9b384" },
-  { id: "infancia", label: "Infancia", word: "Infancia", color: "#3b6ea5", accent: "#bfe1ff" },
-  { id: "verano", label: "Verano", word: "Verano", color: "#c98a1a", accent: "#ffe9a8" },
-  { id: "general", label: "Recuerdo", word: "Recuerda", color: "#4a4a5e", accent: "#cfcfe6" },
-  { id: "abrazo", label: "Abrazo", word: "Abrazo", color: "#9c3a5a", accent: "#ffc8d8" },
-  { id: "simbolos", label: "Símbolos", word: "∞", color: "#2f3a52", accent: "#9fb4e0" },
-];
-
-export function CapsulaScene() {
-  const [active, setActive] = useState<Destino>(DESTINOS[0]);
+export function CapsulaScene({
+  activeId,
+  onSelect,
+}: {
+  activeId: string;
+  onSelect: (id: string) => void;
+}) {
   const [ready, setReady] = useState(false);
   const skyRef = useRef<HTMLElement | null>(null);
   const wordRef = useRef<HTMLElement | null>(null);
+  const active = destinoById(activeId);
 
   // Aplicar el destino activo a los elementos A-Frame de forma imperativa
   // (setAttribute) — más robusto que props de React sobre custom elements.
@@ -71,7 +58,7 @@ export function CapsulaScene() {
           <button
             key={d.id}
             type="button"
-            onClick={() => setActive(d)}
+            onClick={() => onSelect(d.id)}
             className={`rounded-full px-3 py-1.5 text-xs font-medium transition ${
               active.id === d.id
                 ? "bg-white text-black"
@@ -88,13 +75,13 @@ export function CapsulaScene() {
 
         <a-scene embedded vr-mode-ui="enterVRButton: #vrbtn" style={{ width: "100vw", height: "100vh" }}>
 
-          <a-sky ref={skyRef} color={DESTINOS[0].color} />
+          <a-sky ref={skyRef} color={active.color} />
           {/* Palabra flotante delante del usuario */}
 
           <a-text
             ref={wordRef}
-            value={DESTINOS[0].word}
-            color={DESTINOS[0].accent}
+            value={active.word}
+            color={active.accent}
             position="0 1.6 -3"
             align="center"
             width="6"

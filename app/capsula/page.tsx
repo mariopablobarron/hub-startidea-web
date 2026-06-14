@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import { CapsulaScene } from "./CapsulaScene";
-import { CapsulaAudio } from "./CapsulaAudio";
+import { CapsulaExperience } from "./CapsulaExperience";
 
 export const metadata: Metadata = {
   title: "Cápsula del Tiempo · Experiencia VR",
@@ -30,10 +29,5 @@ export default async function CapsulaPage({ searchParams }: Props) {
   const isHost = sp.host === "1";
   const sala = sp.sala || "estudio";
 
-  return (
-    <>
-      <CapsulaScene />
-      <CapsulaAudio sala={sala} isHost={isHost} />
-    </>
-  );
+  return <CapsulaExperience sala={sala} isHost={isHost} />;
 }

@@ -4,14 +4,7 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import Script from "next/script";
 import { Mic, MicOff, PhoneCall, Loader2, Volume2 } from "lucide-react";
 import { MODOS } from "./modos";
-
-// Labels de ambiente (espejo de DESTINOS en CapsulaScene) solo para mostrar
-// la sugerencia "ambiente: X" junto al modo; el cambio real de escena se
-// hace arriba en el selector de destino.
-const AMBIENTE_LABEL: Record<string, string> = {
-  granada: "Granada", infancia: "Infancia", verano: "Verano",
-  general: "Recuerdo", abrazo: "Abrazo", simbolos: "Símbolos",
-};
+import { DESTINOS } from "./destinos";
 
 /**
  * Audio en tiempo real + TTS para Cápsula del Tiempo, sobre WebRTC P2P
@@ -48,7 +41,17 @@ type PeerInstance = {
 
 type TtsMsg = { type: "tts"; text: string; voiceId: string };
 
-export function CapsulaAudio({ sala = "estudio", isHost }: { sala?: string; isHost: boolean }) {
+export function CapsulaAudio({
+  sala = "estudio",
+  isHost,
+  activeId,
+  onSelect,
+}: {
+  sala?: string;
+  isHost: boolean;
+  activeId: string;
+  onSelect: (id: string) => void;
+}) {
   const [status, setStatus] = useState<Status>("idle");
   const [muted, setMuted] = useState(false);
   const [err, setErr] = useState<string | null>(null);
@@ -245,11 +248,15 @@ export function CapsulaAudio({ sala = "estudio", isHost }: { sala?: string; isHo
           no hay invitado aún, suena al menos aquí. */}
       {isHost && (status === "connecting" || status === "live") && (
         <div className="fixed bottom-4 left-1/2 z-50 w-[min(94vw,640px)] -translate-x-1/2 rounded-2xl bg-black/80 p-3 backdrop-blur">
-          {/* Modo + público + ambiente sugerido */}
+          {/* Modo (al elegirlo, salta a su ambiente sugerido) + público */}
           <div className="mb-2 flex flex-wrap items-center gap-2">
             <select
               value={modoId}
-              onChange={(e) => setModoId(e.target.value)}
+              onChange={(e) => {
+                const m = MODOS.find((x) => x.id === e.target.value);
+                setModoId(e.target.value);
+                if (m) onSelect(m.ambiente);
+              }}
               className="rounded-lg border border-white/20 bg-white/10 px-2 py-1.5 text-xs font-semibold text-white outline-none"
               title="Modo de la experiencia"
             >
@@ -257,9 +264,24 @@ export function CapsulaAudio({ sala = "estudio", isHost }: { sala?: string; isHo
                 <option key={m.id} value={m.id} className="text-black">{m.nombre}</option>
               ))}
             </select>
-            <span className="text-[11px] text-white/50">
-              {modo.publico} · ambiente sugerido: {AMBIENTE_LABEL[modo.ambiente] ?? modo.ambiente}
-            </span>
+            <span className="text-[11px] text-white/50">{modo.publico}</span>
+          </div>
+
+          {/* Ambiente: control desde el propio panel (además del de arriba) */}
+          <div className="mb-2 flex flex-wrap items-center gap-1.5">
+            <span className="mr-1 text-[11px] text-white/50">Ambiente:</span>
+            {DESTINOS.map((d) => (
+              <button
+                key={d.id}
+                type="button"
+                onClick={() => onSelect(d.id)}
+                className={`rounded-full px-2.5 py-1 text-[11px] transition ${
+                  activeId === d.id ? "bg-white text-black" : "bg-white/10 text-white hover:bg-white/25"
+                }`}
+              >
+                {d.label}
+              </button>
+            ))}
           </div>
 
           {/* Guiones del modo: un clic = suena en las gafas del invitado */}
