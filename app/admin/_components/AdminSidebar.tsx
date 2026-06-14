@@ -23,6 +23,7 @@ import {
   Euro,
   Ticket,
   Banknote,
+  Clapperboard,
 } from "lucide-react";
 import { cn } from "@/lib/cn";
 
@@ -49,6 +50,7 @@ const NAV = [
   { href: "/admin/faq", label: "FAQ chatbot", icon: BookOpen },
   { href: "/admin/conversaciones", label: "Conversaciones", icon: MessageSquare },
   { href: "/admin/seo", label: "SEO (Search Console)", icon: Search },
+  { href: "/admin/capsula/grabaciones", label: "Cápsula · Grabaciones", icon: Clapperboard },
 ];
 
 export function AdminSidebar({
