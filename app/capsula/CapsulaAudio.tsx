@@ -2,9 +2,10 @@
 
 import { useEffect, useRef, useState, useCallback } from "react";
 import Script from "next/script";
-import { Mic, MicOff, PhoneCall, Loader2, Volume2 } from "lucide-react";
+import { Mic, MicOff, PhoneCall, Loader2, Volume2, VolumeX } from "lucide-react";
 import { MODOS } from "./modos";
 import { DESTINOS } from "./destinos";
+import { startSoundscape, type SoundPreset, type Soundscape } from "./soundscape";
 
 /**
  * Audio en tiempo real + TTS para Cápsula del Tiempo, sobre WebRTC P2P
@@ -41,7 +42,12 @@ type PeerInstance = {
 
 type TtsMsg = { type: "tts"; text: string; voiceId: string };
 type DestinoMsg = { type: "destino"; id: string };
-type DataMsg = TtsMsg | DestinoMsg;
+type SonidoMsg = { type: "sonido"; preset: SoundPreset };
+type DataMsg = TtsMsg | DestinoMsg | SonidoMsg;
+
+const SOUND_LABEL: Record<SoundPreset, string> = {
+  none: "sin fondo", olas: "olas", lluvia: "lluvia", viento: "viento", drone: "presencia",
+};
 
 export function CapsulaAudio({
   sala = "estudio",
@@ -63,6 +69,7 @@ export function CapsulaAudio({
   const [speaking, setSpeaking] = useState(false);
   const [modoId, setModoId] = useState(MODOS[0].id);
   const modo = MODOS.find((m) => m.id === modoId) || MODOS[0];
+  const [soundOn, setSoundOn] = useState(true);
 
   const peerRef = useRef<PeerInstance | null>(null);
   const localStreamRef = useRef<MediaStream | null>(null);
@@ -71,6 +78,10 @@ export function CapsulaAudio({
   const ttsAudioRef = useRef<HTMLAudioElement | null>(null);
   // Valor siempre-fresco del ambiente activo, para enviarlo al abrir el canal.
   const activeIdRef = useRef(activeId);
+  // Audio ambiente generativo (Web Audio API).
+  const audioCtxRef = useRef<AudioContext | null>(null);
+  const soundscapeRef = useRef<Soundscape | null>(null);
+  const soundPresetRef = useRef<SoundPreset>("none");
 
   const guestId = `capsula-${sala}-invitado`;
 
@@ -92,6 +103,33 @@ export function CapsulaAudio({
     } catch { /* silencioso */ }
   }, []);
 
+  // AudioContext compartido para el sonido ambiente (creado tras el gesto del
+  // usuario al pulsar Conectar; reanudado si el navegador lo suspende).
+  const ensureCtx = useCallback((): AudioContext | null => {
+    if (!audioCtxRef.current) {
+      try {
+        const AC = window.AudioContext ||
+          (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+        audioCtxRef.current = new AC();
+      } catch { return null; }
+    }
+    if (audioCtxRef.current && audioCtxRef.current.state === "suspended") {
+      audioCtxRef.current.resume().catch(() => {});
+    }
+    return audioCtxRef.current;
+  }, []);
+
+  // Arranca / cambia / detiene el paisaje sonoro local según el preset.
+  const applySound = useCallback((preset: SoundPreset) => {
+    if (preset === soundPresetRef.current) return;
+    soundscapeRef.current?.stop();
+    soundscapeRef.current = null;
+    soundPresetRef.current = preset;
+    if (preset === "none") return;
+    const ctx = ensureCtx();
+    if (ctx) soundscapeRef.current = startSoundscape(ctx, preset);
+  }, [ensureCtx]);
+
   function playRemoteVoice(stream: MediaStream) {
     if (voiceAudioRef.current) {
       voiceAudioRef.current.srcObject = stream;
@@ -109,8 +147,10 @@ export function CapsulaAudio({
       void playTts(msg.text, msg.voiceId);
     } else if (msg.type === "destino" && msg.id) {
       onSelect(msg.id);
+    } else if (msg.type === "sonido") {
+      applySound(msg.preset);
     }
-  }, [playTts, onSelect]);
+  }, [playTts, onSelect, applySound]);
 
   async function connect() {
     setErr(null);
@@ -119,6 +159,7 @@ export function CapsulaAudio({
       if (!window.Peer) throw new Error("Librería de audio aún cargando, reintenta en 2s.");
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
       localStreamRef.current = stream;
+      ensureCtx(); // crear AudioContext con el gesto activo (para el ambiente)
 
       if (isHost) {
         const peer = new window.Peer(undefined, { debug: 1 });
@@ -131,7 +172,10 @@ export function CapsulaAudio({
           const dc = peer.connect(guestId);
           dc.on("open", () => {
             dataConnRef.current = dc;
-            try { dc.send({ type: "destino", id: activeIdRef.current } as DestinoMsg); } catch {}
+            try {
+              dc.send({ type: "destino", id: activeIdRef.current } as DestinoMsg);
+              dc.send({ type: "sonido", preset: soundPresetRef.current } as SonidoMsg);
+            } catch {}
           });
           // Reintentos por si el invitado conecta después
           let tries = 0;
@@ -143,7 +187,10 @@ export function CapsulaAudio({
               const d = peer.connect(guestId);
               d.on("open", () => {
                 dataConnRef.current = d;
-                try { d.send({ type: "destino", id: activeIdRef.current } as DestinoMsg); } catch {}
+                try {
+                  d.send({ type: "destino", id: activeIdRef.current } as DestinoMsg);
+                  d.send({ type: "sonido", preset: soundPresetRef.current } as SonidoMsg);
+                } catch {}
               });
             }
           }, 3000);
@@ -228,9 +275,23 @@ export function CapsulaAudio({
     }
   }, [activeId, isHost]);
 
+  // HOST: el sonido efectivo = el del modo (salvo que el host lo silencie).
+  // Al cambiar, lo aplica aquí y lo propaga al invitado.
+  useEffect(() => {
+    if (!isHost) return;
+    const eff: SoundPreset = soundOn ? modo.sonido : "none";
+    applySound(eff);
+    const dc = dataConnRef.current;
+    if (dc && dc.open !== false) {
+      try { dc.send({ type: "sonido", preset: eff } as SonidoMsg); } catch {}
+    }
+  }, [isHost, soundOn, modo.sonido, applySound]);
+
   useEffect(() => {
     return () => {
       localStreamRef.current?.getTracks().forEach((t) => t.stop());
+      soundscapeRef.current?.stop();
+      audioCtxRef.current?.close().catch(() => {});
       peerRef.current?.destroy();
     };
   }, []);
@@ -292,6 +353,22 @@ export function CapsulaAudio({
               ))}
             </select>
             <span className="text-[11px] text-white/50">{modo.publico}</span>
+            <button
+              type="button"
+              onClick={() => setSoundOn((v) => !v)}
+              disabled={modo.sonido === "none"}
+              className={`ml-auto inline-flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-[11px] font-medium transition ${
+                modo.sonido === "none"
+                  ? "cursor-default bg-white/5 text-white/30"
+                  : soundOn
+                    ? "bg-white/20 text-white"
+                    : "bg-white/10 text-white/50"
+              }`}
+              title="Sonido ambiente"
+            >
+              {soundOn && modo.sonido !== "none" ? <Volume2 size={13} /> : <VolumeX size={13} />}
+              {SOUND_LABEL[modo.sonido]}
+            </button>
           </div>
 
           {/* Ambiente: control desde el propio panel (además del de arriba) */}

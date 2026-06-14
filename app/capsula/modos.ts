@@ -15,12 +15,15 @@
  * invasivo, sin prometer que sustituye a una persona (honestidad relacional).
  */
 
+import type { SoundPreset } from "./soundscape";
+
 export type ModoCapsula = {
   id: string;
   nombre: string;
   proposito: string;
   publico: string;
   ambiente: string; // id de DESTINO sugerido en CapsulaScene
+  sonido: SoundPreset; // fondo sonoro sugerido (generativo, sin archivos)
   guiones: string[];
 };
 
@@ -31,6 +34,7 @@ export const MODOS: ModoCapsula[] = [
     proposito: "El programa Cápsula del Tiempo: que la persona cuente su historia.",
     publico: "Todos",
     ambiente: "granada",
+    sonido: "none",
     guiones: [
       "Bienvenido. Estás en la Cápsula del Tiempo. Aquí no hay prisa.",
       "Cuando quieras, empezamos. Cuéntame de dónde vienes.",
@@ -47,6 +51,7 @@ export const MODOS: ModoCapsula[] = [
     proposito: "Respiración y calma guiadas para soltar tensión.",
     publico: "Todos",
     ambiente: "verano",
+    sonido: "olas",
     guiones: [
       "Ponte cómodo. Vamos a respirar juntos.",
       "Toma aire despacio por la nariz… y suéltalo poco a poco.",
@@ -62,6 +67,7 @@ export const MODOS: ModoCapsula[] = [
     proposito: "Espacio íntimo para mirar adentro y hacerse preguntas.",
     publico: "Adultos y mayores",
     ambiente: "general",
+    sonido: "drone",
     guiones: [
       "Date un momento. Aquí solo estás tú y tus pensamientos.",
       "¿Qué es lo que de verdad te importa hoy?",
@@ -77,6 +83,7 @@ export const MODOS: ModoCapsula[] = [
     proposito: "Acompañar en la soledad no deseada. Estar, sin pedir nada.",
     publico: "Mayores, personas que se sienten solas",
     ambiente: "abrazo",
+    sonido: "drone",
     guiones: [
       "Hola. Me alegro de estar aquí contigo.",
       "No tienes que decir nada. Solo quería acompañarte un rato.",
@@ -92,6 +99,7 @@ export const MODOS: ModoCapsula[] = [
     proposito: "Evocar la memoria (reminiscencia). Cuidado con mayores.",
     publico: "Mayores",
     ambiente: "infancia",
+    sonido: "lluvia",
     guiones: [
       "Cierra los ojos un momento. Vamos a viajar hacia atrás.",
       "Piensa en la casa donde creciste. ¿Recuerdas su olor?",
@@ -107,6 +115,7 @@ export const MODOS: ModoCapsula[] = [
     proposito: "Reír, sonreír, quitar peso. Un rato cálido y ligero.",
     publico: "Jóvenes y todos",
     ambiente: "verano",
+    sonido: "none",
     guiones: [
       "Vamos a tomarnos esto con calma y una sonrisa.",
       "¿Cuál es la última cosa que te hizo reír de verdad?",
