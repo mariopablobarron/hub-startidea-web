@@ -10,6 +10,7 @@ import { validateCoupon, redeemCoupon } from "./coupons";
 import { sendTransferInstructionsEmail } from "@/lib/mail/transfer";
 import { content, bookingRef } from "@/lib/content";
 import { getStripe, isStripeConfigured } from "@/lib/stripe/client";
+import { ingestContactToCrm } from "@/lib/crm/ingest";
 
 /**
  * Guest checkout — visitor reserva sin tener cuenta previa.
@@ -142,6 +143,17 @@ export async function createGuestBookingAndCheckout(formData: FormData) {
       data: { phone: data.guestPhone },
     }).catch(() => {});
   }
+
+  // Alimentar el CRM central de TodoMerchandising con el contacto.
+  // Fire-and-forget: no bloquea la reserva si el CRM no responde.
+  void ingestContactToCrm({
+    email: data.guestEmail,
+    name: data.guestName,
+    phone: data.guestPhone,
+    source: "hub-coworking:reserva",
+    tags: ["coworking", `sala:${data.roomSlug}`],
+    kind: "newsletter",
+  });
 
   // 7. Crear Booking + Payment vinculados (transaction)
   const { booking, payment } = await prisma.$transaction(async (tx) => {
