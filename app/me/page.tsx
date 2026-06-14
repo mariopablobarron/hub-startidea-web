@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Calendar, Ticket, MessageCircle, Settings, Sparkles, ArrowRight } from "lucide-react";
+import { Calendar, Ticket, MessageCircle, Settings, Sparkles, ArrowRight, Gamepad2 } from "lucide-react";
 import { requireAuth, ROLE_LABEL } from "@/lib/auth/roles";
 import { signOut } from "@/auth";
 import { prisma } from "@/lib/db/prisma";
-import { content } from "@/lib/content";
+import { content, virtualSpace } from "@/lib/content";
 
 export const metadata: Metadata = {
   title: "Mi cuenta",
@@ -166,6 +166,21 @@ export default async function MePage() {
             </ul>
           )}
         </Card>
+
+        {virtualSpace.enabled && (
+          <Card icon={<Gamepad2 size={18} />} title="Espacio virtual">
+            <p className="text-sm text-[var(--color-mute)]">
+              Coincide con la comunidad en el espacio virtual del HUB — muévete por
+              las salas y habla por proximidad.
+            </p>
+            <Link
+              href="/espacio"
+              className="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-[var(--color-coral-600)] hover:underline"
+            >
+              Entrar al espacio <ArrowRight size={14} />
+            </Link>
+          </Card>
+        )}
 
         <Card icon={<Settings size={18} />} title="Tu cuenta">
           <ul className="space-y-2 text-sm">
