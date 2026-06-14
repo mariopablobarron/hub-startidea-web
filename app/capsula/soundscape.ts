@@ -45,12 +45,13 @@ export function startSoundscape(
   ctx: AudioContext,
   preset: SoundPreset,
   volume = 0.14,
+  destination?: AudioNode,
 ): Soundscape | null {
   if (preset === "none") return null;
 
   const master = ctx.createGain();
   master.gain.value = 0;
-  master.connect(ctx.destination);
+  master.connect(destination || ctx.destination); // bus audible (para grabar también)
   master.gain.linearRampToValueAtTime(volume, ctx.currentTime + 1.8); // fade-in suave
 
   const sources: AudioScheduledSourceNode[] = [];

@@ -511,3 +511,30 @@ model KeyHolder {
   @@index([status])
   @@index([accessType, status])
 }
+
+// ============================================================
+// CÁPSULA DEL TIEMPO — GRABACIONES
+// ============================================================
+
+enum RecordingKind {
+  AUDIO // solo mezcla de audio (voz invitado + entrevistador + TTS + ambiente)
+  VIDEO // escena 360 + audio
+}
+
+// Grabación de una sesión de la experiencia Cápsula del Tiempo. El archivo
+// real NO va a git (pesa) ni a /public (privado): vive en un volumen del VPS
+// (RECORDINGS_DIR) y se sirve por endpoint autenticado. Aquí solo metadatos.
+// Sesiones íntimas: nunca públicas, solo accesibles desde el admin.
+model Recording {
+  id          String        @id @default(cuid())
+  sala        String // código de sala de la Cápsula (p.ej. "estudio")
+  kind        RecordingKind @default(VIDEO)
+  mime        String // p.ej. "video/webm"
+  filename    String // nombre del archivo en disco (no la ruta completa)
+  sizeBytes   Int // tamaño en bytes (límite de subida < 2 GB → Int basta)
+  durationSec Int? // duración aproximada si el cliente la reporta
+  note        String?       @db.Text // nota opcional del entrevistador
+  createdAt   DateTime      @default(now())
+
+  @@index([sala, createdAt])
+}

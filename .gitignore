@@ -38,3 +38,6 @@ yarn-error.log*
 /test-results/
 /playwright-report/
 /playwright/.cache/
+
+# Grabaciones de la Cápsula (local dev). En prod van a un volumen del VPS.
+/.recordings/

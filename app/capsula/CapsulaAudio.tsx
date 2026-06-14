@@ -43,11 +43,24 @@ type PeerInstance = {
 type TtsMsg = { type: "tts"; text: string; voiceId: string };
 type DestinoMsg = { type: "destino"; id: string };
 type SonidoMsg = { type: "sonido"; preset: SoundPreset };
-type DataMsg = TtsMsg | DestinoMsg | SonidoMsg;
+type RecMsg = { type: "rec"; action: "start" | "stop" };
+type RecDoneMsg = { type: "recdone"; ok: boolean };
+type DataMsg = TtsMsg | DestinoMsg | SonidoMsg | RecMsg | RecDoneMsg;
 
 const SOUND_LABEL: Record<SoundPreset, string> = {
   none: "sin fondo", olas: "olas", lluvia: "lluvia", viento: "viento", drone: "presencia",
 };
+
+// Primer mimeType de grabación soportado por el navegador (Quest incluida).
+function pickRecMime(kind: "audio" | "video"): string {
+  const cands = kind === "video"
+    ? ["video/webm;codecs=vp9,opus", "video/webm;codecs=vp8,opus", "video/webm", "video/mp4"]
+    : ["audio/webm;codecs=opus", "audio/webm", "audio/mp4", "audio/ogg"];
+  for (const c of cands) {
+    if (typeof MediaRecorder !== "undefined" && MediaRecorder.isTypeSupported?.(c)) return c;
+  }
+  return "";
+}
 
 export function CapsulaAudio({
   sala = "estudio",
@@ -82,6 +95,15 @@ export function CapsulaAudio({
   const audioCtxRef = useRef<AudioContext | null>(null);
   const soundscapeRef = useRef<Soundscape | null>(null);
   const soundPresetRef = useRef<SoundPreset>("none");
+  // Grafo de grabación: bus audible (→ altavoces y → grabación) + micro.
+  const audibleBusRef = useRef<GainNode | null>(null);
+  const recordDestRef = useRef<MediaStreamAudioDestinationNode | null>(null);
+  const ttsSrcRef = useRef<MediaElementAudioSourceNode | null>(null);
+  const recorderRef = useRef<MediaRecorder | null>(null);
+  const chunksRef = useRef<Blob[]>([]);
+  const recStartRef = useRef<number>(0);
+  const [recording, setRecording] = useState(false);
+  const [recInfo, setRecInfo] = useState<string | null>(null);
 
   const guestId = `capsula-${sala}-invitado`;
 
@@ -110,7 +132,24 @@ export function CapsulaAudio({
       try {
         const AC = window.AudioContext ||
           (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
-        audioCtxRef.current = new AC();
+        const ctx = new AC();
+        audioCtxRef.current = ctx;
+        // Grafo: TODO lo audible pasa por un bus → altavoces y → grabación.
+        // El micro va aparte (solo a grabación: el invitado no se oye a sí mismo).
+        const bus = ctx.createGain();
+        bus.connect(ctx.destination);
+        audibleBusRef.current = bus;
+        const rd = ctx.createMediaStreamDestination();
+        bus.connect(rd);
+        recordDestRef.current = rd;
+        // El TTS (elemento <audio>) se enruta por el bus (audible + grabable).
+        if (ttsAudioRef.current && !ttsSrcRef.current) {
+          try {
+            const s = ctx.createMediaElementSource(ttsAudioRef.current);
+            s.connect(bus);
+            ttsSrcRef.current = s;
+          } catch { /* ya conectado */ }
+        }
       } catch { return null; }
     }
     if (audioCtxRef.current && audioCtxRef.current.state === "suspended") {
@@ -127,11 +166,111 @@ export function CapsulaAudio({
     soundPresetRef.current = preset;
     if (preset === "none") return;
     const ctx = ensureCtx();
-    if (ctx) soundscapeRef.current = startSoundscape(ctx, preset);
+    if (ctx) soundscapeRef.current = startSoundscape(ctx, preset, 0.14, audibleBusRef.current || undefined);
   }, [ensureCtx]);
 
+  // === Grabación (la ejecuta el INVITADO; el host la dispara por datos) ===
+
+  // Sube el blob grabado al servidor y avisa al host del resultado.
+  const uploadRecording = useCallback(async (kind: "audio" | "video", mimeType: string) => {
+    const blob = new Blob(chunksRef.current, { type: mimeType || "video/webm" });
+    chunksRef.current = [];
+    if (!blob.size) {
+      try { dataConnRef.current?.send({ type: "recdone", ok: false } as RecDoneMsg); } catch {}
+      return;
+    }
+    const dur = Math.round((performance.now() - recStartRef.current) / 1000);
+    const baseMime = (mimeType || "video/webm").split(";")[0];
+    let ok = false;
+    try {
+      const res = await fetch(
+        `/api/capsula/recordings?sala=${encodeURIComponent(sala)}&kind=${kind}&dur=${dur}&mime=${encodeURIComponent(baseMime)}`,
+        { method: "POST", headers: { "Content-Type": baseMime }, body: blob },
+      );
+      ok = res.ok;
+    } catch { ok = false; }
+    try { dataConnRef.current?.send({ type: "recdone", ok } as RecDoneMsg); } catch {}
+  }, [sala]);
+
+  // Arranca la grabación: vídeo del lienzo 360 + mezcla de audio (micro +
+  // voz del entrevistador + TTS + ambiente). Si no hay lienzo, graba solo audio.
+  const startRecording = useCallback(() => {
+    if (recorderRef.current) return;
+    const ctx = ensureCtx();
+    if (!ctx || !recordDestRef.current) return;
+    const tracks: MediaStreamTrack[] = [];
+    let kind: "audio" | "video" = "audio";
+    const canvas = document
+      .querySelector("a-scene")
+      ?.querySelector("canvas") as HTMLCanvasElement | null;
+    if (canvas && typeof canvas.captureStream === "function") {
+      try {
+        canvas.captureStream(30).getVideoTracks().forEach((t) => tracks.push(t));
+        if (tracks.length) kind = "video";
+      } catch { /* sin vídeo → solo audio */ }
+    }
+    recordDestRef.current.stream.getAudioTracks().forEach((t) => tracks.push(t));
+    if (!tracks.length) return;
+    const mixed = new MediaStream(tracks);
+    const mime = pickRecMime(kind);
+    let rec: MediaRecorder;
+    try {
+      rec = new MediaRecorder(mixed, mime ? { mimeType: mime } : undefined);
+    } catch {
+      try { rec = new MediaRecorder(mixed); } catch { return; }
+    }
+    chunksRef.current = [];
+    rec.ondataavailable = (e) => { if (e.data && e.data.size) chunksRef.current.push(e.data); };
+    rec.onstop = () => { void uploadRecording(kind, rec.mimeType); };
+    try { rec.start(1000); } catch { return; } // timeslice 1s
+    recorderRef.current = rec;
+    recStartRef.current = performance.now();
+    setRecording(true);
+  }, [ensureCtx, uploadRecording]);
+
+  const stopRecording = useCallback(() => {
+    const rec = recorderRef.current;
+    recorderRef.current = null;
+    setRecording(false);
+    if (rec && rec.state !== "inactive") {
+      try { rec.stop(); } catch {}
+    }
+  }, []);
+
+  // HOST: dispara/detiene la grabación en el invitado por el canal de datos.
+  function toggleRecording() {
+    if (!dataConnRef.current || dataConnRef.current.open === false) {
+      setRecInfo("No hay invitado conectado para grabar");
+      return;
+    }
+    const next = !recording;
+    setRecording(next);
+    setRecInfo(next ? "Grabando…" : "Procesando grabación…");
+    try {
+      dataConnRef.current.send({ type: "rec", action: next ? "start" : "stop" } as RecMsg);
+    } catch {}
+  }
+
   function playRemoteVoice(stream: MediaStream) {
-    if (voiceAudioRef.current) {
+    const ctx = ensureCtx();
+    if (ctx && audibleBusRef.current) {
+      try {
+        // Enrutar por el bus (audible + grabable). El <audio> muteado solo
+        // "activa" el flujo del MediaStream remoto en algunos navegadores.
+        ctx.createMediaStreamSource(stream).connect(audibleBusRef.current);
+        if (voiceAudioRef.current) {
+          voiceAudioRef.current.srcObject = stream;
+          voiceAudioRef.current.muted = true;
+          voiceAudioRef.current.play().catch(() => {});
+        }
+      } catch {
+        if (voiceAudioRef.current) {
+          voiceAudioRef.current.srcObject = stream;
+          voiceAudioRef.current.muted = false;
+          voiceAudioRef.current.play().catch(() => {});
+        }
+      }
+    } else if (voiceAudioRef.current) {
       voiceAudioRef.current.srcObject = stream;
       voiceAudioRef.current.play().catch(() => {});
     }
@@ -149,8 +288,16 @@ export function CapsulaAudio({
       onSelect(msg.id);
     } else if (msg.type === "sonido") {
       applySound(msg.preset);
+    } else if (msg.type === "rec" && !isHost) {
+      // El invitado graba cuando el entrevistador lo pide.
+      if (msg.action === "start") startRecording();
+      else stopRecording();
+    } else if (msg.type === "recdone" && isHost) {
+      // El entrevistador recibe el resultado de la subida.
+      setRecording(false);
+      setRecInfo(msg.ok ? "Grabación guardada ✓" : "No se pudo guardar la grabación");
     }
-  }, [playTts, onSelect, applySound]);
+  }, [playTts, onSelect, applySound, startRecording, stopRecording, isHost]);
 
   async function connect() {
     setErr(null);
@@ -159,7 +306,12 @@ export function CapsulaAudio({
       if (!window.Peer) throw new Error("Librería de audio aún cargando, reintenta en 2s.");
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
       localStreamRef.current = stream;
-      ensureCtx(); // crear AudioContext con el gesto activo (para el ambiente)
+      // Crear AudioContext con el gesto activo + enrutar el micro SOLO a la
+      // grabación (el invitado no se oye a sí mismo, pero su voz se graba).
+      const ac = ensureCtx();
+      if (ac && recordDestRef.current) {
+        try { ac.createMediaStreamSource(stream).connect(recordDestRef.current); } catch {}
+      }
 
       if (isHost) {
         const peer = new window.Peer(undefined, { debug: 1 });
@@ -168,8 +320,9 @@ export function CapsulaAudio({
           // Canal de voz
           const call = peer.call(guestId, stream);
           call.on("stream", (r: MediaStream) => playRemoteVoice(r));
-          // Canal de datos (TTS + ambiente)
+          // Canal de datos (TTS + ambiente + control de grabación)
           const dc = peer.connect(guestId);
+          dc.on("data", handleData); // recibe "recdone" del invitado
           dc.on("open", () => {
             dataConnRef.current = dc;
             try {
@@ -185,6 +338,7 @@ export function CapsulaAudio({
             c.on("stream", (r: MediaStream) => { clearInterval(retry); playRemoteVoice(r); });
             if (!dataConnRef.current) {
               const d = peer.connect(guestId);
+              d.on("data", handleData);
               d.on("open", () => {
                 dataConnRef.current = d;
                 try {
@@ -289,6 +443,7 @@ export function CapsulaAudio({
 
   useEffect(() => {
     return () => {
+      try { recorderRef.current?.stop(); } catch {}
       localStreamRef.current?.getTracks().forEach((t) => t.stop());
       soundscapeRef.current?.stop();
       audioCtxRef.current?.close().catch(() => {});
@@ -336,6 +491,22 @@ export function CapsulaAudio({
           no hay invitado aún, suena al menos aquí. */}
       {isHost && (status === "connecting" || status === "live") && (
         <div className="fixed bottom-4 left-1/2 z-50 w-[min(94vw,640px)] -translate-x-1/2 rounded-2xl bg-black/80 p-3 backdrop-blur">
+          {/* Grabación: el invitado graba lo que ve + habla + escucha */}
+          <div className="mb-2 flex items-center gap-2 border-b border-white/10 pb-2">
+            <button
+              type="button"
+              onClick={toggleRecording}
+              className={`inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-semibold transition ${
+                recording ? "bg-red-600 text-white" : "bg-white/15 text-white hover:bg-white/25"
+              }`}
+              title="Graba la sesión en las gafas del invitado y la sube al servidor"
+            >
+              <span className={`inline-block h-2.5 w-2.5 rounded-full bg-red-500 ${recording ? "animate-pulse" : ""}`} />
+              {recording ? "Detener grabación" : "Grabar sesión"}
+            </button>
+            {recInfo && <span className="text-[11px] text-white/60">{recInfo}</span>}
+          </div>
+
           {/* Modo (al elegirlo, salta a su ambiente sugerido) + público */}
           <div className="mb-2 flex flex-wrap items-center gap-2">
             <select
