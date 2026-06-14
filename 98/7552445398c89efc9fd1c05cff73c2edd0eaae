@@ -1,0 +1,24 @@
+app/api/capsula/voices/route.ts
+  s_a44e906d905f48::t_be5060c926e1fe 1-42
+app/capsula/CapsulaAudio.tsx
+  s_a44e906d905f48::t_b0c161a48481b1 3,5,8-10,12-18,20,24,31-32,36,40-41,46-50,53-55,59-80,85-92,97,105,107-111,114,116-120,124,126,128-135,142-148,151,153,170-182,192-194,196,199-200,210-212,224,229-272
+  s_a44e906d905f48::t_8eefe5aca60686 225-228
+app/api/capsula/tts/route.ts
+  s_a44e906d905f48::t_112efde8fe0915 1-78
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "987552445398c89efc9fd1c05cff73c2edd0eaae",
+  "prompts": {},
+  "sessions": {
+    "s_a44e906d905f48": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "81ebd0fe-fabf-4fa7-bbd2-edb830fa5e8e",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}
