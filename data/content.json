@@ -509,12 +509,12 @@
     "instructions": ""
   },
   "virtualSpace": {
-    "enabled": false,
-    "provider": "",
-    "url": "",
+    "enabled": true,
+    "provider": "gather",
+    "url": "https://app.gather.town/app/NgnE9s7zc0M2BFo9/startidea",
     "title": "Espacio virtual del HUB",
-    "description": "Entra al espacio virtual del HUB: muévete, coincide con la comunidad y habla por proximidad, como si estuvieras en el local.",
+    "description": "Entra al espacio virtual del HUB: muévete por las salas y habla con la comunidad por proximidad, como si estuvieras en el local.",
     "requireLogin": true,
-    "embed": true
+    "embed": false
   }
 }
