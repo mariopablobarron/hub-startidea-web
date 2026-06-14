@@ -40,6 +40,8 @@ type PeerInstance = {
 };
 
 type TtsMsg = { type: "tts"; text: string; voiceId: string };
+type DestinoMsg = { type: "destino"; id: string };
+type DataMsg = TtsMsg | DestinoMsg;
 
 export function CapsulaAudio({
   sala = "estudio",
@@ -67,6 +69,8 @@ export function CapsulaAudio({
   const dataConnRef = useRef<DataConn | null>(null);
   const voiceAudioRef = useRef<HTMLAudioElement | null>(null);
   const ttsAudioRef = useRef<HTMLAudioElement | null>(null);
+  // Valor siempre-fresco del ambiente activo, para enviarlo al abrir el canal.
+  const activeIdRef = useRef(activeId);
 
   const guestId = `capsula-${sala}-invitado`;
 
@@ -96,13 +100,17 @@ export function CapsulaAudio({
     setStatus("live");
   }
 
-  // El invitado, al recibir una orden TTS por datos, genera y reproduce.
+  // El invitado recibe por datos: TTS (genera+reproduce) y cambios de
+  // ambiente (actualiza su escena para seguir al entrevistador).
   const handleData = useCallback((raw: unknown) => {
-    const msg = raw as TtsMsg;
-    if (msg && msg.type === "tts" && msg.text && msg.voiceId) {
+    const msg = raw as DataMsg;
+    if (!msg || typeof msg !== "object") return;
+    if (msg.type === "tts" && msg.text && msg.voiceId) {
       void playTts(msg.text, msg.voiceId);
+    } else if (msg.type === "destino" && msg.id) {
+      onSelect(msg.id);
     }
-  }, [playTts]);
+  }, [playTts, onSelect]);
 
   async function connect() {
     setErr(null);
@@ -119,9 +127,12 @@ export function CapsulaAudio({
           // Canal de voz
           const call = peer.call(guestId, stream);
           call.on("stream", (r: MediaStream) => playRemoteVoice(r));
-          // Canal de datos (TTS)
+          // Canal de datos (TTS + ambiente)
           const dc = peer.connect(guestId);
-          dc.on("open", () => { dataConnRef.current = dc; });
+          dc.on("open", () => {
+            dataConnRef.current = dc;
+            try { dc.send({ type: "destino", id: activeIdRef.current } as DestinoMsg); } catch {}
+          });
           // Reintentos por si el invitado conecta después
           let tries = 0;
           const retry = setInterval(() => {
@@ -130,7 +141,10 @@ export function CapsulaAudio({
             c.on("stream", (r: MediaStream) => { clearInterval(retry); playRemoteVoice(r); });
             if (!dataConnRef.current) {
               const d = peer.connect(guestId);
-              d.on("open", () => { dataConnRef.current = d; });
+              d.on("open", () => {
+                dataConnRef.current = d;
+                try { d.send({ type: "destino", id: activeIdRef.current } as DestinoMsg); } catch {}
+              });
             }
           }, 3000);
         });
@@ -200,6 +214,19 @@ export function CapsulaAudio({
     setTtsText("");
     await speak(t);
   }
+
+  // Mantener fresco el ref del ambiente (para el envío al abrir el canal).
+  useEffect(() => { activeIdRef.current = activeId; }, [activeId]);
+
+  // HOST: propagar el ambiente al invitado cuando cambia —venga del selector
+  // de arriba o de los botones del panel— si el canal de datos está abierto.
+  useEffect(() => {
+    if (!isHost) return;
+    const dc = dataConnRef.current;
+    if (dc && dc.open !== false) {
+      try { dc.send({ type: "destino", id: activeId } as DestinoMsg); } catch {}
+    }
+  }, [activeId, isHost]);
 
   useEffect(() => {
     return () => {
