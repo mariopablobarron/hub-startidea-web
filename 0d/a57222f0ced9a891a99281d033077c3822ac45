@@ -1,0 +1,27 @@
+prisma/schema.prisma
+  s_a44e906d905f48::t_3c2b0086d55f18 69
+  s_a44e906d905f48::t_096a479c0fc897 456-513
+app/admin/page.tsx
+  s_a44e906d905f48::t_0120864c3dcddf 27
+  s_a44e906d905f48::t_13c3ec89bd21d4 103-109
+lib/admin/keyholders.ts
+  s_a44e906d905f48::t_16cd78849a14d4 1-227
+app/admin/llaves/page.tsx
+  s_a44e906d905f48::t_c6bf6f2dd1df3a 1-218
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "0da57222f0ced9a891a99281d033077c3822ac45",
+  "prompts": {},
+  "sessions": {
+    "s_a44e906d905f48": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "81ebd0fe-fabf-4fa7-bbd2-edb830fa5e8e",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}
