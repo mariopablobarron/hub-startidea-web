@@ -142,6 +142,29 @@ export async function updateSite(formData: FormData) {
   });
 }
 
+export async function updateVirtualSpace(formData: FormData) {
+  return withFeedback(`/admin/espacio`, async () => {
+    await requireAdmin();
+    const url = String(formData.get("url") || "").trim();
+    // Validación ligera: si se marca enabled, exigir URL https válida.
+    const enabled = formData.get("enabled") === "on";
+    if (enabled && !/^https:\/\/.+/.test(url)) {
+      throw new Error("Para activar el espacio, pon una URL https válida.");
+    }
+    const vs = {
+      enabled,
+      provider: String(formData.get("provider") || "").trim(),
+      url,
+      title: String(formData.get("title") || "Espacio virtual del HUB").trim(),
+      description: String(formData.get("description") || "").trim(),
+      requireLogin: formData.get("requireLogin") === "on",
+      embed: formData.get("embed") === "on",
+    };
+    const next = { ...contentJson, virtualSpace: vs } as ContentJson;
+    await saveContent(next, "feat(admin): configurar espacio virtual");
+  });
+}
+
 export async function updateRoom(slug: string, formData: FormData) {
   return withFeedback(`/admin/salas/${slug}`, async () => {
     await requireAdmin();

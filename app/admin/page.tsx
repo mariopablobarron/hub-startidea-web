@@ -25,6 +25,7 @@ import {
   Ticket,
   Banknote,
   KeyRound,
+  Gamepad2,
 } from "lucide-react";
 
 type Card = {
@@ -105,6 +106,13 @@ const CARDS: Card[] = [
     title: "Control de acceso",
     desc: "Quién tiene llave, código o tarjeta del HUB. Altas y bajas con histórico auditado.",
     icon: KeyRound,
+    group: "plataforma",
+  },
+  {
+    href: "/admin/espacio",
+    title: "Espacio virtual",
+    desc: "Conectar un espacio tipo SpatialChat/Gather (videojuego 2D + salas + vídeo proximidad).",
+    icon: Gamepad2,
     group: "plataforma",
   },
   // Narrativa principal

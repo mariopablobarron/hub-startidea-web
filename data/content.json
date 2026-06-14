@@ -507,5 +507,14 @@
     "iban": "",
     "bankName": "",
     "instructions": ""
+  },
+  "virtualSpace": {
+    "enabled": false,
+    "provider": "",
+    "url": "",
+    "title": "Espacio virtual del HUB",
+    "description": "Entra al espacio virtual del HUB: muévete, coincide con la comunidad y habla por proximidad, como si estuvieras en el local.",
+    "requireLogin": true,
+    "embed": true
   }
 }

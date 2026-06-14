@@ -36,6 +36,28 @@ export type Content = typeof contentJson;
 
 export const content = contentJson as Content;
 
+/** Config del espacio virtual (estilo SpatialChat/Gather) embebido. */
+export type VirtualSpace = {
+  enabled: boolean;
+  provider: string; // gather | spatialchat | workadventure | ""
+  url: string;
+  title: string;
+  description: string;
+  requireLogin: boolean;
+  embed: boolean;
+};
+
+export const virtualSpace = (content as Content & { virtualSpace?: VirtualSpace })
+  .virtualSpace ?? {
+  enabled: false,
+  provider: "",
+  url: "",
+  title: "Espacio virtual del HUB",
+  description: "",
+  requireLogin: true,
+  embed: true,
+};
+
 export const rooms = content.rooms as Room[];
 
 /**
