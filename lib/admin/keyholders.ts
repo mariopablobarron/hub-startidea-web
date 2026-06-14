@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 import { prisma } from "@/lib/db/prisma";
 import { getCurrentUser } from "@/lib/auth/roles";
+import { ACCESS_LABEL } from "./access-labels";
 import type { AccessType } from "@prisma/client";
 
 /**
@@ -199,15 +200,6 @@ export async function reactivateKeyHolder(formData: FormData) {
 }
 
 // ── helpers ──────────────────────────────────────────────────────────
-
-export const ACCESS_LABEL: Record<AccessType, string> = {
-  PHYSICAL_KEY: "Llave física",
-  ALARM_CODE: "Código alarma",
-  ACCESS_CARD: "Tarjeta proximidad",
-  GARAGE_REMOTE: "Mando garaje",
-  BUILDING_KEY: "Llave portal",
-  OTHER: "Otro",
-};
 
 function esc(s: string): string {
   return s.replace(/[_*[\]()~`>#+=|{}.!-]/g, (c) => "\\" + c);

@@ -6,8 +6,8 @@ import {
   createKeyHolder,
   revokeKeyHolder,
   reactivateKeyHolder,
-  ACCESS_LABEL,
 } from "@/lib/admin/keyholders";
+import { ACCESS_LABEL } from "@/lib/admin/access-labels";
 import type { AccessType } from "@prisma/client";
 
 export const dynamic = "force-dynamic";
