@@ -1,0 +1,24 @@
+app/capsula/page.tsx
+  s_a44e906d905f48::t_0e85c2fbbdaa7c 1-30
+app/capsula/CapsulaScene.tsx
+  s_a44e906d905f48::t_eb2b97cb035942 1-122
+app/capsula/aframe.d.ts
+  s_a44e906d905f48::t_015d3fb3708e95 2,6-10,12-22
+  s_a44e906d905f48::t_f529274b487748 1,3-5,11
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "356df4ec955c26a4ef25a0feaa12f77dbb487d88",
+  "prompts": {},
+  "sessions": {
+    "s_a44e906d905f48": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "81ebd0fe-fabf-4fa7-bbd2-edb830fa5e8e",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}
