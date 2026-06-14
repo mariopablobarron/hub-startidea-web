@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/db/prisma";
 import { signIn } from "@/auth";
 import { sendWelcomeEmail } from "@/lib/mail/welcome";
+import { ingestContactToCrm } from "@/lib/crm/ingest";
 
 export const metadata: Metadata = {
   title: "Crear cuenta",
@@ -44,6 +45,15 @@ export default async function RegistroPage({ searchParams }: Props) {
       // Welcome email "best-effort": si Resend falla, no rompe el registro.
       // Se envía en paralelo al magic-link para que el user reciba ambos.
       void sendWelcomeEmail({ to: email, name, callbackUrl: cb });
+      // Nuevo registro → CRM central. await porque signIn() redirige
+      // después; el helper nunca lanza (no rompe el alta).
+      await ingestContactToCrm({
+        email,
+        name,
+        source: "hub-coworking:registro",
+        tags: ["registro"],
+        kind: "newsletter",
+      });
     }
 
     // Disparar magic-link → tras click en el email, aterriza en callbackUrl
