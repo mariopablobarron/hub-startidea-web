@@ -1,0 +1,30 @@
+app/capsula/destinos.ts
+  s_a44e906d905f48::t_8c8569392a2367 1-33
+app/capsula/CapsulaScene.tsx
+  s_a44e906d905f48::t_467278e7e1bf21 5,8-11,13-19,23,61,78,83-84
+app/capsula/CapsulaExperience.tsx
+  s_a44e906d905f48::t_d6b1bf592a8ae9 1-22
+app/capsula/CapsulaAudio.tsx
+  s_a44e906d905f48::t_d7cd3afa5a0047 7
+  s_a44e906d905f48::t_338382a8a6e5ba 251,255-259,267-284
+  s_a44e906d905f48::t_60d8b77a004544 44-54
+app/capsula/page.tsx
+  s_a44e906d905f48::t_c635ba3d5eea8d 32
+  s_a44e906d905f48::t_9b5fa59fe12da6 2
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "5adae24d8df66b8900dc8fecee58c4685996846e",
+  "prompts": {},
+  "sessions": {
+    "s_a44e906d905f48": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "81ebd0fe-fabf-4fa7-bbd2-edb830fa5e8e",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}
