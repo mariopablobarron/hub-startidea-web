@@ -1,0 +1,21 @@
+app/capsula/page.tsx
+  s_a44e906d905f48::t_9eaab7f8671d1e 3,11-14,16,18-24,26,28-38
+app/capsula/CapsulaAudio.tsx
+  s_a44e906d905f48::t_9ff8b678195dab 1-175
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "87125821f7bd1b04f50ebbd815732b9c8239f44c",
+  "prompts": {},
+  "sessions": {
+    "s_a44e906d905f48": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "81ebd0fe-fabf-4fa7-bbd2-edb830fa5e8e",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}
