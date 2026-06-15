@@ -1,0 +1,19 @@
+.github/workflows/deploy.yml
+  s_a44e906d905f48::t_580eb5e58c0d1a 36-39,45-47,49,54,56
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.7",
+  "base_commit_sha": "238d20ce0c9d8d77f27bbba8c9d9623fecad92f8",
+  "prompts": {},
+  "sessions": {
+    "s_a44e906d905f48": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "81ebd0fe-fabf-4fa7-bbd2-edb830fa5e8e",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}
