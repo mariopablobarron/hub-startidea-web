@@ -18,9 +18,24 @@ export function CapsulaScene({
   onSelect: (id: string) => void;
 }) {
   const [ready, setReady] = useState(false);
+  const [recording, setRecording] = useState(false);
   const skyRef = useRef<HTMLElement | null>(null);
   const wordRef = useRef<HTMLElement | null>(null);
+  const recTextRef = useRef<HTMLElement | null>(null);
   const active = destinoById(activeId);
+
+  // El invitado debe ver que se le graba también DENTRO de las gafas (en VR
+  // los overlays HTML no se ven). CapsulaAudio emite "capsula:rec" al iniciar/
+  // detener; aquí mostramos/ocultamos un aviso anclado a la cámara (HUD).
+  useEffect(() => {
+    const h = (e: Event) => setRecording(!!(e as CustomEvent).detail);
+    window.addEventListener("capsula:rec", h);
+    return () => window.removeEventListener("capsula:rec", h);
+  }, []);
+
+  useEffect(() => {
+    recTextRef.current?.setAttribute("visible", recording ? "true" : "false");
+  }, [recording, ready]);
 
   // Aplicar el destino activo a los elementos A-Frame de forma imperativa
   // (setAttribute) — más robusto que props de React sobre custom elements.
@@ -88,7 +103,18 @@ export function CapsulaScene({
             font="kelsonsans"
           />
 
-          <a-camera wasd-controls-enabled="false" />
+          <a-camera wasd-controls-enabled="false">
+            {/* Aviso de grabación anclado a la cámara — visible también en VR */}
+            <a-text
+              ref={recTextRef}
+              value="● Grabando"
+              color="#ff5252"
+              visible="false"
+              position="0.34 0.26 -0.7"
+              width="1.1"
+              align="right"
+            />
+          </a-camera>
         </a-scene>
       </div>
 

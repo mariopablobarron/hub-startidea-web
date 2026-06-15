@@ -419,6 +419,12 @@ export function CapsulaAudio({
   // Mantener fresco el ref del ambiente (para el envío al abrir el canal).
   useEffect(() => { activeIdRef.current = activeId; }, [activeId]);
 
+  // Emitir el estado de grabación para que la escena 3D muestre el aviso
+  // "grabando" anclado a la cámara (visible también dentro de las gafas en VR).
+  useEffect(() => {
+    try { window.dispatchEvent(new CustomEvent("capsula:rec", { detail: recording })); } catch {}
+  }, [recording]);
+
   // HOST: propagar el ambiente al invitado cuando cambia —venga del selector
   // de arriba o de los botones del panel— si el canal de datos está abierto.
   useEffect(() => {
