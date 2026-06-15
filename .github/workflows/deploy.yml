@@ -1,8 +1,17 @@
-name: Deploy a producción (hubstartidea.es)
+name: Verificar deploy (hubstartidea.es)
 
-# Cada push a main dispara un deploy. La SSH key dedicada que vive en el
-# secret `VPS_SSH_KEY` solo puede ejecutar /root/deploy-hub-startidea-web.sh
-# del VPS — está restringida con command="..." en authorized_keys.
+# IMPORTANTE: este workflow YA NO despliega.
+# El deploy real lo hace un cron-pull en el VPS cada 5 min
+# (/root/hub-startidea-web-autodeploy.sh): compara el sha de main con el tag de
+# la imagen en marcha y, si hay cambios desplegables, corre el deploy. Se migró
+# a pull el 2026-06-11 porque fail2ban banea el SSH entrante del runner en :22.
+#
+# Aquí solo VERIFICAMOS: hacemos polling de /api/health (que expone COMMIT_SHA)
+# hasta que el commit pusheado esté realmente sirviéndose en producción.
+# Verde = el commit está vivo en prod. Rojo = no llegó a desplegarse a tiempo.
+#
+# paths-ignore replica el filtro del cron-pull: cambios solo en docs/infra/CI no
+# disparan deploy, así que tampoco deben disparar (ni hacer fallar) esta verificación.
 
 on:
   push:
@@ -10,33 +19,37 @@ on:
     paths-ignore:
       - 'docs/**'
       - 'reports/**'
+      - 'infra/**'
+      - '.github/**'
       - 'README.md'
       - '.gitignore'
   workflow_dispatch: {}
 
 concurrency:
-  group: deploy-hub-startidea-web
+  group: verify-deploy-hub-startidea-web
   cancel-in-progress: false
 
 jobs:
-  deploy:
-    name: SSH + build + recreate
+  verify:
+    name: Esperar a que el cron-pull publique este commit
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      - name: Deploy via OpenSSH directo
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.VPS_SSH_KEY }}
+      - name: Polling de /api/health
         run: |
-          mkdir -p ~/.ssh
-          printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519
-          chmod 600 ~/.ssh/id_ed25519
-          ssh-keyscan -t ed25519,rsa,ecdsa 72.61.195.108 2>/dev/null > ~/.ssh/known_hosts
-
-          ssh -i ~/.ssh/id_ed25519 \
-              -o ConnectTimeout=30 \
-              -o ServerAliveInterval=30 \
-              -o ServerAliveCountMax=10 \
-              -o BatchMode=yes \
-              root@72.61.195.108 \
-              ":"
+          SHORT=$(echo "${{ github.sha }}" | cut -c1-7)
+          echo "Esperando commit=$SHORT en https://hubstartidea.es/api/health"
+          echo "(el deploy lo hace el cron-pull del VPS; puede tardar ~5-12 min)"
+          for i in $(seq 1 64); do
+            COMMIT=$(curl -fsS -m 10 https://hubstartidea.es/api/health 2>/dev/null \
+              | sed -n 's/.*"commit":"\([^"]*\)".*/\1/p' || echo "")
+            echo "[$i/64] health commit=${COMMIT:-(sin respuesta)}"
+            if [ "$COMMIT" = "$SHORT" ]; then
+              echo "::notice::Commit $SHORT desplegado y sirviéndose en producción"
+              exit 0
+            fi
+            sleep 15
+          done
+          echo "::error::El commit $SHORT no apareció en /api/health tras ~16 min."
+          echo "El deploy lo hace el cron-pull del VPS: revisa /var/log/hub-startidea-web-autodeploy.log"
+          exit 1

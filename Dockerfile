@@ -51,6 +51,12 @@ ENV NEXT_TELEMETRY_DISABLED=1
 ENV PORT=3000
 ENV HOSTNAME=0.0.0.0
 
+# SHA del commit desplegado — lo inyecta deploy-hub-startidea-web.sh con
+# --build-arg. Lo expone /api/health para que el CI (que ya NO puede usar SSH:
+# fail2ban banea el :22) verifique por polling qué commit está realmente vivo.
+ARG COMMIT_SHA=""
+ENV COMMIT_SHA=$COMMIT_SHA
+
 RUN addgroup -S -g 1001 nodejs && adduser -S -u 1001 -G nodejs nextjs
 
 COPY --from=builder /app/public ./public
