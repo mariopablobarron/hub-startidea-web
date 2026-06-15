@@ -33,23 +33,26 @@ jobs:
   verify:
     name: Esperar a que el cron-pull publique este commit
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    # Margen amplio: el cron-pull espera hasta 5 min al siguiente tick + ~7 min
+    # de build (más si el VPS va cargado) → el deploy tarda ~12-15 min. El
+    # polling debe cubrirlo con holgura para no dar falso rojo por timeout.
+    timeout-minutes: 26
     steps:
       - name: Polling de /api/health
         run: |
           SHORT=$(echo "${{ github.sha }}" | cut -c1-7)
           echo "Esperando commit=$SHORT en https://hubstartidea.es/api/health"
-          echo "(el deploy lo hace el cron-pull del VPS; puede tardar ~5-12 min)"
-          for i in $(seq 1 64); do
-            COMMIT=$(curl -fsS -m 10 https://hubstartidea.es/api/health 2>/dev/null \
+          echo "(el deploy lo hace el cron-pull del VPS; puede tardar ~12-15 min)"
+          for i in $(seq 1 95); do
+            COMMIT=$(curl -fsS -m 6 https://hubstartidea.es/api/health 2>/dev/null \
               | sed -n 's/.*"commit":"\([^"]*\)".*/\1/p' || echo "")
-            echo "[$i/64] health commit=${COMMIT:-(sin respuesta)}"
+            echo "[$i/95] health commit=${COMMIT:-(sin respuesta)}"
             if [ "$COMMIT" = "$SHORT" ]; then
               echo "::notice::Commit $SHORT desplegado y sirviéndose en producción"
               exit 0
             fi
-            sleep 15
+            sleep 10
           done
-          echo "::error::El commit $SHORT no apareció en /api/health tras ~16 min."
+          echo "::error::El commit $SHORT no apareció en /api/health tras ~22 min."
           echo "El deploy lo hace el cron-pull del VPS: revisa /var/log/hub-startidea-web-autodeploy.log"
           exit 1
