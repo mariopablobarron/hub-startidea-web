@@ -460,10 +460,17 @@ export function CapsulaAudio({
       {/* Estado de conexión (abajo-centro) */}
       <div className="fixed bottom-20 left-1/2 z-50 -translate-x-1/2">
         {status === "idle" && (
-          <button type="button" onClick={connect}
-            className="inline-flex items-center gap-2 rounded-full bg-[var(--color-coral-500,#e63e73)] px-5 py-3 text-sm font-semibold text-white shadow-lg">
-            <PhoneCall size={16} /> Conectar audio {isHost ? "(entrevistador)" : ""}
-          </button>
+          <div className="flex flex-col items-center gap-2">
+            <button type="button" onClick={connect}
+              className="inline-flex items-center gap-2 rounded-full bg-[var(--color-coral-500,#e63e73)] px-5 py-3 text-sm font-semibold text-white shadow-lg">
+              <PhoneCall size={16} /> Conectar audio {isHost ? "(entrevistador)" : ""}
+            </button>
+            {!isHost && (
+              <span className="rounded-full bg-black/60 px-3 py-1 text-[11px] text-white/80">
+                Esta sesión puede grabarse (imagen y voz)
+              </span>
+            )}
+          </div>
         )}
         {status === "connecting" && (
           <div className="inline-flex items-center gap-2 rounded-full bg-black/70 px-5 py-3 text-sm font-medium text-white">
@@ -485,6 +492,14 @@ export function CapsulaAudio({
           </div>
         )}
       </div>
+
+      {/* Aviso visible al invitado mientras se graba (consentimiento en vivo). */}
+      {!isHost && recording && (
+        <div className="fixed top-16 left-1/2 z-50 inline-flex -translate-x-1/2 items-center gap-2 rounded-full bg-red-600/90 px-4 py-2 text-sm font-semibold text-white shadow-lg">
+          <span className="inline-block h-2.5 w-2.5 animate-pulse rounded-full bg-white" />
+          Grabando esta sesión
+        </div>
+      )}
 
       {/* Panel del entrevistador — desde que conecta. Aparece aunque el
           invitado no tenga micro: el TTS viaja por el canal de datos y, si
