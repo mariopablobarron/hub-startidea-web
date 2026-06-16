@@ -44,14 +44,18 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
   const body = (await req.json().catch(() => ({}))) as {
     guion?: Array<{ fase?: string; texto?: string }>;
     note?: string;
+    carta?: string;
+    cartaNotas?: string;
   };
-  const data: { guion?: object; note?: string } = {};
+  const data: { guion?: object; note?: string; carta?: string; cartaNotas?: string } = {};
   if (Array.isArray(body.guion)) {
     data.guion = body.guion
       .filter((g) => g && typeof g.texto === "string" && g.texto.trim())
       .map((g) => ({ fase: String(g.fase || "frase"), texto: String(g.texto).trim() }));
   }
   if (typeof body.note === "string") data.note = body.note;
+  if (typeof body.carta === "string") data.carta = body.carta;
+  if (typeof body.cartaNotas === "string") data.cartaNotas = body.cartaNotas;
   if (!Object.keys(data).length) {
     return NextResponse.json({ error: "nada que actualizar" }, { status: 400 });
   }

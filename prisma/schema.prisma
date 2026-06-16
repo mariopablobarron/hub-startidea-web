@@ -555,6 +555,8 @@ model CapsulaSession {
   guion        Json // guion generado por IA: [{ fase, texto }]
   transcript   Json? // historial del chat de preparación (contexto para el copiloto)
   note         String?    @db.Text // notas post-sesión del entrevistador
+  cartaNotas   String?    @db.Text // lo que el entrevistador apunta de la sesión (para la carta)
+  carta        String?    @db.Text // "carta del tiempo" generada por IA (el recuerdo que se lleva la persona)
   recordingId  String?    @unique // enlace opcional a la grabación de la sesión
   recording    Recording? @relation(fields: [recordingId], references: [id], onDelete: SetNull)
   createdAt    DateTime   @default(now())

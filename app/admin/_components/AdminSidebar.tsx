@@ -27,6 +27,7 @@ import {
   Wand2,
   Music,
   Music2,
+  Mail,
 } from "lucide-react";
 import { cn } from "@/lib/cn";
 
@@ -54,6 +55,7 @@ const NAV = [
   { href: "/admin/conversaciones", label: "Conversaciones", icon: MessageSquare },
   { href: "/admin/seo", label: "SEO (Search Console)", icon: Search },
   { href: "/admin/capsula/torre", label: "Cápsula · Torre de Control", icon: Wand2 },
+  { href: "/admin/capsula/sesiones", label: "Cápsula · Sesiones y cartas", icon: Mail },
   { href: "/admin/capsula/musica", label: "Cápsula · Música", icon: Music },
   { href: "/admin/capsula/spotify", label: "Cápsula · Spotify", icon: Music2 },
   { href: "/admin/capsula/grabaciones", label: "Cápsula · Grabaciones", icon: Clapperboard },
