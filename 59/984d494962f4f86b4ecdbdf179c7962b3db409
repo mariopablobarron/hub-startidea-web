@@ -1,0 +1,41 @@
+lib/capsula/spotify.ts
+  s_a44e906d905f48::t_d40de185060c60 1-51
+app/api/admin/spotify/login/route.ts
+  s_a44e906d905f48::t_ca9f1991797db7 1-24
+app/capsula/CapsulaSpotify.tsx
+  s_a44e906d905f48::t_ab3d2ccdba5a27 1-106
+app/api/capsula/spotify/control/route.ts
+  s_a44e906d905f48::t_908e1c85795624 1-78
+app/capsula/CapsulaExperience.tsx
+  s_a44e906d905f48::t_bf8739a1a514c3 37
+  s_a44e906d905f48::t_630c1bb71af88e 7
+app/admin/_components/AdminSidebar.tsx
+  s_a44e906d905f48::t_dfd11ce47552c2 58
+  s_a44e906d905f48::t_b866df3d7ae911 29
+app/api/admin/spotify/callback/route.ts
+  s_a44e906d905f48::t_7801372908ea7f 1-62
+app/admin/capsula/spotify/page.tsx
+  s_a44e906d905f48::t_1f67dc576c11aa 1-39
+prisma/migrations/20260616090000_add_spotify_auth/migration.sql
+  s_a44e906d905f48::t_b9f4a7404cfe1a 1-13
+app/api/admin/spotify/status/route.ts
+  s_a44e906d905f48::t_fcc77e4d4b5fc3 1-17
+prisma/schema.prisma
+  s_a44e906d905f48::t_b69a73ab539216 579-592
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.7",
+  "base_commit_sha": "59984d494962f4f86b4ecdbdf179c7962b3db409",
+  "prompts": {},
+  "sessions": {
+    "s_a44e906d905f48": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "81ebd0fe-fabf-4fa7-bbd2-edb830fa5e8e",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}
