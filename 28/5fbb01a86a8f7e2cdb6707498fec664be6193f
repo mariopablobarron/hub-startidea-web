@@ -1,0 +1,21 @@
+app/admin/capsula/sesiones/SesionesManager.tsx
+  s_a44e906d905f48::t_6dc766f58fe5b0 3-4,15,24-31,41,46,55-60,104-136,188,204-222
+app/api/admin/capsula/carta-audio/route.ts
+  s_a44e906d905f48::t_05e10b8b5c0d46 1-65
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.7",
+  "base_commit_sha": "285fbb01a86a8f7e2cdb6707498fec664be6193f",
+  "prompts": {},
+  "sessions": {
+    "s_a44e906d905f48": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "81ebd0fe-fabf-4fa7-bbd2-edb830fa5e8e",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}
