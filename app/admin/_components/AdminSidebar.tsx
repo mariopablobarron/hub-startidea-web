@@ -24,6 +24,7 @@ import {
   Ticket,
   Banknote,
   Clapperboard,
+  Wand2,
 } from "lucide-react";
 import { cn } from "@/lib/cn";
 
@@ -50,6 +51,7 @@ const NAV = [
   { href: "/admin/faq", label: "FAQ chatbot", icon: BookOpen },
   { href: "/admin/conversaciones", label: "Conversaciones", icon: MessageSquare },
   { href: "/admin/seo", label: "SEO (Search Console)", icon: Search },
+  { href: "/admin/capsula/torre", label: "Cápsula · Torre de Control", icon: Wand2 },
   { href: "/admin/capsula/grabaciones", label: "Cápsula · Grabaciones", icon: Clapperboard },
 ];
 

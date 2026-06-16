@@ -11,12 +11,26 @@ import { DESTINOS } from "./destinos";
  * arriba (escena) O desde el panel del entrevistador (botones de ambiente y
  * salto automático al elegir modo), y ambos quedan sincronizados.
  */
-export function CapsulaExperience({ sala, isHost }: { sala: string; isHost: boolean }) {
+export function CapsulaExperience({
+  sala,
+  isHost,
+  sesionId,
+}: {
+  sala: string;
+  isHost: boolean;
+  sesionId?: string | null;
+}) {
   const [activeId, setActiveId] = useState(DESTINOS[0].id);
   return (
     <>
       <CapsulaScene activeId={activeId} onSelect={setActiveId} />
-      <CapsulaAudio sala={sala} isHost={isHost} activeId={activeId} onSelect={setActiveId} />
+      <CapsulaAudio
+        sala={sala}
+        isHost={isHost}
+        activeId={activeId}
+        onSelect={setActiveId}
+        sesionId={sesionId}
+      />
     </>
   );
 }

@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 };
 
 type Props = {
-  searchParams: Promise<{ host?: string; sala?: string }>;
+  searchParams: Promise<{ host?: string; sala?: string; sesion?: string }>;
 };
 
 /**
@@ -28,6 +28,7 @@ export default async function CapsulaPage({ searchParams }: Props) {
   const sp = await searchParams;
   const isHost = sp.host === "1";
   const sala = sp.sala || "estudio";
+  const sesionId = sp.sesion || null;
 
-  return <CapsulaExperience sala={sala} isHost={isHost} />;
+  return <CapsulaExperience sala={sala} isHost={isHost} sesionId={sesionId} />;
 }

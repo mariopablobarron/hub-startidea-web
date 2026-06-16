@@ -536,5 +536,29 @@ model Recording {
   note        String?       @db.Text // nota opcional del entrevistador
   createdAt   DateTime      @default(now())
 
+  capsulaSession CapsulaSession? // sesión personalizada que produjo esta grabación
+
+  @@index([sala, createdAt])
+}
+
+// Sesión personalizada de la Cápsula del Tiempo, diseñada en la "Torre de
+// Control" del admin: el entrevistador contextualiza al invitado con ayuda de
+// la IA, que genera un guion a medida (apertura, historia, preguntas,
+// reflexión, cierre). Se usa en vivo en /capsula?host=1&sesion=<id>.
+model CapsulaSession {
+  id           String     @id @default(cuid())
+  sala         String     @default("estudio")
+  guestName    String? // nombre del invitado (para personalizar el guion)
+  guestContext String     @db.Text // contexto: edad, situación, motivo, propósito
+  modoBase     String? // modo de referencia (entrevista, relajacion, presencia…)
+  ambiente     String? // destino 360 sugerido (granada, infancia…)
+  guion        Json // guion generado por IA: [{ fase, texto }]
+  transcript   Json? // historial del chat de preparación (contexto para el copiloto)
+  note         String?    @db.Text // notas post-sesión del entrevistador
+  recordingId  String?    @unique // enlace opcional a la grabación de la sesión
+  recording    Recording? @relation(fields: [recordingId], references: [id], onDelete: SetNull)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
   @@index([sala, createdAt])
 }

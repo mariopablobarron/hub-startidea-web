@@ -67,11 +67,13 @@ export function CapsulaAudio({
   isHost,
   activeId,
   onSelect,
+  sesionId,
 }: {
   sala?: string;
   isHost: boolean;
   activeId: string;
   onSelect: (id: string) => void;
+  sesionId?: string | null;
 }) {
   const [status, setStatus] = useState<Status>("idle");
   const [muted, setMuted] = useState(false);
@@ -83,6 +85,7 @@ export function CapsulaAudio({
   const [modoId, setModoId] = useState(MODOS[0].id);
   const modo = MODOS.find((m) => m.id === modoId) || MODOS[0];
   const [soundOn, setSoundOn] = useState(true);
+  const [customGuion, setCustomGuion] = useState<{ fase: string; texto: string }[]>([]);
 
   const peerRef = useRef<PeerInstance | null>(null);
   const localStreamRef = useRef<MediaStream | null>(null);
@@ -419,6 +422,21 @@ export function CapsulaAudio({
   // Mantener fresco el ref del ambiente (para el envío al abrir el canal).
   useEffect(() => { activeIdRef.current = activeId; }, [activeId]);
 
+  // Cargar el guion personalizado de la Torre de Control (URL con ?sesion).
+  useEffect(() => {
+    if (!isHost || !sesionId) return;
+    let cancel = false;
+    fetch(`/api/capsula/sesion/${sesionId}`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d: { guion?: { fase: string; texto: string }[]; ambiente?: string } | null) => {
+        if (cancel || !d) return;
+        if (Array.isArray(d.guion)) setCustomGuion(d.guion);
+        if (d.ambiente) onSelect(d.ambiente);
+      })
+      .catch(() => {});
+    return () => { cancel = true; };
+  }, [isHost, sesionId, onSelect]);
+
   // Emitir el estado de grabación para que la escena 3D muestre el aviso
   // "grabando" anclado a la cámara (visible también dentro de las gafas en VR).
   useEffect(() => {
@@ -579,6 +597,27 @@ export function CapsulaAudio({
               </button>
             ))}
           </div>
+
+          {/* Guion personalizado de la Torre de Control (si la URL trae ?sesion) */}
+          {customGuion.length > 0 && (
+            <div className="mb-2 rounded-lg border border-[var(--color-coral-500,#e63e73)]/40 bg-[var(--color-coral-500,#e63e73)]/10 p-2">
+              <div className="mb-1 text-[11px] font-semibold text-white/85">Guion personalizado</div>
+              <div className="flex max-h-32 flex-wrap gap-1.5 overflow-y-auto">
+                {customGuion.map((g, i) => (
+                  <button
+                    key={i}
+                    type="button"
+                    onClick={() => speak(g.texto)}
+                    disabled={speaking || !voiceId}
+                    title={g.fase}
+                    className="rounded-full bg-[var(--color-coral-500,#e63e73)]/25 px-2.5 py-1 text-left text-[11px] text-white transition hover:bg-[var(--color-coral-500,#e63e73)]/45 disabled:opacity-40"
+                  >
+                    {g.texto}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Guiones del modo: un clic = suena en las gafas del invitado */}
           <div className="mb-2 flex max-h-28 flex-wrap gap-1.5 overflow-y-auto">
