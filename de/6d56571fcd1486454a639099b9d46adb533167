@@ -1,0 +1,46 @@
+prisma/migrations/20260616080000_add_music_track/migration.sql
+  s_a44e906d905f48::t_63fd9c93dedc08 1-14
+lib/capsula/recordings.ts
+  s_a44e906d905f48::t_c7cce83aadb00d 32-47
+app/capsula/CapsulaAudio.tsx
+  s_a44e906d905f48::t_f4d4121afa0767 5
+  s_a44e906d905f48::t_afdc70b4145faa 486-494
+  s_a44e906d905f48::t_b4a26ae9617684 334-347,349
+  s_a44e906d905f48::t_bba653a5aa965b 549
+  s_a44e906d905f48::t_64379ee9023154 705-725
+  s_a44e906d905f48::t_989c33898cd22a 162-169
+  s_a44e906d905f48::t_751fca1fe7264c 257-274
+  s_a44e906d905f48::t_62c0b6c78093bb 48-49
+  s_a44e906d905f48::t_ca300dd9850da8 90-93
+app/api/capsula/musica/route.ts
+  s_a44e906d905f48::t_0ba7e022928c55 1-29
+app/api/admin/capsula/musica/route.ts
+  s_a44e906d905f48::t_46ccc2fdf1c4d5 1-71
+app/admin/_components/AdminSidebar.tsx
+  s_a44e906d905f48::t_11bdd4ab3fb5d8 28
+  s_a44e906d905f48::t_990618f31386b0 56
+app/admin/capsula/musica/MusicaManager.tsx
+  s_a44e906d905f48::t_26ba619aed6add 1-106
+prisma/schema.prisma
+  s_a44e906d905f48::t_0b3d3bfb3e15a1 565-578
+app/admin/capsula/musica/page.tsx
+  s_a44e906d905f48::t_579c5b3836341f 1-37
+app/api/capsula/musica/[id]/route.ts
+  s_a44e906d905f48::t_ef90cbe4763b0c 1-81
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.7",
+  "base_commit_sha": "de6d56571fcd1486454a639099b9d46adb533167",
+  "prompts": {},
+  "sessions": {
+    "s_a44e906d905f48": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "81ebd0fe-fabf-4fa7-bbd2-edb830fa5e8e",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}
