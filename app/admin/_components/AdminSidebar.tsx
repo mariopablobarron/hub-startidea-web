@@ -26,6 +26,7 @@ import {
   Clapperboard,
   Wand2,
   Music,
+  Music2,
 } from "lucide-react";
 import { cn } from "@/lib/cn";
 
@@ -54,6 +55,7 @@ const NAV = [
   { href: "/admin/seo", label: "SEO (Search Console)", icon: Search },
   { href: "/admin/capsula/torre", label: "Cápsula · Torre de Control", icon: Wand2 },
   { href: "/admin/capsula/musica", label: "Cápsula · Música", icon: Music },
+  { href: "/admin/capsula/spotify", label: "Cápsula · Spotify", icon: Music2 },
   { href: "/admin/capsula/grabaciones", label: "Cápsula · Grabaciones", icon: Clapperboard },
 ];
 

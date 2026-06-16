@@ -576,3 +576,17 @@ model MusicTrack {
 
   @@index([createdAt])
 }
+
+// Conexión OAuth con Spotify (una sola cuenta: la del HUB). Singleton con
+// id fijo "default". Guarda los tokens para controlar la reproducción desde
+// el panel en sesiones presenciales. El Client Secret va en env, no aquí.
+model SpotifyAuth {
+  id           String   @id @default("default")
+  accessToken  String   @db.Text
+  refreshToken String   @db.Text
+  expiresAt    DateTime // cuándo caduca el accessToken
+  scope        String?
+  displayName  String? // nombre de la cuenta conectada (informativo)
+  updatedAt    DateTime @updatedAt
+  createdAt    DateTime @default(now())
+}
