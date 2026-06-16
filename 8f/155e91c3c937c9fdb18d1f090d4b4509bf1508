@@ -1,0 +1,27 @@
+app/capsula/CapsulaAudio.tsx
+  s_a44e906d905f48::t_f18ec50cf3185a 447-457
+  s_a44e906d905f48::t_5ecf156ed745fd 108
+app/capsula/CapsulaCopiloto.tsx
+  s_a44e906d905f48::t_18d5d698702c2e 1-105
+app/api/capsula/copiloto/route.ts
+  s_a44e906d905f48::t_1ff5b6d83f6cd3 1-77
+app/capsula/CapsulaExperience.tsx
+  s_a44e906d905f48::t_f998ada98103d0 6
+  s_a44e906d905f48::t_9740e467e91d68 35
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.7",
+  "base_commit_sha": "8f155e91c3c937c9fdb18d1f090d4b4509bf1508",
+  "prompts": {},
+  "sessions": {
+    "s_a44e906d905f48": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "81ebd0fe-fabf-4fa7-bbd2-edb830fa5e8e",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}
