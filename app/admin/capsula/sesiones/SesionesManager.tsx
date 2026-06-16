@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { Sparkles, Copy, Save, Loader2, ChevronDown, ChevronUp, Check } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Sparkles, Copy, Save, Loader2, ChevronDown, ChevronUp, Check, Volume2 } from "lucide-react";
 
 type Item = {
   id: string;
@@ -12,6 +12,7 @@ type Item = {
   carta: string | null;
   createdAt: string;
 };
+type Voice = { id: string; name: string };
 
 function fmtDate(iso: string): string {
   return new Date(iso).toLocaleString("es-ES", {
@@ -20,6 +21,14 @@ function fmtDate(iso: string): string {
 }
 
 export function SesionesManager({ items }: { items: Item[] }) {
+  const [voices, setVoices] = useState<Voice[]>([]);
+  useEffect(() => {
+    fetch("/api/capsula/voices")
+      .then((r) => (r.ok ? r.json() : { voices: [] }))
+      .then((d: { voices?: Voice[] }) => setVoices(d.voices || []))
+      .catch(() => {});
+  }, []);
+
   if (!items.length) {
     return (
       <p className="rounded-xl border border-dashed border-neutral-300 p-8 text-center text-sm text-neutral-500">
@@ -29,12 +38,12 @@ export function SesionesManager({ items }: { items: Item[] }) {
   }
   return (
     <ul className="space-y-3">
-      {items.map((s) => <SesionCard key={s.id} s={s} />)}
+      {items.map((s) => <SesionCard key={s.id} s={s} voices={voices} />)}
     </ul>
   );
 }
 
-function SesionCard({ s }: { s: Item }) {
+function SesionCard({ s, voices }: { s: Item; voices: Voice[] }) {
   const [open, setOpen] = useState(false);
   const [notas, setNotas] = useState(s.cartaNotas || "");
   const [carta, setCarta] = useState(s.carta || "");
@@ -43,6 +52,12 @@ function SesionCard({ s }: { s: Item }) {
   const [saved, setSaved] = useState(true);
   const [copied, setCopied] = useState(false);
   const [err, setErr] = useState<string | null>(null);
+  const [voiceId, setVoiceId] = useState("");
+  const [audioBusy, setAudioBusy] = useState(false);
+
+  useEffect(() => {
+    if (!voiceId && voices[0]) setVoiceId(voices[0].id);
+  }, [voices, voiceId]);
 
   async function generar() {
     setGen(true);
@@ -84,6 +99,39 @@ function SesionCard({ s }: { s: Item }) {
       setCopied(true);
       setTimeout(() => setCopied(false), 1500);
     } catch {}
+  }
+
+  async function descargarAudio() {
+    if (!voiceId) return;
+    setAudioBusy(true);
+    setErr(null);
+    try {
+      // Guarda primero la carta editada para que el audio use la versión actual.
+      if (!saved) await guardar();
+      const res = await fetch("/api/admin/capsula/carta-audio", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sessionId: s.id, voiceId }),
+      });
+      if (!res.ok) {
+        const d = await res.json().catch(() => ({}));
+        setErr(d.error || "No se pudo generar el audio.");
+        return;
+      }
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `carta-del-tiempo-${(s.guestName || "carta").replace(/[^a-zA-Z0-9._-]/g, "-")}.mp3`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    } catch {
+      setErr("Error de red al generar el audio.");
+    } finally {
+      setAudioBusy(false);
+    }
   }
 
   return (
@@ -137,7 +185,7 @@ function SesionCard({ s }: { s: Item }) {
                 rows={10}
                 className="mt-1 w-full resize-y rounded-lg border border-neutral-300 px-3 py-2 text-sm leading-relaxed outline-none focus:border-neutral-500"
               />
-              <div className="mt-2 flex items-center gap-2">
+              <div className="mt-2 flex flex-wrap items-center gap-2">
                 <button
                   type="button"
                   onClick={copiar}
@@ -152,6 +200,26 @@ function SesionCard({ s }: { s: Item }) {
                   className="inline-flex items-center gap-1.5 rounded-lg border border-neutral-300 px-3 py-1.5 text-xs font-semibold disabled:opacity-50"
                 >
                   {saving ? <Loader2 size={13} className="animate-spin" /> : <Save size={13} />} {saved ? "Guardada" : "Guardar"}
+                </button>
+
+                {/* Audio-recuerdo: la carta narrada con voz */}
+                <span className="mx-1 h-4 w-px bg-neutral-200" />
+                <select
+                  value={voiceId}
+                  onChange={(e) => setVoiceId(e.target.value)}
+                  className="rounded-lg border border-neutral-300 px-2 py-1.5 text-xs outline-none"
+                  title="Voz de la narración"
+                >
+                  {voices.length === 0 && <option value="">— voces —</option>}
+                  {voices.map((v) => <option key={v.id} value={v.id}>{v.name}</option>)}
+                </select>
+                <button
+                  type="button"
+                  onClick={descargarAudio}
+                  disabled={audioBusy || !voiceId}
+                  className="inline-flex items-center gap-1.5 rounded-lg bg-neutral-900 px-3 py-1.5 text-xs font-semibold text-white hover:bg-neutral-700 disabled:opacity-50"
+                >
+                  {audioBusy ? <Loader2 size={13} className="animate-spin" /> : <Volume2 size={13} />} Carta en voz
                 </button>
               </div>
             </div>
