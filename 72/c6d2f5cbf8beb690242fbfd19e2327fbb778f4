@@ -1,0 +1,32 @@
+prisma/migrations/20260616100000_add_capsula_carta/migration.sql
+  s_a44e906d905f48::t_854f4f9f253038 1-3
+app/admin/_components/AdminSidebar.tsx
+  s_a44e906d905f48::t_017c3869d9df77 58
+  s_a44e906d905f48::t_9d5e58a34e07d7 30
+app/admin/capsula/sesiones/page.tsx
+  s_a44e906d905f48::t_e4f3ff630fc4ba 1-44
+app/api/admin/capsula/carta/route.ts
+  s_a44e906d905f48::t_1b9707390f9c73 1-69
+app/api/capsula/sesion/[id]/route.ts
+  s_a44e906d905f48::t_2748298653bea4 47-48,50,57-58
+prisma/schema.prisma
+  s_a44e906d905f48::t_f8331e61468430 558-559
+app/admin/capsula/sesiones/SesionesManager.tsx
+  s_a44e906d905f48::t_119bbf26aac686 1-163
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.7",
+  "base_commit_sha": "72c6d2f5cbf8beb690242fbfd19e2327fbb778f4",
+  "prompts": {},
+  "sessions": {
+    "s_a44e906d905f48": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "81ebd0fe-fabf-4fa7-bbd2-edb830fa5e8e",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}
