@@ -1,0 +1,46 @@
+app/admin/_components/AdminSidebar.tsx
+  s_a44e906d905f48::t_2a433ad70787e0 27
+  s_a44e906d905f48::t_0f5439cdf17462 54
+app/api/capsula/sesion/[id]/route.ts
+  s_a44e906d905f48::t_ac62ff10078c34 1-60
+app/capsula/page.tsx
+  s_a44e906d905f48::t_c3e790620fb6d8 11
+  s_a44e906d905f48::t_42b5fe6318e0c7 31,33
+app/api/admin/capsula/generar-guion/route.ts
+  s_a44e906d905f48::t_a6616c5452d2ca 4
+  s_a44e906d905f48::t_f4dd1bdec7ea39 1-3,5-56,58-145
+  s_a44e906d905f48::t_b91114d6aa51c4 57
+app/admin/capsula/torre/page.tsx
+  s_a44e906d905f48::t_b975addee9920d 1-28
+prisma/schema.prisma
+  s_a44e906d905f48::t_5341a296615b73 539-562
+app/capsula/CapsulaExperience.tsx
+  s_a44e906d905f48::t_e62875544a9c5f 14-22,27-33
+prisma/migrations/20260615150000_add_capsula_session/migration.sql
+  s_a44e906d905f48::t_f2fbb75229a8ec 1-26
+app/api/admin/capsula/chat/route.ts
+  s_a44e906d905f48::t_50dbd1c7556745 1-50
+app/capsula/CapsulaAudio.tsx
+  s_a44e906d905f48::t_cf5e43db0d72b5 88
+  s_a44e906d905f48::t_1cab84b0032a9f 70,76
+  s_a44e906d905f48::t_45e58ff86e6bf0 601-621
+  s_a44e906d905f48::t_f5298c051e7dae 425-439
+app/admin/capsula/torre/TorreDeControl.tsx
+  s_a44e906d905f48::t_47fc71bcd1c5b8 1-243
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.7",
+  "base_commit_sha": "2b00f2e94a23da04bed915791a71a7ae584c13b0",
+  "prompts": {},
+  "sessions": {
+    "s_a44e906d905f48": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "81ebd0fe-fabf-4fa7-bbd2-edb830fa5e8e",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}
