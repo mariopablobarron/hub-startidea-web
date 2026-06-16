@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { CapsulaScene } from "./CapsulaScene";
 import { CapsulaAudio } from "./CapsulaAudio";
+import { CapsulaCopiloto } from "./CapsulaCopiloto";
 import { DESTINOS } from "./destinos";
 
 /**
@@ -31,6 +32,7 @@ export function CapsulaExperience({
         onSelect={setActiveId}
         sesionId={sesionId}
       />
+      {isHost && sesionId && <CapsulaCopiloto sesionId={sesionId} />}
     </>
   );
 }

@@ -105,6 +105,7 @@ export function CapsulaAudio({
   const recorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
   const recStartRef = useRef<number>(0);
+  const speakRef = useRef<((t: string) => Promise<void>) | null>(null);
   const [recording, setRecording] = useState(false);
   const [recInfo, setRecInfo] = useState<string | null>(null);
 
@@ -442,6 +443,17 @@ export function CapsulaAudio({
   useEffect(() => {
     try { window.dispatchEvent(new CustomEvent("capsula:rec", { detail: recording })); } catch {}
   }, [recording]);
+
+  // El copiloto (CapsulaCopiloto) pide lanzar una sugerencia por voz vía evento.
+  useEffect(() => { speakRef.current = speak; });
+  useEffect(() => {
+    const h = (e: Event) => {
+      const t = (e as CustomEvent).detail;
+      if (typeof t === "string" && t.trim()) void speakRef.current?.(t);
+    };
+    window.addEventListener("capsula:say", h);
+    return () => window.removeEventListener("capsula:say", h);
+  }, []);
 
   // HOST: propagar el ambiente al invitado cuando cambia —venga del selector
   // de arriba o de los botones del panel— si el canal de datos está abierto.
