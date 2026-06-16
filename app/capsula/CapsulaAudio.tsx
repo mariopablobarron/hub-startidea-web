@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback } from "react";
 import Script from "next/script";
-import { Mic, MicOff, PhoneCall, Loader2, Volume2, VolumeX } from "lucide-react";
+import { Mic, MicOff, PhoneCall, Loader2, Volume2, VolumeX, Music } from "lucide-react";
 import { MODOS } from "./modos";
 import { DESTINOS } from "./destinos";
 import { startSoundscape, type SoundPreset, type Soundscape } from "./soundscape";
@@ -45,7 +45,8 @@ type DestinoMsg = { type: "destino"; id: string };
 type SonidoMsg = { type: "sonido"; preset: SoundPreset };
 type RecMsg = { type: "rec"; action: "start" | "stop" };
 type RecDoneMsg = { type: "recdone"; ok: boolean };
-type DataMsg = TtsMsg | DestinoMsg | SonidoMsg | RecMsg | RecDoneMsg;
+type MusicMsg = { type: "music"; action: "play" | "stop"; id?: string };
+type DataMsg = TtsMsg | DestinoMsg | SonidoMsg | RecMsg | RecDoneMsg | MusicMsg;
 
 const SOUND_LABEL: Record<SoundPreset, string> = {
   none: "sin fondo", olas: "olas", lluvia: "lluvia", viento: "viento", drone: "presencia",
@@ -86,6 +87,10 @@ export function CapsulaAudio({
   const modo = MODOS.find((m) => m.id === modoId) || MODOS[0];
   const [soundOn, setSoundOn] = useState(true);
   const [customGuion, setCustomGuion] = useState<{ fase: string; texto: string }[]>([]);
+  const [tracks, setTracks] = useState<{ id: string; title: string }[]>([]);
+  const [playingId, setPlayingId] = useState<string | null>(null);
+  const musicAudioRef = useRef<HTMLAudioElement | null>(null);
+  const musicSrcRef = useRef<MediaElementAudioSourceNode | null>(null);
 
   const peerRef = useRef<PeerInstance | null>(null);
   const localStreamRef = useRef<MediaStream | null>(null);
@@ -152,6 +157,14 @@ export function CapsulaAudio({
             const s = ctx.createMediaElementSource(ttsAudioRef.current);
             s.connect(bus);
             ttsSrcRef.current = s;
+          } catch { /* ya conectado */ }
+        }
+        // La música de fondo también va por el bus (audible + grabable).
+        if (musicAudioRef.current && !musicSrcRef.current) {
+          try {
+            const ms = ctx.createMediaElementSource(musicAudioRef.current);
+            ms.connect(bus);
+            musicSrcRef.current = ms;
           } catch { /* ya conectado */ }
         }
       } catch { return null; }
@@ -241,6 +254,24 @@ export function CapsulaAudio({
     }
   }, []);
 
+  // Música de fondo: suena aquí y en el invitado (por el canal de datos).
+  function playMusic(id: string) {
+    const a = musicAudioRef.current;
+    if (!a) return;
+    ensureCtx();
+    a.src = `/api/capsula/musica/${id}`;
+    a.loop = true;
+    a.volume = 0.5; // bajo, para hablar encima
+    void a.play().catch(() => {});
+    setPlayingId(id);
+    try { dataConnRef.current?.send({ type: "music", action: "play", id } as MusicMsg); } catch {}
+  }
+  function stopMusic() {
+    musicAudioRef.current?.pause();
+    setPlayingId(null);
+    try { dataConnRef.current?.send({ type: "music", action: "stop" } as MusicMsg); } catch {}
+  }
+
   // HOST: dispara/detiene la grabación en el invitado por el canal de datos.
   function toggleRecording() {
     if (!dataConnRef.current || dataConnRef.current.open === false) {
@@ -300,8 +331,22 @@ export function CapsulaAudio({
       // El entrevistador recibe el resultado de la subida.
       setRecording(false);
       setRecInfo(msg.ok ? "Grabación guardada ✓" : "No se pudo guardar la grabación");
+    } else if (msg.type === "music") {
+      // El invitado reproduce/para la música que pone el entrevistador.
+      const a = musicAudioRef.current;
+      if (a) {
+        if (msg.action === "play" && msg.id) {
+          ensureCtx();
+          a.src = `/api/capsula/musica/${msg.id}`;
+          a.loop = true;
+          a.volume = 0.5;
+          void a.play().catch(() => {});
+        } else if (msg.action === "stop") {
+          a.pause();
+        }
+      }
     }
-  }, [playTts, onSelect, applySound, startRecording, stopRecording, isHost]);
+  }, [playTts, onSelect, applySound, startRecording, stopRecording, isHost, ensureCtx]);
 
   async function connect() {
     setErr(null);
@@ -438,6 +483,15 @@ export function CapsulaAudio({
     return () => { cancel = true; };
   }, [isHost, sesionId, onSelect]);
 
+  // Cargar la biblioteca de música (solo el host la elige).
+  useEffect(() => {
+    if (!isHost) return;
+    fetch("/api/capsula/musica")
+      .then((r) => (r.ok ? r.json() : { tracks: [] }))
+      .then((d: { tracks?: { id: string; title: string }[] }) => setTracks(d.tracks || []))
+      .catch(() => {});
+  }, [isHost]);
+
   // Emitir el estado de grabación para que la escena 3D muestre el aviso
   // "grabando" anclado a la cámara (visible también dentro de las gafas en VR).
   useEffect(() => {
@@ -492,6 +546,7 @@ export function CapsulaAudio({
       <Script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js" strategy="afterInteractive" />
       <audio ref={voiceAudioRef} autoPlay playsInline className="hidden" />
       <audio ref={ttsAudioRef} autoPlay playsInline className="hidden" />
+      <audio ref={musicAudioRef} loop playsInline className="hidden" />
 
       {/* Estado de conexión (abajo-centro) */}
       <div className="fixed bottom-20 left-1/2 z-50 -translate-x-1/2">
@@ -646,6 +701,27 @@ export function CapsulaAudio({
               </button>
             ))}
           </div>
+
+          {/* Música de fondo (biblioteca) — suena en el invitado por el canal P2P */}
+          {tracks.length > 0 && (
+            <div className="mb-2 flex flex-wrap items-center gap-1.5">
+              <span className="mr-1 inline-flex items-center gap-1 text-[11px] text-white/50">
+                <Music size={12} /> Música:
+              </span>
+              {tracks.map((t) => (
+                <button
+                  key={t.id}
+                  type="button"
+                  onClick={() => (playingId === t.id ? stopMusic() : playMusic(t.id))}
+                  className={`rounded-full px-2.5 py-1 text-[11px] transition ${
+                    playingId === t.id ? "bg-emerald-600 text-white" : "bg-white/10 text-white hover:bg-white/25"
+                  }`}
+                >
+                  {t.title}
+                </button>
+              ))}
+            </div>
+          )}
 
           {/* Voz + texto libre + decir + micro */}
           <div className="flex items-center gap-2">

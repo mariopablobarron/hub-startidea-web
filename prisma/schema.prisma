@@ -562,3 +562,17 @@ model CapsulaSession {
 
   @@index([sala, createdAt])
 }
+
+// Pista de música de la biblioteca de la Cápsula del Tiempo. El archivo vive en
+// el volumen del VPS (subdir "musica" de RECORDINGS_DIR); se sirve por endpoint
+// same-origin para que suene en las gafas del invitado por el canal P2P.
+model MusicTrack {
+  id        String   @id @default(cuid())
+  title     String
+  filename  String
+  mime      String
+  sizeBytes Int
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+}

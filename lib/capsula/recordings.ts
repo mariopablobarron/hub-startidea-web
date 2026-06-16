@@ -29,3 +29,19 @@ export function recordingPath(filename: string): string {
   const safe = path.basename(filename).replace(/[^a-zA-Z0-9._-]/g, "");
   return path.join(RECORDINGS_DIR, safe);
 }
+
+// === Biblioteca de música (mismo volumen, subdir "musica") ===
+export const MUSIC_DIR = path.join(RECORDINGS_DIR, "musica");
+export const MAX_MUSIC_BYTES = 30 * 1024 * 1024; // 30 MB por pista
+export const ALLOWED_MUSIC_MIME = [
+  "audio/mpeg",
+  "audio/mp4",
+  "audio/ogg",
+  "audio/wav",
+  "audio/webm",
+];
+
+export function musicPath(filename: string): string {
+  const safe = path.basename(filename).replace(/[^a-zA-Z0-9._-]/g, "");
+  return path.join(MUSIC_DIR, safe);
+}
