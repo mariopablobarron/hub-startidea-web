@@ -1,0 +1,32 @@
+docs/chat-security.md
+  s_5cc4671b80d79c::t_8f0dab5607c182 1-14
+.github/workflows/security-tests.yml
+  s_5cc4671b80d79c::t_8f0dab5607c182 22
+lib/chat/persist.ts
+  s_5cc4671b80d79c::t_8f0dab5607c182 16,38-40,42,45,52,74,84
+app/api/chat/route.ts
+  s_5cc4671b80d79c::t_58b73ebe8230af 3
+  s_5cc4671b80d79c::t_8f0dab5607c182 22-45,73
+scripts/chat-conversation-security.test.ts
+  s_5cc4671b80d79c::t_8f0dab5607c182 1-79
+package.json
+  s_5cc4671b80d79c::t_8f0dab5607c182 17
+lib/chat/conversationId.ts
+  s_5cc4671b80d79c::t_8f0dab5607c182 1-49
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.23",
+  "base_commit_sha": "6c3a328c5a4a4afabee7dd5f10b64d5312fc8fe6",
+  "prompts": {},
+  "sessions": {
+    "s_5cc4671b80d79c": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "01a026e9-cdb5-7833-a5ac-183a923ec421",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "mariopablobarron <mariopablobarron@users.noreply.github.com>"
+    }
+  }
+}
