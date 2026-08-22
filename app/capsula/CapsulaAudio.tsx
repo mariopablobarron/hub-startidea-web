@@ -46,7 +46,15 @@ type SonidoMsg = { type: "sonido"; preset: SoundPreset };
 type RecMsg = { type: "rec"; action: "start" | "stop" };
 type RecDoneMsg = { type: "recdone"; ok: boolean };
 type MusicMsg = { type: "music"; action: "play" | "stop"; id?: string };
-type DataMsg = TtsMsg | DestinoMsg | SonidoMsg | RecMsg | RecDoneMsg | MusicMsg;
+type CapabilityMsg = { type: "capability"; token: string };
+type DataMsg =
+  | TtsMsg
+  | DestinoMsg
+  | SonidoMsg
+  | RecMsg
+  | RecDoneMsg
+  | MusicMsg
+  | CapabilityMsg;
 
 const SOUND_LABEL: Record<SoundPreset, string> = {
   none: "sin fondo", olas: "olas", lluvia: "lluvia", viento: "viento", drone: "presencia",
@@ -111,14 +119,22 @@ export function CapsulaAudio({
   const chunksRef = useRef<Blob[]>([]);
   const recStartRef = useRef<number>(0);
   const speakRef = useRef<((t: string) => Promise<void>) | null>(null);
+  const capabilityReadyRef = useRef<Promise<void> | null>(isHost ? Promise.resolve() : null);
   const [recording, setRecording] = useState(false);
   const [recInfo, setRecInfo] = useState<string | null>(null);
 
   const guestId = `capsula-${sala}-invitado`;
 
+  const waitForCapability = useCallback(async () => {
+    if (isHost) return;
+    if (!capabilityReadyRef.current) throw new Error("capacidad-no-recibida");
+    await capabilityReadyRef.current;
+  }, [isHost]);
+
   // Reproduce un texto TTS localmente (lo usan host —preview— e invitado).
   const playTts = useCallback(async (text: string, vId: string) => {
     try {
+      await waitForCapability();
       const res = await fetch("/api/capsula/tts", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -132,7 +148,7 @@ export function CapsulaAudio({
         await ttsAudioRef.current.play().catch(() => {});
       }
     } catch { /* silencioso */ }
-  }, []);
+  }, [waitForCapability]);
 
   // AudioContext compartido para el sonido ambiente (creado tras el gesto del
   // usuario al pulsar Conectar; reanudado si el navegador lo suspende).
@@ -200,6 +216,7 @@ export function CapsulaAudio({
     const baseMime = (mimeType || "video/webm").split(";")[0];
     let ok = false;
     try {
+      await waitForCapability();
       const res = await fetch(
         `/api/capsula/recordings?sala=${encodeURIComponent(sala)}&kind=${kind}&dur=${dur}&mime=${encodeURIComponent(baseMime)}`,
         { method: "POST", headers: { "Content-Type": baseMime }, body: blob },
@@ -207,7 +224,7 @@ export function CapsulaAudio({
       ok = res.ok;
     } catch { ok = false; }
     try { dataConnRef.current?.send({ type: "recdone", ok } as RecDoneMsg); } catch {}
-  }, [sala]);
+  }, [sala, waitForCapability]);
 
   // Arranca la grabación: vídeo del lienzo 360 + mezcla de audio (micro +
   // voz del entrevistador + TTS + ambiente). Si no hay lienzo, graba solo audio.
@@ -254,16 +271,23 @@ export function CapsulaAudio({
     }
   }, []);
 
-  // Música de fondo: suena aquí y en el invitado (por el canal de datos).
+  const playMusicLocal = useCallback(async (id: string) => {
+    try {
+      await waitForCapability();
+      const a = musicAudioRef.current;
+      if (!a) return;
+      ensureCtx();
+      a.src = `/api/capsula/musica/${id}`;
+      a.loop = true;
+      a.volume = 0.5; // bajo, para hablar encima
+      await a.play().catch(() => {});
+      setPlayingId(id);
+    } catch { /* el invitado aún no recibió una capacidad válida */ }
+  }, [ensureCtx, waitForCapability]);
+
+  // Música de fondo: suena aquí y se ordena al invitado por datos.
   function playMusic(id: string) {
-    const a = musicAudioRef.current;
-    if (!a) return;
-    ensureCtx();
-    a.src = `/api/capsula/musica/${id}`;
-    a.loop = true;
-    a.volume = 0.5; // bajo, para hablar encima
-    void a.play().catch(() => {});
-    setPlayingId(id);
+    void playMusicLocal(id);
     try { dataConnRef.current?.send({ type: "music", action: "play", id } as MusicMsg); } catch {}
   }
   function stopMusic() {
@@ -317,7 +341,14 @@ export function CapsulaAudio({
   const handleData = useCallback((raw: unknown) => {
     const msg = raw as DataMsg;
     if (!msg || typeof msg !== "object") return;
-    if (msg.type === "tts" && msg.text && msg.voiceId) {
+    if (msg.type === "capability" && typeof msg.token === "string" && msg.token.length <= 4096) {
+      capabilityReadyRef.current = fetch("/api/capsula/capability/activate", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${msg.token}` },
+      }).then((response) => {
+        if (!response.ok) throw new Error("capacidad-invalida");
+      });
+    } else if (msg.type === "tts" && msg.text && msg.voiceId) {
       void playTts(msg.text, msg.voiceId);
     } else if (msg.type === "destino" && msg.id) {
       onSelect(msg.id);
@@ -333,26 +364,31 @@ export function CapsulaAudio({
       setRecInfo(msg.ok ? "Grabación guardada ✓" : "No se pudo guardar la grabación");
     } else if (msg.type === "music") {
       // El invitado reproduce/para la música que pone el entrevistador.
-      const a = musicAudioRef.current;
-      if (a) {
-        if (msg.action === "play" && msg.id) {
-          ensureCtx();
-          a.src = `/api/capsula/musica/${msg.id}`;
-          a.loop = true;
-          a.volume = 0.5;
-          void a.play().catch(() => {});
-        } else if (msg.action === "stop") {
-          a.pause();
-        }
-      }
+      if (msg.action === "play" && msg.id) void playMusicLocal(msg.id);
+      else if (msg.action === "stop") musicAudioRef.current?.pause();
     }
-  }, [playTts, onSelect, applySound, startRecording, stopRecording, isHost, ensureCtx]);
+  }, [playTts, onSelect, applySound, startRecording, stopRecording, isHost, playMusicLocal]);
 
   async function connect() {
     setErr(null);
     setStatus("connecting");
     try {
       if (!window.Peer) throw new Error("Librería de audio aún cargando, reintenta en 2s.");
+      let guestCapability: string | null = null;
+      if (isHost) {
+        const capabilityResponse = await fetch("/api/capsula/capability", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ sala }),
+        });
+        const capabilityData = (await capabilityResponse.json().catch(() => ({}))) as {
+          token?: string;
+        };
+        if (!capabilityResponse.ok || !capabilityData.token) {
+          throw new Error("No se pudo autorizar al invitado. Vuelve a iniciar sesión.");
+        }
+        guestCapability = capabilityData.token;
+      }
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
       localStreamRef.current = stream;
       // Crear AudioContext con el gesto activo + enrutar el micro SOLO a la
@@ -375,6 +411,9 @@ export function CapsulaAudio({
           dc.on("open", () => {
             dataConnRef.current = dc;
             try {
+              if (guestCapability) {
+                dc.send({ type: "capability", token: guestCapability } as CapabilityMsg);
+              }
               dc.send({ type: "destino", id: activeIdRef.current } as DestinoMsg);
               dc.send({ type: "sonido", preset: soundPresetRef.current } as SonidoMsg);
             } catch {}
@@ -391,6 +430,9 @@ export function CapsulaAudio({
               d.on("open", () => {
                 dataConnRef.current = d;
                 try {
+                  if (guestCapability) {
+                    d.send({ type: "capability", token: guestCapability } as CapabilityMsg);
+                  }
                   d.send({ type: "destino", id: activeIdRef.current } as DestinoMsg);
                   d.send({ type: "sonido", preset: soundPresetRef.current } as SonidoMsg);
                 } catch {}

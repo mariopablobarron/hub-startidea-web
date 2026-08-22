@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { authorizeCapsulaRequest } from "@/lib/capsula/security";
 
 /**
  * GET /api/capsula/voices — lista las voces disponibles en la cuenta
@@ -8,9 +9,11 @@ import { NextResponse } from "next/server";
  * Sin API key configurada → 503 (la página lo maneja mostrando aviso).
  */
 export const runtime = "nodejs";
-export const revalidate = 3600;
+export const dynamic = "force-dynamic";
 
-export async function GET() {
+export async function GET(request: Request) {
+  const access = await authorizeCapsulaRequest(request, null);
+  if (!access) return NextResponse.json({ error: "no-autorizado" }, { status: 403 });
   const key = process.env.ELEVENLABS_API_KEY;
   if (!key) {
     return NextResponse.json({ error: "elevenlabs-no-configurado" }, { status: 503 });

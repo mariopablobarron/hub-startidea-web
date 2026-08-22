@@ -131,8 +131,9 @@ export function TorreDeControl() {
           </select>
           <input
             value={sala}
-            onChange={(e) => setSala(e.target.value)}
+            onChange={(e) => setSala(e.target.value.replace(/[^A-Za-z0-9_-]/g, "").slice(0, 40))}
             placeholder="sala"
+            maxLength={40}
             className="rounded-lg border border-neutral-300 px-3 py-2 text-sm outline-none focus:border-neutral-500"
             title="Código de sala (igual en las gafas)"
           />

@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { CapsulaExperience } from "./CapsulaExperience";
+import { requireAdmin } from "@/lib/auth/roles";
+import { normalizeCapsulaSala } from "@/lib/capsula/capability";
 
 export const metadata: Metadata = {
   title: "Cápsula del Tiempo · Experiencia VR",
@@ -27,8 +29,14 @@ type Props = {
 export default async function CapsulaPage({ searchParams }: Props) {
   const sp = await searchParams;
   const isHost = sp.host === "1";
-  const sala = sp.sala || "estudio";
+  const sala = normalizeCapsulaSala(sp.sala || "estudio") || "estudio";
   const sesionId = sp.sesion || null;
+
+  if (isHost) {
+    const query = new URLSearchParams({ host: "1", sala });
+    if (sesionId) query.set("sesion", sesionId);
+    await requireAdmin(`/capsula?${query.toString()}`);
+  }
 
   return <CapsulaExperience sala={sala} isHost={isHost} sesionId={sesionId} />;
 }

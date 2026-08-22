@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db/prisma";
-import { hasRole } from "@/lib/auth/roles";
+import { authorizeCapsulaRequest } from "@/lib/capsula/security";
 
 /**
  * Sesión personalizada de la Cápsula del Tiempo.
  *
- * GET  — same-origin: devuelve el guion + meta para el panel del entrevistador
+ * GET  — solo ADMIN: devuelve el guion + meta para el panel del entrevistador
  *        en vivo (/capsula?host=1&sesion=<id>). NO expone el contexto del
  *        invitado ni el transcript (datos sensibles), solo las frases a lanzar.
  * PATCH — solo ADMIN: edita el guion (ajustes del entrevistador) o la nota.
@@ -13,17 +13,9 @@ import { hasRole } from "@/lib/auth/roles";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-function sameOrigin(req: Request): boolean {
-  const host = req.headers.get("host") || "";
-  if (!host) return false;
-  const origin = req.headers.get("origin") || req.headers.get("referer") || "";
-  return origin.includes(host);
-}
-
 export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
-  if (!sameOrigin(req)) {
-    return NextResponse.json({ error: "origen-no-permitido" }, { status: 403 });
-  }
+  const access = await authorizeCapsulaRequest(req, null);
+  if (!access) return NextResponse.json({ error: "no-autorizado" }, { status: 403 });
   const { id } = await params;
   const s = await prisma.capsulaSession.findUnique({
     where: { id },
@@ -37,9 +29,8 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
 }
 
 export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
-  if (!(await hasRole(["ADMIN"]))) {
-    return NextResponse.json({ error: "no autorizado" }, { status: 403 });
-  }
+  const access = await authorizeCapsulaRequest(req, null, { requireSameOrigin: true });
+  if (!access) return NextResponse.json({ error: "no autorizado" }, { status: 403 });
   const { id } = await params;
   const body = (await req.json().catch(() => ({}))) as {
     guion?: Array<{ fase?: string; texto?: string }>;
