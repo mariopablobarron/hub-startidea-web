@@ -1,5 +1,6 @@
 import { createOpenRouter } from "@openrouter/ai-sdk-provider";
 import { convertToModelMessages, streamText, stepCountIs, type UIMessage } from "ai";
+import { InvalidConversationIdError, resolveConversationId } from "@/lib/chat/conversationId";
 import { buildSystemPrompt } from "@/lib/chat/systemPrompt";
 import { checkRateLimit, fingerprintFrom } from "@/lib/chat/rateLimit";
 import { saveConversationTurn } from "@/lib/chat/persist";
@@ -18,6 +19,30 @@ function uiMessageText(m: UIMessage): string {
 }
 
 export async function POST(req: Request) {
+  let body: { messages?: unknown; conversationId?: unknown };
+  try {
+    const parsed: unknown = await req.json();
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+      throw new Error("body inválido");
+    }
+    body = parsed as { messages?: unknown; conversationId?: unknown };
+  } catch {
+    return Response.json({ error: "invalid_request", message: "JSON inválido" }, { status: 400 });
+  }
+
+  let conversationId: string;
+  try {
+    conversationId = resolveConversationId(body.conversationId);
+  } catch (error) {
+    if (error instanceof InvalidConversationIdError) {
+      return Response.json(
+        { error: "invalid_conversation_id", message: "conversationId inválido" },
+        { status: 400 },
+      );
+    }
+    throw error;
+  }
+
   const apiKey = process.env.OPENROUTER_API_KEY;
   if (!apiKey) {
     return new Response("OpenRouter API key no configurada", { status: 503 });
@@ -45,12 +70,7 @@ export async function POST(req: Request) {
     );
   }
 
-  const body = (await req.json()) as {
-    messages: UIMessage[];
-    conversationId?: string;
-  };
-  const messages = body.messages || [];
-  const conversationId = body.conversationId || crypto.randomUUID();
+  const messages = Array.isArray(body.messages) ? (body.messages as UIMessage[]) : [];
 
   const openrouter = createOpenRouter({
     apiKey,
