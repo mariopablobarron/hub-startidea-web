@@ -13,6 +13,7 @@
  */
 
 import { commitFile } from "@/lib/admin/persist";
+import { conversationStoragePath, normalizeConversationId } from "@/lib/chat/conversationId";
 
 type BufferedConversation = {
   id: string;
@@ -34,18 +35,21 @@ export async function saveConversationTurn(opts: {
   assistantMessage: { role: string; content: string };
   usage?: { promptTokens?: number; completionTokens?: number };
 }) {
+  // Defensa en profundidad: aunque otro caller omita la validación HTTP,
+  // persistencia nunca acepta un identificador que pueda convertirse en ruta.
+  const conversationId = normalizeConversationId(opts.conversationId);
   const now = new Date().toISOString();
-  let conv = buffer.get(opts.conversationId);
+  let conv = buffer.get(conversationId);
   if (!conv) {
     conv = {
-      id: opts.conversationId,
+      id: conversationId,
       fingerprint: opts.fingerprint,
       startedAt: now,
       lastMessageAt: now,
       messages: [],
       totalUsage: { promptTokens: 0, completionTokens: 0 },
     };
-    buffer.set(opts.conversationId, conv);
+    buffer.set(conversationId, conv);
   }
 
   if (opts.userMessage) {
@@ -67,7 +71,7 @@ export async function saveConversationTurn(opts: {
   // (Re)programa el flush
   if (conv.flushTimer) clearTimeout(conv.flushTimer);
   conv.flushTimer = setTimeout(() => {
-    void flushConversation(opts.conversationId).catch((e) =>
+    void flushConversation(conversationId).catch((e) =>
       console.error("[chat] flush failed:", e),
     );
   }, FLUSH_DELAY_MS);
@@ -77,9 +81,7 @@ async function flushConversation(conversationId: string) {
   const conv = buffer.get(conversationId);
   if (!conv) return;
 
-  // Filename con fecha para que sea fácil ordenar y purgar viejos.
-  const date = conv.startedAt.slice(0, 10); // YYYY-MM-DD
-  const path = `data/conversations/${date}/${conversationId}.json`;
+  const path = conversationStoragePath(conv.startedAt, conversationId);
   const payload = {
     id: conv.id,
     fingerprint: conv.fingerprint,
