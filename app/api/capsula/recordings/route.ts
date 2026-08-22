@@ -3,6 +3,9 @@ import { createWriteStream } from "node:fs";
 import { mkdir, rm } from "node:fs/promises";
 import { Readable } from "node:stream";
 import { prisma } from "@/lib/db/prisma";
+import { normalizeCapsulaSala } from "@/lib/capsula/capability";
+import { capsulaQuotaStore } from "@/lib/capsula/quota";
+import { authorizeCapsulaRequest } from "@/lib/capsula/security";
 import {
   RECORDINGS_DIR,
   MAX_RECORDING_BYTES,
@@ -18,31 +21,27 @@ import {
  * bufferizamos el archivo entero en memoria) contando bytes para cortar si
  * supera el límite. Metadatos por query: ?sala=&kind=audio|video&dur=&mime=.
  *
- * Guard de mismo-origen (el invitado es anónimo, no puede autenticarse): solo
- * se acepta desde la propia web. Las grabaciones NUNCA son públicas.
+ * El invitado usa una capacidad de corta duración entregada por el host
+ * autenticado. Las grabaciones NUNCA son públicas.
  */
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-function sameOrigin(req: Request): boolean {
-  const host = req.headers.get("host") || "";
-  if (!host) return false;
-  const origin = req.headers.get("origin") || req.headers.get("referer") || "";
-  return origin.includes(host);
-}
-
 export async function POST(req: Request) {
-  if (!sameOrigin(req)) {
-    return NextResponse.json({ error: "origen-no-permitido" }, { status: 403 });
-  }
+  const access = await authorizeCapsulaRequest(req, "recording:create", {
+    requireSameOrigin: true,
+  });
+  if (!access) return NextResponse.json({ error: "no-autorizado" }, { status: 403 });
   if (!req.body) {
     return NextResponse.json({ error: "sin cuerpo" }, { status: 400 });
   }
 
   const url = new URL(req.url);
-  const sala =
-    (url.searchParams.get("sala") || "estudio").slice(0, 40).replace(/[^a-zA-Z0-9_-]/g, "") ||
-    "estudio";
+  const sala = normalizeCapsulaSala(url.searchParams.get("sala") || "estudio");
+  if (!sala) return NextResponse.json({ error: "sala-invalida" }, { status: 400 });
+  if (access.kind === "capability" && access.claims.sala !== sala) {
+    return NextResponse.json({ error: "sala-no-autorizada" }, { status: 403 });
+  }
   const kind = url.searchParams.get("kind") === "audio" ? "AUDIO" : "VIDEO";
   const mime = url.searchParams.get("mime") || req.headers.get("content-type") || "video/webm";
   const durRaw = parseInt(url.searchParams.get("dur") || "", 10);
@@ -50,6 +49,12 @@ export async function POST(req: Request) {
 
   if (!ALLOWED_RECORDING_MIME.some((m) => mime.startsWith(m))) {
     return NextResponse.json({ error: "tipo no permitido", mime }, { status: 415 });
+  }
+  if (
+    access.kind === "capability" &&
+    !capsulaQuotaStore.reserveRecording(access.claims.jti, access.claims.exp * 1000)
+  ) {
+    return NextResponse.json({ error: "cuota-grabaciones-agotada" }, { status: 429 });
   }
 
   const ext = mime.includes("mp4") ? "mp4" : mime.includes("ogg") ? "ogg" : "webm";
@@ -92,6 +97,17 @@ export async function POST(req: Request) {
   if (bytes === 0) {
     await rm(filePath, { force: true }).catch(() => {});
     return NextResponse.json({ error: "grabación vacía" }, { status: 400 });
+  }
+  if (
+    access.kind === "capability" &&
+    !capsulaQuotaStore.commitRecordingBytes(
+      access.claims.jti,
+      bytes,
+      access.claims.exp * 1000,
+    )
+  ) {
+    await rm(filePath, { force: true }).catch(() => {});
+    return NextResponse.json({ error: "cuota-bytes-agotada" }, { status: 429 });
   }
 
   const rec = await prisma.recording.create({

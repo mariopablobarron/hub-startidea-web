@@ -1,4 +1,6 @@
 import { NextResponse } from "next/server";
+import { authorizeCapsulaRequest } from "@/lib/capsula/security";
+import { capsulaQuotaStore } from "@/lib/capsula/quota";
 
 /**
  * POST /api/capsula/tts — genera audio TTS con ElevenLabs.
@@ -16,25 +18,9 @@ export const dynamic = "force-dynamic";
 
 const MODEL = "eleven_multilingual_v2"; // soporta español con calidad
 
-/**
- * Guard de mismo-origen: el TTS consume créditos de ElevenLabs, así que
- * solo lo permitimos desde la propia web (la experiencia /capsula). No
- * rompe el flujo anónimo del invitado —el navegador envía Origin/Referer
- * en el fetch same-origin— pero corta llamadas directas con curl/scripts.
- * No es infalible (el header es falsificable) pero eleva la barrera frente
- * al abuso casual; el límite de 1000 chars es la segunda capa.
- */
-function sameOrigin(req: Request): boolean {
-  const host = req.headers.get("host") || "";
-  if (!host) return false;
-  const origin = req.headers.get("origin") || req.headers.get("referer") || "";
-  return origin.includes(host);
-}
-
 export async function POST(req: Request) {
-  if (!sameOrigin(req)) {
-    return NextResponse.json({ error: "origen-no-permitido" }, { status: 403 });
-  }
+  const access = await authorizeCapsulaRequest(req, "tts", { requireSameOrigin: true });
+  if (!access) return NextResponse.json({ error: "no-autorizado" }, { status: 403 });
   const key = process.env.ELEVENLABS_API_KEY;
   if (!key) {
     return NextResponse.json({ error: "elevenlabs-no-configurado" }, { status: 503 });
@@ -53,6 +39,16 @@ export async function POST(req: Request) {
   }
   if (text.length > 1000) {
     return NextResponse.json({ error: "texto demasiado largo (máx 1000)" }, { status: 400 });
+  }
+  if (
+    access.kind === "capability" &&
+    !capsulaQuotaStore.consumeTts(
+      access.claims.jti,
+      text.length,
+      access.claims.exp * 1000,
+    )
+  ) {
+    return NextResponse.json({ error: "cuota-tts-agotada" }, { status: 429 });
   }
 
   try {

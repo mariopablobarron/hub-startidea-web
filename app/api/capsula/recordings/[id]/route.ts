@@ -3,8 +3,8 @@ import { createReadStream } from "node:fs";
 import { stat } from "node:fs/promises";
 import { Readable } from "node:stream";
 import { prisma } from "@/lib/db/prisma";
-import { hasRole } from "@/lib/auth/roles";
 import { recordingPath } from "@/lib/capsula/recordings";
+import { authorizeCapsulaRequest } from "@/lib/capsula/security";
 
 /**
  * GET /api/capsula/recordings/[id] — sirve una grabación (solo ADMIN).
@@ -20,9 +20,8 @@ export async function GET(
   req: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  if (!(await hasRole(["ADMIN"]))) {
-    return NextResponse.json({ error: "no autorizado" }, { status: 403 });
-  }
+  const access = await authorizeCapsulaRequest(req, null);
+  if (!access) return NextResponse.json({ error: "no autorizado" }, { status: 403 });
   const { id } = await params;
   const rec = await prisma.recording.findUnique({ where: { id } });
   if (!rec) {
@@ -82,12 +81,11 @@ export async function GET(
  * Borra el archivo del disco y el registro.
  */
 export async function DELETE(
-  _req: Request,
+  req: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  if (!(await hasRole(["ADMIN"]))) {
-    return NextResponse.json({ error: "no autorizado" }, { status: 403 });
-  }
+  const access = await authorizeCapsulaRequest(req, null, { requireSameOrigin: true });
+  if (!access) return NextResponse.json({ error: "no autorizado" }, { status: 403 });
   const { id } = await params;
   const rec = await prisma.recording.findUnique({ where: { id } });
   if (!rec) {

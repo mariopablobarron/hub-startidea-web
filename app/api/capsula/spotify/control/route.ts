@@ -1,24 +1,19 @@
 import { NextResponse } from "next/server";
 import { getSpotifyAccessToken } from "@/lib/capsula/spotify";
+import { authorizeCapsulaRequest } from "@/lib/capsula/security";
 
 /**
  * POST /api/capsula/spotify/control — controla la reproducción de Spotify desde
- * el panel (same-origin; usa el token guardado de la cuenta del HUB).
+ * el panel ADMIN; usa el token guardado de la cuenta del HUB.
  * action: search | play | pause | next | previous. Para play/pause/next hace
  * falta un dispositivo Spotify activo (móvil/PC/altavoz con Spotify abierto).
  */
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-function sameOrigin(req: Request): boolean {
-  const host = req.headers.get("host") || "";
-  if (!host) return false;
-  const origin = req.headers.get("origin") || req.headers.get("referer") || "";
-  return origin.includes(host);
-}
-
 export async function POST(req: Request) {
-  if (!sameOrigin(req)) return NextResponse.json({ error: "origen-no-permitido" }, { status: 403 });
+  const access = await authorizeCapsulaRequest(req, null, { requireSameOrigin: true });
+  if (!access) return NextResponse.json({ error: "no-autorizado" }, { status: 403 });
   const token = await getSpotifyAccessToken();
   if (!token) return NextResponse.json({ error: "spotify-no-conectado" }, { status: 409 });
 

@@ -3,28 +3,20 @@ import { createReadStream } from "node:fs";
 import { stat, rm } from "node:fs/promises";
 import { Readable } from "node:stream";
 import { prisma } from "@/lib/db/prisma";
-import { hasRole } from "@/lib/auth/roles";
 import { musicPath } from "@/lib/capsula/recordings";
+import { authorizeCapsulaRequest } from "@/lib/capsula/security";
 
 /**
- * GET   — sirve la pista (same-origin) para que suene en la experiencia, con
+ * GET   — sirve la pista a ADMIN o capacidad music:read, con
  *         soporte Range para seek. Cacheable (la música no cambia).
  * DELETE — borra la pista (solo ADMIN).
  */
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-function sameOrigin(req: Request): boolean {
-  const host = req.headers.get("host") || "";
-  if (!host) return false;
-  const origin = req.headers.get("origin") || req.headers.get("referer") || "";
-  return origin.includes(host);
-}
-
 export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
-  if (!sameOrigin(req)) {
-    return NextResponse.json({ error: "origen-no-permitido" }, { status: 403 });
-  }
+  const access = await authorizeCapsulaRequest(req, "music:read");
+  if (!access) return NextResponse.json({ error: "no-autorizado" }, { status: 403 });
   const { id } = await params;
   const t = await prisma.musicTrack.findUnique({ where: { id } });
   if (!t) return NextResponse.json({ error: "no encontrada" }, { status: 404 });
@@ -68,10 +60,9 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
   });
 }
 
-export async function DELETE(_req: Request, { params }: { params: Promise<{ id: string }> }) {
-  if (!(await hasRole(["ADMIN"]))) {
-    return NextResponse.json({ error: "no autorizado" }, { status: 403 });
-  }
+export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const access = await authorizeCapsulaRequest(req, null, { requireSameOrigin: true });
+  if (!access) return NextResponse.json({ error: "no autorizado" }, { status: 403 });
   const { id } = await params;
   const t = await prisma.musicTrack.findUnique({ where: { id } });
   if (!t) return NextResponse.json({ error: "no encontrada" }, { status: 404 });

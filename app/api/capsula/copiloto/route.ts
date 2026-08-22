@@ -1,6 +1,7 @@
 import { createOpenRouter } from "@openrouter/ai-sdk-provider";
 import { convertToModelMessages, streamText, type UIMessage } from "ai";
 import { prisma } from "@/lib/db/prisma";
+import { authorizeCapsulaRequest } from "@/lib/capsula/security";
 
 /**
  * POST /api/capsula/copiloto — copiloto en vivo del entrevistador.
@@ -8,7 +9,7 @@ import { prisma } from "@/lib/db/prisma";
  * Durante la sesión, el entrevistador escribe cómo va reaccionando la persona
  * y la IA sugiere SOLO la siguiente intervención (una frase/pregunta breve,
  * lista para decir). Conoce el contexto del invitado y el guion de la
- * CapsulaSession (?sesion). Same-origin (el host no está logueado); el contexto
+ * CapsulaSession (?sesion). Solo ADMIN; el contexto
  * sensible se usa server-side, nunca se expone al cliente.
  */
 export const runtime = "nodejs";
@@ -16,15 +17,9 @@ export const maxDuration = 60;
 
 const MODEL = process.env.CAPSULA_MODEL || "anthropic/claude-haiku-4.5";
 
-function sameOrigin(req: Request): boolean {
-  const host = req.headers.get("host") || "";
-  if (!host) return false;
-  const origin = req.headers.get("origin") || req.headers.get("referer") || "";
-  return origin.includes(host);
-}
-
 export async function POST(req: Request) {
-  if (!sameOrigin(req)) return new Response("origen-no-permitido", { status: 403 });
+  const access = await authorizeCapsulaRequest(req, null, { requireSameOrigin: true });
+  if (!access) return new Response("no-autorizado", { status: 403 });
   const apiKey = process.env.OPENROUTER_API_KEY;
   if (!apiKey) return new Response("OPENROUTER_API_KEY no configurada", { status: 503 });
 
